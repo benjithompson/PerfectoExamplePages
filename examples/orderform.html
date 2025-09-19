@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Order Entry Form</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Inlined CSS for single-file distribution -->
+  <style>
+/* Base Design Tokens */
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  --color-bg: #ffffff;
+  --color-surface: #f5f7fa;
+  --color-surface-alt: #eef1f5;
+  --color-border: #d0d7e2;
+  --color-border-strong: #b5c0ce;
+  --color-text: #1f2a37;
+  --color-text-light: #5a6b82;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-subtle: #eff6ff;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fee2e2;
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 10px -2px rgba(0,0,0,.08), 0 2px 4px -1px rgba(0,0,0,.06);
+  --focus-ring: 0 0 0 3px rgba(37,99,235,.35);
+  --transition: .16s cubic-bezier(.4,0,.2,1);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-surface-alt: #253248;
+  --color-border: #334155;
+  --color-border-strong: #475569;
+  --color-text: #f1f5f9;
+  --color-text-light: #94a3b8;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-subtle: #1e3a8a;
+  --color-danger: #f87171;
+  --color-danger-bg: #7f1d1d;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,h2,h3,legend { font-weight:600; letter-spacing:.5px; }
+
+h1 { font-size: clamp(1.6rem, 2.2vw, 2.1rem); margin: .25rem 0 1rem; }
+legend { padding:0 .5rem; }
+
+p, small { line-height: 1.45; }
+.intro { margin-top:0; color: var(--color-text-light); }
+
+.visually-hidden {
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+
+/* Layout */
+.app-header, .app-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: .75rem 1rem; gap:.75rem; flex-wrap:wrap;
+  background: var(--color-surface);
+  border-bottom:1px solid var(--color-border);
+}
+.app-footer { margin-top:3rem; border-top:1px solid var(--color-border); border-bottom:none; font-size:.85rem; color:var(--color-text-light); }
+.brand { font-weight:600; font-size:1.1rem; }
+.profile-switcher { display:flex; gap:.5rem; align-items:center; }
+
+.container { max-width:1200px; margin:0 auto; padding:1.25rem clamp(.9rem,2vw,2rem) 3rem; }
+
+form { display:flex; flex-direction:column; gap:2rem; }
+fieldset { border:1px solid var(--color-border); padding:1.25rem clamp(.75rem,1.2vw,1.5rem) 1.5rem; border-radius:var(--radius-md); background:var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  position:relative;
+}
+fieldset legend { font-size: .95rem; font-weight:600; }
+
+.grid { display:grid; gap:1rem 1.1rem; }
+.cols-3 { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+.cols-4 { grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); }
+.col-span-2 { grid-column: span 2; }
+.col-span-4 { grid-column: 1 / -1; }
+
+@media (max-width:780px){
+  .col-span-2 { grid-column: 1 / -1; }
+}
+
+.form-control { display:flex; flex-direction:column; position:relative; }
+.form-control.inline { flex-direction:row; align-items:center; gap:.5rem; }
+.form-control label { font-size:.8rem; font-weight:500; text-transform:uppercase; letter-spacing:.5px; color:var(--color-text-light); margin-bottom:.35rem; }
+.form-control input, .form-control select, .form-control textarea {
+  font: inherit; padding:.65rem .7rem; border:1px solid var(--color-border); background: var(--color-bg); color: var(--color-text); border-radius:var(--radius-sm); line-height:1.2;
+  transition: var(--transition);
+}
+.form-control textarea { resize:vertical; }
+.form-control input:focus, .form-control select:focus, .form-control textarea:focus {
+  outline:none; border-color: var(--color-accent); box-shadow: var(--focus-ring);
+}
+.form-control input:disabled, .form-control textarea:disabled { opacity:.55; cursor:not-allowed; }
+
+.req { color: var(--color-danger); font-weight:600; }
+.hint { color: var(--color-text-light); font-size:.65rem; margin-top:.25rem; }
+
+/* Buttons */
+button, .button { font: inherit; cursor:pointer; }
+button { border:none; }
+.primary, .secondary, .ghost-btn { padding:.7rem 1.1rem; border-radius:var(--radius-sm); font-weight:500; letter-spacing:.3px; display:inline-flex; align-items:center; gap:.4rem; }
+.primary { background:var(--color-accent); color:#fff; box-shadow: var(--shadow-sm); }
+.primary:hover { background:var(--color-accent-hover); }
+.secondary { background:var(--color-surface-alt); color:var(--color-text); border:1px solid var(--color-border); }
+.secondary:hover { background:var(--color-surface); }
+.ghost-btn { background:transparent; color:var(--color-text-light); border:1px solid var(--color-border); }
+.ghost-btn:hover { color:var(--color-text); background:var(--color-surface-alt); }
+
+.actions { display:flex; gap:.75rem; flex-wrap:wrap; }
+
+/* Validation Styles */
+input[required]:user-invalid, textarea[required]:user-invalid {
+  border-color: var(--color-danger); background: var(--color-danger-bg); color:#fff;
+}
+input[required]:user-invalid:focus, textarea[required]:user-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220,38,38,.5);
+}
+
+/* Admin hidden fields */
+[data-admin-hidden] { display:none !important; }
+
+/* Result Preview */
+.result { margin-top:2.5rem; background:var(--color-surface); padding:1.25rem 1rem 1.5rem; border-radius:var(--radius-md); border:1px solid var(--color-border); box-shadow: var(--shadow-sm); }
+.result h2 { margin-top:0; font-size:1rem; letter-spacing:.5px; }
+.code { margin:0; background:var(--color-bg); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--color-border-strong); overflow:auto; font-size:.8rem; line-height:1.35; }
+
+/* Scrollbars (Webkit) */
+.code::-webkit-scrollbar { height:10px; width:10px; }
+.code::-webkit-scrollbar-track { background:transparent; }
+.code::-webkit-scrollbar-thumb { background:var(--color-border-strong); border-radius:20px; }
+
+/* Transitions & Prefers */
+@media (prefers-reduced-motion: reduce){
+  * { animation-duration: .01ms !important; animation-iteration-count:1 !important; transition:none !important; }
+}
+
+/* Utility */
+.fade-in { animation: fade .35s ease; }
+@keyframes fade { from { opacity:0; transform:translateY(4px);} to { opacity:1; transform:translateY(0);} }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">🛒 Order Portal</div>
+    <div class="profile-switcher">
+      <label for="profileRole" class="visually-hidden">Profile Role</label>
+      <select id="profileRole" aria-label="Profile Role">
+        <option value="standard" selected>Standard User</option>
+        <option value="admin">Administrator</option>
+      </select>
+      <button id="toggleTheme" type="button" class="ghost-btn" aria-pressed="false" aria-label="Toggle color theme">🌗</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>New Order</h1>
+    <p class="intro">Enter customer, shipping and order details below. Fields marked with <span class="req">*</span> are required.</p>
+
+    <form id="orderForm" novalidate>
+      <!-- CUSTOMER INFO -->
+      <fieldset>
+        <legend>Customer Information</legend>
+        <div class="grid cols-3">
+          <div class="form-control">
+            <label for="customerId">Customer ID <span class="req">*</span></label>
+            <input id="customerId" name="customerId" required autocomplete="off" />
+            <small class="hint">Internal reference code.</small>
+          </div>
+          <div class="form-control">
+            <label for="firstName">First Name <span class="req">*</span></label>
+            <input id="firstName" name="firstName" required autocomplete="given-name" />
+          </div>
+          <div class="form-control">
+            <label for="lastName">Last Name <span class="req">*</span></label>
+            <input id="lastName" name="lastName" required autocomplete="family-name" />
+          </div>
+          <div class="form-control">
+            <label for="email">Email <span class="req">*</span></label>
+            <input id="email" name="email" type="email" required autocomplete="email" />
+          </div>
+          <div class="form-control">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" />
+          </div>
+          <div class="form-control">
+            <label for="accountType">Account Type</label>
+            <select id="accountType" name="accountType">
+              <option value="retail">Retail</option>
+              <option value="wholesale">Wholesale</option>
+              <option value="vip">VIP</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- SHIPPING ADDRESS -->
+      <fieldset>
+        <legend>Shipping Address</legend>
+        <div class="grid cols-4">
+          <div class="form-control col-span-2">
+            <label for="shipAddress1">Address Line 1 <span class="req">*</span></label>
+            <input id="shipAddress1" name="shipAddress1" required autocomplete="address-line1" />
+          </div>
+          <div class="form-control col-span-2">
+            <label for="shipAddress2">Address Line 2</label>
+            <input id="shipAddress2" name="shipAddress2" autocomplete="address-line2" />
+          </div>
+          <div class="form-control">
+            <label for="shipCity">City <span class="req">*</span></label>
+            <input id="shipCity" name="shipCity" required autocomplete="address-level2" />
+          </div>
+            <div class="form-control">
+            <label for="shipState">State/Prov <span class="req">*</span></label>
+            <input id="shipState" name="shipState" required autocomplete="address-level1" />
+          </div>
+          <div class="form-control">
+            <label for="shipPostal">Postal Code <span class="req">*</span></label>
+            <input id="shipPostal" name="shipPostal" required autocomplete="postal-code" />
+          </div>
+          <div class="form-control">
+            <label for="shipCountry">Country <span class="req">*</span></label>
+            <input id="shipCountry" name="shipCountry" required autocomplete="country-name" />
+          </div>
+          <div class="form-control col-span-4 inline">
+            <input type="checkbox" id="copyToBilling" />
+            <label for="copyToBilling">Use shipping address as billing</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- BILLING ADDRESS (ADMIN ONLY FIELDS) -->
+      <fieldset id="billingFieldset">
+        <legend>Billing Address</legend>
+        <div class="grid cols-4">
+          <div class="form-control col-span-2">
+            <label for="billAddress1">Address Line 1 <span class="req">*</span></label>
+            <input id="billAddress1" name="billAddress1" required autocomplete="address-line1" />
+          </div>
+          <div class="form-control col-span-2">
+            <label for="billAddress2">Address Line 2</label>
+            <input id="billAddress2" name="billAddress2" autocomplete="address-line2" />
+          </div>
+          <div class="form-control">
+            <label for="billCity">City <span class="req">*</span></label>
+            <input id="billCity" name="billCity" required autocomplete="address-level2" />
+          </div>
+          <div class="form-control">
+            <label for="billState">State/Prov <span class="req">*</span></label>
+            <input id="billState" name="billState" required autocomplete="address-level1" />
+          </div>
+          <div class="form-control">
+            <label for="billPostal">Postal Code <span class="req">*</span></label>
+            <input id="billPostal" name="billPostal" required autocomplete="postal-code" />
+          </div>
+            <div class="form-control">
+            <label for="billCountry">Country <span class="req">*</span></label>
+            <input id="billCountry" name="billCountry" required autocomplete="country-name" />
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ORDER DETAILS -->
+      <fieldset>
+        <legend>Order Details</legend>
+        <div class="grid cols-4">
+          <div class="form-control">
+            <label for="orderNumber">Order # <span class="req">*</span></label>
+            <input id="orderNumber" name="orderNumber" required />
+          </div>
+          <div class="form-control">
+            <label for="orderDate">Order Date <span class="req">*</span></label>
+            <input id="orderDate" name="orderDate" type="date" required />
+          </div>
+          <div class="form-control">
+            <label for="shipMethod">Ship Method</label>
+            <select id="shipMethod" name="shipMethod">
+              <option>Ground</option>
+              <option>2-Day</option>
+              <option>Overnight</option>
+            </select>
+          </div>
+          <div class="form-control">
+            <label for="currency">Currency</label>
+            <select id="currency" name="currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </div>
+          <div class="form-control col-span-2">
+            <label for="specialInstructions">Special Instructions</label>
+            <textarea id="specialInstructions" name="specialInstructions" rows="2"></textarea>
+          </div>
+          <div class="form-control">
+            <label for="discountCode">Discount Code</label>
+            <input id="discountCode" name="discountCode" />
+          </div>
+          <div class="form-control">
+            <label for="salesRep">Sales Rep</label>
+            <input id="salesRep" name="salesRep" />
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- PAYMENT -->
+      <fieldset>
+        <legend>Payment</legend>
+        <div class="grid cols-4">
+          <div class="form-control">
+            <label for="cardName">Name on Card <span class="req">*</span></label>
+            <input id="cardName" name="cardName" required autocomplete="cc-name" />
+          </div>
+          <div class="form-control">
+            <label for="cardNumber">Card Number <span class="req">*</span></label>
+            <input id="cardNumber" name="cardNumber" required inputmode="numeric" autocomplete="cc-number" />
+          </div>
+          <div class="form-control">
+            <label for="exp">Exp (MM/YY) <span class="req">*</span></label>
+            <input id="exp" name="exp" required inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" />
+          </div>
+          <div class="form-control">
+            <label for="cvv">CVV <span class="req">*</span></label>
+            <input id="cvv" name="cvv" required inputmode="numeric" autocomplete="cc-csc" />
+          </div>
+          <div class="form-control col-span-2">
+            <label for="billingNotes">Billing Notes</label>
+            <textarea id="billingNotes" name="billingNotes" rows="2"></textarea>
+          </div>
+          <div class="form-control col-span-2">
+            <label for="internalNotes">Internal Notes (Admin)</label>
+            <textarea id="internalNotes" name="internalNotes" rows="2" data-admin></textarea>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit" class="primary">Submit Order</button>
+        <button type="reset" class="secondary">Reset</button>
+      </div>
+    </form>
+
+    <section id="result" aria-live="polite" class="result" hidden>
+      <h2>Submission Preview</h2>
+      <pre id="resultPre" class="code"></pre>
+    </section>
+  </main>
+
+  <footer class="app-footer">Order Portal Demo • <span id="year"></span></footer>
+
+  <!-- Inlined JS for single-file distribution -->
+  <script>
+/* Main App Logic */
+(function(){
+  const form = document.getElementById('orderForm');
+  const profileRole = document.getElementById('profileRole');
+  const billingFieldset = document.getElementById('billingFieldset');
+  const copyToBilling = document.getElementById('copyToBilling');
+  const resultSection = document.getElementById('result');
+  const resultPre = document.getElementById('resultPre');
+  const toggleThemeBtn = document.getElementById('toggleTheme');
+  const yearEl = document.getElementById('year');
+  yearEl.textContent = new Date().getFullYear();
+
+  // Fields marked admin only via data-admin
+  const adminOnly = [...form.querySelectorAll('[data-admin]')];
+
+  function applyRole(role){
+    const isAdmin = role === 'admin';
+    // Admin only fields
+    adminOnly.forEach(el => {
+      const wrapper = el.closest('.form-control');
+      if(!wrapper) return;
+      if(isAdmin){
+        wrapper.removeAttribute('data-admin-hidden');
+      } else {
+        wrapper.setAttribute('data-admin-hidden','');
+      }
+    });
+    // Billing fieldset hidden for standard users
+    billingFieldset.style.display = isAdmin ? '' : 'none';
+  }
+
+  profileRole.addEventListener('change', e => applyRole(e.target.value));
+  applyRole(profileRole.value);
+
+  // Theme toggle
+  toggleThemeBtn.addEventListener('click', () => {
+    const root = document.documentElement;
+    const current = root.getAttribute('data-theme') || 'light';
+    const next = current === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    toggleThemeBtn.setAttribute('aria-pressed', String(next==='dark'));
+  });
+
+  // Copy shipping to billing
+  copyToBilling.addEventListener('change', () => {
+    if(copyToBilling.checked){
+      const map = ['Address1','Address2','City','State','Postal','Country'];
+      map.forEach(part => {
+        const ship = document.getElementById('ship'+part);
+        const bill = document.getElementById('bill'+part);
+        if(ship && bill){
+          bill.value = ship.value;
+          bill.setAttribute('disabled','disabled');
+        }
+      });
+    } else {
+      ['billAddress1','billAddress2','billCity','billState','billPostal','billCountry'].forEach(id => {
+        const el = document.getElementById(id); if(el){ el.removeAttribute('disabled'); }
+      });
+    }
+  });
+
+  // If shipping changes while copy is on, update billing
+  form.addEventListener('input', (e) => {
+    if(!copyToBilling.checked) return;
+    const id = e.target.id;
+    if(id.startsWith('ship')){
+      const billingId = id.replace('ship','bill');
+      const bill = document.getElementById(billingId);
+      if(bill){ bill.value = e.target.value; }
+    }
+  });
+
+  // Basic validation on submit plus preview
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    resultSection.hidden = true;
+
+    // HTML5 constraint API
+    if(!form.checkValidity()){
+      form.reportValidity();
+      return;
+    }
+
+    const data = formToObject(new FormData(form));
+    data._meta = { submittedAt: new Date().toISOString(), role: profileRole.value };
+
+    resultPre.textContent = JSON.stringify(data, null, 2);
+    resultSection.hidden = false;
+    resultSection.classList.add('fade-in');
+  });
+
+  form.addEventListener('reset', () => {
+    setTimeout(()=>{ resultSection.hidden = true; }, 0);
+  });
+
+  function formToObject(fd){
+    const o = {};
+    for(const [k,v] of fd.entries()){
+      // Skip disabled (some browsers include) and internal admin hidden
+      const el = form.elements.namedItem(k);
+      if(el instanceof HTMLElement && el.hasAttribute('disabled')) continue;
+      o[k] = v;
+    }
+    return o;
+  }
+
+  // Format card number & restrict digits
+  const cardNumber = document.getElementById('cardNumber');
+  cardNumber.addEventListener('input', () => {
+    const raw = cardNumber.value.replace(/\D/g,'').slice(0,16);
+    cardNumber.value = raw.replace(/(\d{4})(?=\d)/g,'$1 ');
+  });
+
+  // Exp date formatting MM/YY
+  const exp = document.getElementById('exp');
+  exp.addEventListener('input', () => {
+    let raw = exp.value.replace(/[^\d]/g,'').slice(0,4);
+    if(raw.length >= 3){ raw = raw.slice(0,2) + '/' + raw.slice(2); }
+    exp.value = raw;
+  });
+
+  // CVV restrict
+  const cvv = document.getElementById('cvv');
+  cvv.addEventListener('input', () => {
+    cvv.value = cvv.value.replace(/\D/g,'').slice(0,4);
+  });
+})();
+  </script>
+</body>
+</html>
