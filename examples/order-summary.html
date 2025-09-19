@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Order Summary</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif; margin: 0; line-height: 1.4; padding: 1.25rem clamp(1rem,2vw,2.5rem); background: var(--bg,#fff); color: var(--fg,#222); }
+    h1 { margin-top: 0; font-size: clamp(1.6rem,4vw,2.4rem); }
+    .container { max-width: 1000px; margin: 0 auto; }
+    header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem; }
+    nav a { text-decoration:none; color: #2a62d6; font-weight:500; }
+    nav a:hover, nav a:focus-visible { text-decoration:underline; }
+    .card-grid { display:grid; gap:1rem; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); margin-block:1rem 2rem; }
+    .card { background: rgba(0,0,0,.04); padding:1rem 1.1rem 1.2rem; border-radius:12px; position:relative; backdrop-filter:blur(3px); }
+    @media (prefers-color-scheme: dark){ .card { background: rgba(255,255,255,.08); } }
+    .card h2 { font-size:1.05rem; margin:.2rem 0 .7rem; letter-spacing:.5px; text-transform:uppercase; font-weight:600; opacity:.8; }
+    dl { margin:0; }
+    dt { font-size:.7rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; opacity:.65; }
+    dd { margin:0 0 .9rem; font-size:.95rem; word-break:break-word; }
+    code.inline { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background: rgba(0,0,0,.07); padding:.15rem .4rem; border-radius:6px; font-size:.8rem; }
+    @media (prefers-color-scheme: dark){ code.inline { background: rgba(255,255,255,.12); } }
+    .meta { font-size:.75rem; opacity:.7; }
+    .empty { border:2px dashed rgba(0,0,0,.25); padding:2rem 1.5rem; text-align:center; border-radius:14px; max-width:600px; margin:2rem auto; }
+    @media (prefers-color-scheme: dark){ .empty { border-color: rgba(255,255,255,.28);} }
+    button, a.button { cursor:pointer; font:inherit; padding:.7rem 1.05rem; border-radius:8px; border:1px solid rgba(0,0,0,.25); background:#2a62d6; color:#fff; font-weight:600; letter-spacing:.5px; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; box-shadow:0 2px 4px rgba(0,0,0,.2); }
+    button:hover, a.button:hover, button:focus-visible, a.button:focus-visible { background:#1d4fae; }
+    @media (prefers-color-scheme: dark){ button, a.button { background:#467ceb; border-color:rgba(255,255,255,.25);} button:hover, a.button:hover { background:#5f8feb; } }
+    .actions { margin-top:1rem; display:flex; flex-wrap:wrap; gap:.75rem; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+    footer { margin-top:3rem; font-size:.75rem; opacity:.6; text-align:center; }
+    .fade-in { animation:fade .5s ease; }
+    @keyframes fade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 tabindex="-1" id="pageTitle">Order Summary</h1>
+      <nav><a href="orderform.html">← New Order</a> | <a href="../index.html">Examples Index</a></nav>
+    </header>
+
+    <div id="content" class="fade-in" aria-live="polite"></div>
+  </div>
+  <footer>Generated summary page • <span class="meta">Client-side only demo</span></footer>
+
+<script>
+(function(){
+  const root = document.getElementById('content');
+  let raw; try { raw = sessionStorage.getItem('latestOrder'); } catch(e) {}
+
+  if(!raw){
+    root.innerHTML = `<div class="empty"><h2>No Order Data</h2><p>The session doesn't contain an order. You may have opened this page directly or the data expired.</p><p><a class="button" href="orderform.html">Fill Order Form</a></p></div>`;
+    return;
+  }
+  let data;
+  try { data = JSON.parse(raw); } catch(e){
+    root.innerHTML = `<div class="empty"><h2>Corrupted Data</h2><p>The stored order data could not be parsed.</p><p><a class="button" href="orderform.html">Start Over</a></p></div>`;
+    return; }
+
+  // Helper to build a definition list card
+  function card(title, entries){
+    return `<section class="card" role="region" aria-label="${title}"><h2>${title}</h2><dl>${entries.map(([k,v])=>`<dt>${k}</dt><dd>${v ? sanitize(v): '<em>—</em>'}</dd>`).join('')}</dl></section>`;
+  }
+  function sanitize(str){
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+  }
+  function yesNo(val){ return val ? 'Yes' : 'No'; }
+
+  const sections = [];
+  sections.push(card('Customer', [
+    ['First Name', data.firstName],
+    ['Last Name', data.lastName],
+    ['Email', data.email],
+    ['Phone', data.phone]
+  ]));
+
+  sections.push(card('Shipping Address', [
+    ['Line 1', data.shippingAddress1],
+    ['Line 2', data.shippingAddress2],
+    ['City', data.shippingCity],
+    ['State', data.shippingState],
+    ['Postal Code', data.shippingPostal]
+  ]));
+
+  sections.push(card('Billing Address', [
+    ['Use Shipping?', yesNo(data.sameAsShipping)],
+    ['Line 1', data.billingAddress1],
+    ['Line 2', data.billingAddress2],
+    ['City', data.billingCity],
+    ['State', data.billingState],
+    ['Postal Code', data.billingPostal]
+  ]));
+
+  sections.push(card('Order Details', [
+    ['Product ID', data.productId],
+    ['Quantity', data.quantity],
+    ['Expedite?', yesNo(data.expedite)]
+  ]));
+
+  sections.push(card('Payment (Masked)', [
+    ['Card Number', data.cardNumberMasked || '—'],
+    ['Expiration', data.exp || '—'],
+    ['CVV', data.cvvMasked || '—']
+  ]));
+
+  sections.push(card('Meta', [
+    ['Role', data._meta && data._meta.role],
+    ['Source', data._meta && data._meta.source],
+    ['Submitted At', data._meta && data._meta.submittedAt]
+  ]));
+
+  root.innerHTML = `<div class="card-grid">${sections.join('')}</div>` +
+    `<div class="actions"><a class="button" href="orderform.html">Create Another Order</a><button id="clear">Clear Session</button><button id="jsonBtn" type="button">View JSON</button></div>` +
+    `<dialog id="rawDialog"><h2 style="margin-top:0">Raw Data JSON</h2><pre style="max-height:50vh;overflow:auto;background:rgba(0,0,0,.07);padding:1rem;border-radius:8px;">${sanitize(JSON.stringify(data,null,2))}</pre><form method="dialog" style="margin-top:1rem;text-align:right;"><button>Close</button></form></dialog>`;
+
+  const dialog = document.getElementById('rawDialog');
+  document.getElementById('jsonBtn').addEventListener('click', () => dialog.showModal());
+  document.getElementById('clear').addEventListener('click', () => {
+    try { sessionStorage.removeItem('latestOrder'); } catch(e){}
+    location.href = 'orderform.html';
+  });
+
+  // Focus main heading for accessibility after dynamic content insertion
+  requestAnimationFrame(()=> {
+    const heading = document.getElementById('pageTitle');
+    heading && heading.focus();
+  });
+})();
+</script>
+</body>
+</html>

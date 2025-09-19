@@ -447,20 +447,24 @@ input[required]:user-invalid:focus, textarea[required]:user-invalid:focus {
   // Basic validation on submit plus preview
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    resultSection.hidden = true;
-
     // HTML5 constraint API
     if(!form.checkValidity()){
       form.reportValidity();
       return;
     }
-
     const data = formToObject(new FormData(form));
-    data._meta = { submittedAt: new Date().toISOString(), role: profileRole.value };
-
-    resultPre.textContent = JSON.stringify(data, null, 2);
-    resultSection.hidden = false;
-    resultSection.classList.add('fade-in');
+    // Mask sensitive values before storing
+    if(data.cardNumber){ data.cardNumberMasked = data.cardNumber.replace(/\s+/g,'').replace(/.(?=.{4})/g,'•'); delete data.cardNumber; }
+    if(data.cvv){ data.cvvMasked = data.cvv.replace(/./g,'•'); delete data.cvv; }
+    if(data.exp){ data.exp = data.exp; }
+    data._meta = { submittedAt: new Date().toISOString(), role: profileRole.value, source:'orderform' };
+    try {
+      sessionStorage.setItem('latestOrder', JSON.stringify(data));
+    } catch(err){
+      console.warn('Unable to persist order to sessionStorage', err);
+    }
+    // Navigate to summary page (same folder)
+    window.location.href = 'order-summary.html';
   });
 
   form.addEventListener('reset', () => {

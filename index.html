@@ -164,6 +164,7 @@
   </main>
   <footer class="site-footer">&copy; <span id="year"></span> Examples Directory • Auto-generated list</footer>
 
+  <script src="examples/examples-list.js"></script>
   <script>
     (function(){
       const listEl = document.getElementById('examplesList');
@@ -176,13 +177,10 @@
       const yearEl = document.getElementById('year');
       yearEl.textContent = new Date().getFullYear();
 
-      // ================= STATIC EXAMPLES LIST =================
-      // To add a new example: drop an .html file in examples/ and add an entry below.
-      // Keep objects minimal: { file: 'name.html', name: 'Display Name' }
-      const examples = [
-        { file: 'orderform.html', name: 'Order Form' },
-        { file: 'elements.html', name: 'UI Elements' }
-      ].map(x => ({ ...x, href: 'examples/' + x.file }));
+      // ================= STATIC EXAMPLES LIST (External Source) =================
+      // The array window.EXAMPLES is defined in examples/examples-list.js
+      // Each entry: { file: 'page.html', name: 'Display Name' }
+      const examples = (window.EXAMPLES || []).map(x => ({ ...x, href: 'examples/' + x.file }));
       let filtered = examples.slice();
 
       /* ------------------ THEME HANDLING ------------------ */
