@@ -237,11 +237,17 @@
         </div>
       </div>
     </div>
-    <button id="themeToggle" type="button" aria-pressed="false" title="Toggle theme" style="margin-left:auto;">🌗 Theme</button>
-  </header>
+    <div style="display:flex;align-items:center;gap:.6rem;margin-left:auto;flex-wrap:wrap;">
+      <button id="themeToggle" type="button" aria-pressed="false" title="Toggle theme">🌗 Theme</button>
+      <button id="openModalBtn" type="button" class="btn outline" aria-haspopup="dialog">Open Modal</button>
     </div>
   </header>
   <main>
+    <div class="tabs" role="tablist" aria-label="Page Sections" id="pageTabs">
+      <button role="tab" id="page-tab-1" aria-controls="page-panel-1" aria-selected="true" tabindex="0">Components</button>
+      <button role="tab" id="page-tab-2" aria-controls="page-panel-2" aria-selected="false" tabindex="-1">Data & Files</button>
+    </div>
+    <section id="page-panel-1" class="tab-panel active" role="tabpanel" aria-labelledby="page-tab-1">
     <section class="section-intro">
       <h1>Modern UI Elements</h1>
       <p>This page collects a broad set of native + enhanced UI patterns styled minimally and implemented with progressive enhancement and accessibility in mind. Tweak, copy, adapt.</p>
@@ -415,15 +421,7 @@
       </div>
     </div>
 
-    <h2 id="map">Map</h2>
-    <div class="panel" id="mapSection">
-      <p class="muted" style="margin-top:0;">Interactive Leaflet map with a marker and accessible fallback text.</p>
-      <div id="demoMap" role="region" aria-label="Map showing a sample location">
-        <p style="padding:1rem;">Loading map… (If this remains, the map library may be blocked.)</p>
-      </div>
-    </div>
-
-    <h2 id="gallery">Image Gallery</h2>
+  <h2 id="gallery">Image Gallery</h2>
     <div class="panel">
       <p class="muted" style="margin-top:0;">Click a thumbnail to view it larger. ESC or outside click closes. Arrow keys navigate while open.</p>
       <div class="gallery" id="imageGallery" style="display:grid;gap:.75rem;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));">
@@ -441,6 +439,41 @@
         </button>
       </div>
     </div>
+    <h2 id="map">Map</h2>
+    <div class="panel" id="mapSection">
+      <p class="muted" style="margin-top:0;">Interactive Leaflet map with a marker and accessible fallback text.</p>
+      <div id="demoMap" role="region" aria-label="Map showing a sample location">
+        <p style="padding:1rem;">Loading map… (If this remains, the map library may be blocked.)</p>
+      </div>
+    </div>
+    </section>
+    <section id="page-panel-2" class="tab-panel" role="tabpanel" aria-labelledby="page-tab-2">
+      <h2>Data Table</h2>
+      <p class="muted" style="margin-top:0;">Sortable-feel static table (no JS sorting yet) inside a responsive scroll container. Use keyboard to scroll horizontally when constrained.</p>
+      <div class="panel" style="overflow:auto; max-width:100%;">
+        <table id="exampleDataTable" style="border-collapse:collapse; min-width:940px; font-size:.75rem; width:100%;">
+          <thead>
+            <tr style="background:var(--color-surface-alt);">
+              <th style="text-align:left;padding:.6rem .55rem;border:1px solid var(--color-border);">ID</th>
+              <th style="text-align:left;padding:.6rem .55rem;border:1px solid var(--color-border);">Name</th>
+              <th style="text-align:left;padding:.6rem .55rem;border:1px solid var(--color-border);">Department</th>
+              <th style="text-align:left;padding:.6rem .55rem;border:1px solid var(--color-border);">Role</th>
+              <th style="text-align:left;padding:.6rem .55rem;border:1px solid var(--color-border);">Location</th>
+              <th style="text-align:left;padding:.6rem .55rem;border:1px solid var(--color-border);">Status</th>
+              <th style="text-align:left;padding:.6rem .55rem;border:1px solid var(--color-border);">Last Active</th>
+            </tr>
+          </thead>
+          <tbody id="dataTableBody"></tbody>
+        </table>
+      </div>
+      <h2 style="margin-top:3rem;">File Tree</h2>
+      <p class="muted" style="margin-top:0;">Collapsible, keyboard navigable pseudo file system. Use Arrow keys, Enter/Space to toggle folders.</p>
+      <div class="panel" id="fileTreePanel">
+        <ul class="file-tree" id="fileTree" role="tree" aria-label="Example project file structure" style="list-style:none;margin:0;padding:0;font-size:.75rem;line-height:1.35;">
+          <!-- Tree populated by JS -->
+        </ul>
+      </div>
+    </section>
 
   </main>
 
@@ -588,13 +621,13 @@
     });
 
     /* Modal */
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    const openModalBtn = document.getElementById('openModalBtn');
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  const openModalBtn = document.getElementById('openModalBtn');
     const modal = document.getElementById('demoModal');
     let lastFocus = null;
     function openModal(){ lastFocus=document.activeElement; modalBackdrop.classList.add('show'); modalBackdrop.removeAttribute('aria-hidden'); trapFocus(modal); modal.querySelector('button[data-close-modal]')?.focus(); }
     function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); lastFocus && lastFocus.focus(); }
-    openModalBtn.addEventListener('click', openModal);
+  if(openModalBtn){ openModalBtn.addEventListener('click', openModal); }
     modalBackdrop.addEventListener('click', e => { if(e.target===modalBackdrop) closeModal(); });
     modal.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', closeModal));
     document.addEventListener('keydown', e => { if(e.key==='Escape' && modalBackdrop.classList.contains('show')) closeModal(); });
@@ -685,21 +718,7 @@
       start();
     })();
 
-    /* Map */
-    (function(){
-      const script = document.createElement('script');
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-      script.crossOrigin = '';
-      script.onload = initMap;
-      document.head.appendChild(script);
-      function initMap(){
-        if(!window.L) return;
-        const map = L.map('demoMap',{ scrollWheelZoom:false }).setView([37.7749,-122.4194], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
-        L.marker([37.7749,-122.4194]).addTo(map).bindPopup('Sample Marker: San Francisco').openPopup();
-      }
-    })();
+
 
     /* Gallery Lightbox */
     (function(){
@@ -734,6 +753,189 @@
         else if(e.key==='ArrowRight') nav(1);
         else if(e.key==='ArrowLeft') nav(-1);
       });
+    })();
+
+    /* Map */
+    (function(){
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+      script.crossOrigin = '';
+      script.onload = initMap;
+      document.head.appendChild(script);
+      function initMap(){
+        if(!window.L) return;
+        const map = L.map('demoMap',{ scrollWheelZoom:false }).setView([37.7749,-122.4194], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+        L.marker([37.7749,-122.4194]).addTo(map).bindPopup('Sample Marker: San Francisco').openPopup();
+      }
+    })();
+
+    /* Page-Level Tabs (Components / Data & Files) */
+    (function(){
+      const pageTabs = document.querySelectorAll('#pageTabs [role=tab]');
+      const pagePanels = [
+        document.getElementById('page-panel-1'),
+        document.getElementById('page-panel-2')
+      ];
+      const PAGE_TAB_KEY = 'ui-page-tab';
+      function activate(tab, store=true){
+        pageTabs.forEach(t=>{ t.setAttribute('aria-selected','false'); t.tabIndex=-1; });
+        pagePanels.forEach(p=>p.classList.remove('active'));
+        tab.setAttribute('aria-selected','true'); tab.tabIndex=0;
+        const panelId = tab.getAttribute('aria-controls');
+        const panel = document.getElementById(panelId);
+        panel.classList.add('active');
+        if(store){ localStorage.setItem(PAGE_TAB_KEY, tab.id); }
+      }
+      pageTabs.forEach((t,i)=>{
+        t.addEventListener('click',()=>activate(t));
+        t.addEventListener('keydown', e => {
+          const idx = [...pageTabs].indexOf(t);
+          if(e.key==='ArrowRight'){ const n = pageTabs[(idx+1)%pageTabs.length]; n.focus(); activate(n); }
+          else if(e.key==='ArrowLeft'){ const p = pageTabs[(idx-1+pageTabs.length)%pageTabs.length]; p.focus(); activate(p); }
+          else if(e.key==='Home'){ const f=pageTabs[0]; f.focus(); activate(f); }
+          else if(e.key==='End'){ const l=pageTabs[pageTabs.length-1]; l.focus(); activate(l); }
+        });
+      });
+      // Restore previously active tab
+      const savedTabId = localStorage.getItem(PAGE_TAB_KEY);
+      if(savedTabId){ const savedTab = document.getElementById(savedTabId); if(savedTab){ activate(savedTab, false); } }
+    })();
+
+    /* Data Table Population */
+    (function(){
+      const body = document.getElementById('dataTableBody');
+      if(!body) return;
+      const rows = [
+        ['U1023','Alice Johnson','Engineering','Senior Dev','New York','Active','2025-09-18'],
+        ['U1024','Brian Smith','Design','Lead Designer','Remote','Active','2025-09-18'],
+        ['U1025','Carla Ruiz','Product','PM','Austin','Away','2025-09-17'],
+        ['U1026','David Lin','Engineering','QA Analyst','Seattle','Active','2025-09-19'],
+        ['U1027','Elena Petrova','Data','Data Scientist','Chicago','Active','2025-09-19'],
+        ['U1028','Fiona O\'Reilly','Support','Support Lead','Dublin','Offline','2025-09-16'],
+        ['U1029','Gabe Turner','Marketing','SEO Specialist','Denver','Active','2025-09-19'],
+        ['U1030','Hannah Lee','Engineering','Frontend Dev','Remote','Active','2025-09-18'],
+        ['U1031','Ian Brown','Finance','Analyst','New York','Active','2025-09-18'],
+        ['U1032','Jill Carter','HR','HR Manager','Remote','Away','2025-09-17'],
+        ['U1033','Karl Ng','Security','SecOps Eng','Austin','Active','2025-09-19'],
+        ['U1034','Lena Gomez','Product','UX Researcher','Chicago','Active','2025-09-18'],
+        ['U1035','Mike Chen','Engineering','Backend Dev','Seattle','Offline','2025-09-15'],
+        ['U1036','Nina Park','Design','Illustrator','Remote','Active','2025-09-19'],
+        ['U1037','Omar Hassan','Data','ML Engineer','Boston','Active','2025-09-19'],
+        ['U1038','Priya Patel','Support','CSR','Remote','Active','2025-09-18'],
+        ['U1039','Quinn Davis','Engineering','DevOps','Denver','Active','2025-09-19'],
+        ['U1040','Riley Evans','Engineering','Intern','Remote','Away','2025-09-17'],
+        ['U1041','Sara Müller','Legal','Counsel','Berlin','Active','2025-09-19'],
+        ['U1042','Tom Hardy','Operations','Ops Manager','Chicago','Active','2025-09-18'],
+        ['U1043','Uma Singh','Engineering','Full Stack Dev','Austin','Active','2025-09-19'],
+        ['U1044','Victor Wang','Sales','Account Exec','New York','Active','2025-09-19'],
+        ['U1045','Will Jones','Engineering','SRE','Seattle','Offline','2025-09-14']
+      ];
+      const frag = document.createDocumentFragment();
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        r.forEach((cell,i) => {
+          const td = document.createElement('td');
+          td.textContent = cell; td.style.padding='.5rem .55rem'; td.style.border='1px solid var(--color-border)';
+          if(i===0){ td.style.fontWeight='600'; }
+          if(r[5]==='Offline'){ td.style.opacity='.55'; }
+          tr.appendChild(td);
+        });
+        frag.appendChild(tr);
+      });
+      body.appendChild(frag);
+    })();
+
+    /* File Tree */
+    (function(){
+      const treeRoot = document.getElementById('fileTree');
+      if(!treeRoot) return;
+      const data = [
+        { name:'src', type:'dir', children:[
+          { name:'components', type:'dir', children:[
+            { name:'Button.js', type:'file' },
+            { name:'Modal.js', type:'file' },
+            { name:'Tabs.js', type:'file' }
+          ]},
+          { name:'styles', type:'dir', children:[
+            { name:'base.css', type:'file' },
+            { name:'theme.css', type:'file' }
+          ]},
+          { name:'utils', type:'dir', children:[
+            { name:'dom.js', type:'file' },
+            { name:'format.js', type:'file' }
+          ]},
+          { name:'index.js', type:'file' }
+        ]},
+        { name:'public', type:'dir', children:[
+          { name:'favicon.ico', type:'file' },
+          { name:'robots.txt', type:'file' }
+        ]},
+        { name:'package.json', type:'file' },
+        { name:'README.md', type:'file' }
+      ];
+      function createNode(node, depth=0){
+        const li = document.createElement('li');
+        li.style.margin='0'; li.style.padding='0';
+        if(node.type==='dir'){
+          const btn = document.createElement('button');
+          btn.type='button';
+          btn.setAttribute('role','treeitem');
+          btn.setAttribute('aria-expanded','false');
+          btn.textContent = '📁 ' + node.name;
+          btn.style.display='block';
+          btn.style.width='100%';
+          btn.style.textAlign='left';
+          btn.style.background='transparent';
+          btn.style.border='none';
+          btn.style.padding='.3rem .4rem .3rem '+(depth*1.1 + .4)+'rem';
+          btn.style.cursor='pointer';
+          btn.style.font='inherit';
+          btn.style.color='var(--color-text-dim)';
+          btn.addEventListener('click', ()=> toggle(btn, ul));
+          btn.addEventListener('keydown', e => handleKey(e, btn, ul));
+          const ul = document.createElement('ul');
+          ul.role='group';
+          ul.style.listStyle='none'; ul.style.margin='0'; ul.style.padding='0';
+          ul.hidden = true;
+          if(node.children){ node.children.forEach(ch => ul.appendChild(createNode(ch, depth+1))); }
+          li.appendChild(btn); li.appendChild(ul);
+        } else {
+          const div = document.createElement('div');
+          div.setAttribute('role','treeitem');
+          div.textContent = '📄 ' + node.name;
+          div.style.padding='.3rem .4rem .3rem '+(depth*1.1 + 2.1)+'rem';
+          div.style.color='var(--color-text-dim)';
+          div.tabIndex=-1;
+          li.appendChild(div);
+        }
+        return li;
+      }
+      function toggle(btn, ul){
+        const expanded = btn.getAttribute('aria-expanded')==='true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        ul.hidden = expanded;
+        btn.textContent = (expanded? '📁':'📂') + ' ' + btn.textContent.slice(2);
+      }
+      function handleKey(e, btn, ul){
+        if(e.key==='Enter' || e.key===' '){ toggle(btn,ul); e.preventDefault(); }
+        else if(e.key==='ArrowRight'){ if(btn.getAttribute('aria-expanded')==='false'){ toggle(btn,ul);} else { focusFirstChild(ul); } }
+        else if(e.key==='ArrowLeft'){ if(btn.getAttribute('aria-expanded')==='true'){ toggle(btn,ul);} else { focusParent(btn); } }
+        else if(e.key==='ArrowDown'){ focusNext(btn); e.preventDefault(); }
+        else if(e.key==='ArrowUp'){ focusPrev(btn); e.preventDefault(); }
+        else if(e.key==='Home'){ focusFirst(); e.preventDefault(); }
+        else if(e.key==='End'){ focusLast(); e.preventDefault(); }
+      }
+      function visibleTreeItems(){ return [...treeRoot.querySelectorAll('[role=treeitem]')].filter(el => { let cur=el; while(cur && cur!==treeRoot){ if(cur.tagName==='UL' && cur.hidden) return false; cur=cur.parentElement; } return true; }); }
+      function focusNext(cur){ const items=visibleTreeItems(); const i=items.indexOf(cur); if(i>=0 && i<items.length-1){ items[i+1].focus(); } }
+      function focusPrev(cur){ const items=visibleTreeItems(); const i=items.indexOf(cur); if(i>0){ items[i-1].focus(); } }
+      function focusFirst(){ visibleTreeItems()[0]?.focus(); }
+      function focusLast(){ const items=visibleTreeItems(); items[items.length-1]?.focus(); }
+      function focusParent(btn){ const parentUl = btn.parentElement?.parentElement; if(parentUl && parentUl.closest('[role=treeitem]')){ parentUl.closest('[role=treeitem]').focus(); } }
+      function focusFirstChild(ul){ const first = ul.querySelector('[role=treeitem]'); first && first.focus(); }
+      data.forEach(n => treeRoot.appendChild(createNode(n)));
+      treeRoot.querySelector('[role=treeitem]')?.focus();
     })();
 
   })();
