@@ -90,6 +90,10 @@
   /* Card link styling (entire card clickable) */
   #examplesList > li { list-style:none; padding:0; margin:0; background:none; border:none; }
   #examplesList > li > a.example-card { position:relative; display:flex; flex-direction:column; gap:.55rem; text-decoration:none; color:var(--color-text); font-weight:500; letter-spacing:.35px; font-size:.9rem; background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius); padding:1rem .95rem 1.05rem; box-shadow:var(--shadow-sm); overflow:hidden; transition:var(--transition); }
+  /* Force square tiles in grid view (not list view) */
+  #examplesList:not(.list-view) > li > a.example-card { aspect-ratio:1/1; height:auto; align-items:flex-start; }
+  #examplesList:not(.list-view) > li > a.example-card .filename { margin-top:auto; }
+  #examplesList:not(.list-view) > li > a.example-card .example-title { line-height:1.2; }
   #examplesList > li > a.example-card:before { content:""; position:absolute; inset:0; background:linear-gradient(120deg,rgba(37,99,235,.15), transparent 65%); opacity:0; transition:var(--transition); }
   #examplesList > li > a.example-card:hover { border-color:var(--color-accent); transform:translateY(-3px); box-shadow:var(--shadow-md); }
   #examplesList > li > a.example-card:hover:before { opacity:1; }
@@ -152,8 +156,8 @@
   </header>
   <main>
     <section class="hero panel fade-in" aria-labelledby="hero-title">
-      <h1 id="hero-title">Perfecto Webpage Examples</h1>
-      <p class="lead">A collection of example pages to use for testing Perfecto Scriptless/AI capabilities.</p>
+      <h1 id="hero-title">Webpage Examples</h1>
+      <p class="lead">A collection of example pages to use for testing Functional Scriptless/AI capabilities.</p>
     </section>
 
     <section class="examples-wrapper">
@@ -165,14 +169,14 @@
   <footer class="site-footer">&copy; <span id="year"></span> Examples Directory • Auto-generated list</footer>
 
   <script src="examples/examples-list.js"></script>
+  <script src="./theme.js" defer></script>
   <script>
     (function(){
       const listEl = document.getElementById('examplesList');
       const emptyEl = document.getElementById('emptyState');
       const searchInput = document.getElementById('search');
       const gridBtn = document.getElementById('gridBtn');
-      const listBtn = document.getElementById('listBtn');
-      const themeBtn = document.getElementById('themeToggle');
+  const listBtn = document.getElementById('listBtn');
   // Static mode: no reload button / network fetch
       const yearEl = document.getElementById('year');
       yearEl.textContent = new Date().getFullYear();
@@ -180,32 +184,13 @@
       // ================= STATIC EXAMPLES LIST (External Source) =================
       // The array window.EXAMPLES is defined in examples/examples-list.js
       // Each entry: { file: 'page.html', name: 'Display Name' }
-      const examples = (window.EXAMPLES || []).map(x => ({ ...x, href: 'examples/' + x.file }));
+      const examples = (window.EXAMPLES || []).map(x => {
+        const isExternal = /^(https?:)?\/\//i.test(x.file);
+        return { ...x, href: isExternal ? x.file : ('examples/' + x.file), external:isExternal };
+      });
       let filtered = examples.slice();
 
-      /* ------------------ THEME HANDLING ------------------ */
-      const themePrefKey = 'demo-theme';
-      function applyTheme(t){
-        document.documentElement.setAttribute('data-theme', t);
-        themeBtn.setAttribute('aria-pressed', String(t==='dark'));
-      }
-      const savedTheme = localStorage.getItem(themePrefKey);
-      if(savedTheme){
-        applyTheme(savedTheme);
-      } else if(window.matchMedia('(prefers-color-scheme: dark)').matches){
-        applyTheme('dark');
-      }
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if(!localStorage.getItem(themePrefKey)){
-          applyTheme(e.matches ? 'dark' : 'light');
-        }
-      });
-      themeBtn.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
-        localStorage.setItem(themePrefKey, next);
-      });
+      // Theme handled globally (theme.js)
 
       /* ------------------ VIEW MODE ------------------ */
       const viewPrefKey = 'examples-view-mode';
@@ -251,7 +236,14 @@
       function exampleItem(ex){
         const li = document.createElement('li');
         li.className = 'fade-in';
-        li.innerHTML = `<a class="example-card" href="${encodeURI(ex.href)}" aria-label="Open ${escapeHtml(ex.name)} example"><span class="example-title">🔗 ${escapeHtml(ex.name)}</span><span class="filename" aria-label="Filename">${escapeHtml(ex.file)}</span></a>`;
+        const safeHref = encodeURI(ex.href);
+        const externalAttrs = ex.external ? ' target="_blank" rel="noopener noreferrer" data-external="true"' : '';
+        const host = ex.external ? new URL(ex.href, location.href).hostname.replace(/^www\./,'') : '';
+        const icon = ex.external ? '🌐' : '🔗';
+        li.innerHTML = `<a class="example-card" href="${safeHref}" aria-label="Open ${escapeHtml(ex.name)} example${ex.external?' in new tab':''}"${externalAttrs}>`+
+          `<span class="example-title">${icon} ${escapeHtml(ex.name)}${ex.external?` <span style=\"font-size:.55rem;font-weight:600;letter-spacing:.6px;background:var(--color-surface-alt);border:1px solid var(--color-border);padding:.2rem .4rem;border-radius:8px;\">${escapeHtml(host)}<\/span>`:''}</span>`+
+          `<span class="filename" aria-label="${ex.external?'URL':'Filename'}">${escapeHtml(ex.file)}</span>`+
+        `</a>`;
         return li;
       }
 
@@ -265,8 +257,8 @@
       // Enter key focusing first result
       searchInput.addEventListener('keydown', e => {
         if(e.key === 'Enter'){
-          const first = listEl.querySelector('a.example-link');
-            if(first) first.focus();
+          const first = listEl.querySelector('a.example-card');
+          if(first) first.focus();
         }
       });
 

@@ -494,15 +494,10 @@
 
   <footer>&copy; <span id="year"></span> UI Elements Showcase</footer>
 
+  <script src="../theme.js" defer></script>
   <script>
   (function(){
-    const root = document.documentElement;
-    const themeBtn = document.getElementById('themeToggle');
-    const themeKey = 'ui-theme';
-    const saved = localStorage.getItem(themeKey);
-    function applyTheme(t){ root.setAttribute('data-theme', t); themeBtn.setAttribute('aria-pressed', String(t==='dark')); }
-    if(saved) { applyTheme(saved); } else if(window.matchMedia('(prefers-color-scheme: dark)').matches) { applyTheme('dark'); }
-    themeBtn.addEventListener('click', () => { const cur = root.getAttribute('data-theme')==='dark' ? 'dark':'light'; const next = cur==='dark'?'light':'dark'; applyTheme(next); localStorage.setItem(themeKey,next); });
+  // Theme handled globally (theme.js)
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
