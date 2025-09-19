@@ -3,5 +3,6 @@
 // Keep minimal; index.html will derive full href.
 window.EXAMPLES = [
   { file: 'orderform.html', name: 'Order Form' },
-  { file: 'elements.html', name: 'UI Elements' }
+  { file: 'elements.html', name: 'UI Elements' },
+  { file: 'store.html', name: 'Store Showcase' }
 ];
