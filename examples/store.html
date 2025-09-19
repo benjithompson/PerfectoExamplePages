@@ -63,6 +63,26 @@
 
     .layout { display:grid; grid-template-columns:260px 1fr; max-width:1680px; margin:0 auto; padding:1.8rem clamp(1rem,2.4vw,2.3rem) 4rem; gap:2.2rem; }
     .sidebar { position:sticky; top:5.4rem; align-self:start; display:flex; flex-direction:column; gap:1.2rem; }
+    .sidebar-header { display:none; align-items:center; justify-content:space-between; gap:1rem; padding:0 .2rem .3rem; }
+    .close-filters { background:transparent; border:1px solid var(--color-border); color:var(--color-text-dim); font:inherit; font-size:.9rem; width:34px; height:34px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .close-filters:hover { color:var(--color-text); background:var(--color-surface-alt); }
+    .filters-toggle { background:var(--color-surface-alt); border:1px solid var(--color-border); color:var(--color-text-dim); font:inherit; font-size:.65rem; font-weight:600; letter-spacing:.8px; padding:.55rem .9rem; border-radius:var(--radius-pill); cursor:pointer; display:inline-flex; align-items:center; gap:.4rem; }
+    .filters-toggle[aria-expanded="true"] { background:var(--gradient-accent); border-color:var(--color-accent); color:#fff; box-shadow:0 0 0 3px rgba(99,102,241,.3); }
+    .filters-toggle:focus-visible { outline:2px solid var(--color-accent); outline-offset:2px; }
+    /* Offcanvas / collapsible behavior */
+    @media (max-width:940px){
+      .layout { grid-template-columns:1fr; }
+      .sidebar { position:fixed; top:0; left:0; bottom:0; width:300px; max-width:85%; background:var(--color-surface); padding:1.1rem 1rem 2rem; overflow:auto; box-shadow:0 0 0 1px var(--color-border), 8px 0 28px -6px rgba(0,0,0,.55); transform:translateX(-105%); transition:transform .45s var(--transition); z-index:1300; border-right:1px solid var(--color-border); }
+      .sidebar[aria-hidden="false"] { transform:translateX(0); }
+      .sidebar-header { display:flex; }
+      body.filters-open { overflow:hidden; }
+      .filters-overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:opacity .35s var(--transition); z-index:1200; }
+      .filters-overlay.show { opacity:1; pointer-events:auto; }
+    }
+    /* Narrow desktop collapsible (optional) */
+    @media (min-width:941px){
+      .sidebar.collapsed { width:0; padding:0; margin:0; opacity:0; pointer-events:none; }
+    }
     .filter-group { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius); padding:1rem 1rem 1.2rem; box-shadow:var(--shadow-sm); }
     .filter-group h3 { margin:0 0 .9rem; font-size:.72rem; font-weight:600; letter-spacing:.75px; text-transform:uppercase; color:var(--color-text-dim); }
     .filter-group label { display:flex; align-items:center; gap:.55rem; font-size:.75rem; cursor:pointer; padding:.3rem .35rem; border-radius:8px; }
@@ -191,7 +211,8 @@
   </nav>
 </header>
 <main class="layout">
-  <aside class="sidebar" aria-label="Filters">
+  <aside class="sidebar" aria-label="Filters" id="filtersPane" aria-hidden="false">
+    <div class="sidebar-header"><h2 style="margin:0;font-size:.8rem;letter-spacing:.8px;text-transform:uppercase;color:var(--color-text-dim);">Filters</h2><button type="button" class="close-filters" aria-label="Close filters">×</button></div>
     <div class="filter-group" id="categoryFilters">
       <h3>Categories</h3>
       <!-- dynamic category checkboxes -->
@@ -205,6 +226,7 @@
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin:0 0 1.2rem;">
       <h1>Featured Products</h1>
       <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+        <button type="button" id="filtersToggle" class="filters-toggle" aria-controls="filtersPane" aria-expanded="true">Filters</button>
         <input type="search" id="searchInput" placeholder="Search products..." aria-label="Search products" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-pill);padding:.55rem .9rem;font:inherit;font-size:.7rem;color:var(--color-text);min-width:220px;" />
         <select id="sortSelect" aria-label="Sort products" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-pill);padding:.55rem .8rem;font:inherit;font-size:.65rem;color:var(--color-text-dim);">
           <option value="featured">Featured</option>
@@ -381,6 +403,57 @@
   const emptyMsg = document.getElementById('emptyMsg');
   const searchInput = document.getElementById('searchInput');
   const sortSelect = document.getElementById('sortSelect');
+  const filtersPane = document.getElementById('filtersPane');
+  const filtersToggle = document.getElementById('filtersToggle');
+  const closeFiltersBtn = document.querySelector('.close-filters');
+  let filtersOpen = true; // desktop default
+  // Create overlay for filters (mobile) separate from cart overlay to avoid conflicts
+  let filtersOverlay = document.querySelector('.filters-overlay');
+  if(!filtersOverlay){
+    filtersOverlay = document.createElement('div');
+    filtersOverlay.className='filters-overlay';
+    document.body.appendChild(filtersOverlay);
+  }
+
+  function isMobileFilters(){ return window.matchMedia('(max-width:940px)').matches; }
+  function openFilters(){
+    filtersOpen = true;
+    filtersPane.setAttribute('aria-hidden','false');
+    filtersToggle.setAttribute('aria-expanded','true');
+    if(isMobileFilters()){
+      document.body.classList.add('filters-open');
+      filtersOverlay.classList.add('show');
+      // focus first interactive element inside
+      const first = filtersPane.querySelector('input,button,select');
+      if(first) first.focus();
+    }
+  }
+  function closeFilters(){
+    filtersOpen = false;
+    filtersPane.setAttribute('aria-hidden','true');
+    filtersToggle.setAttribute('aria-expanded','false');
+    if(isMobileFilters()){
+      filtersOverlay.classList.remove('show');
+      document.body.classList.remove('filters-open');
+      filtersToggle.focus();
+    }
+  }
+  function toggleFilters(){ filtersOpen ? closeFilters() : openFilters(); }
+  filtersToggle.addEventListener('click', toggleFilters);
+  closeFiltersBtn.addEventListener('click', closeFilters);
+  filtersOverlay.addEventListener('click', closeFilters);
+  window.addEventListener('keydown', e => { if(e.key==='Escape'){ if(filtersOpen && isMobileFilters()) closeFilters(); }});
+  // Adjust state on resize
+  window.addEventListener('resize', () => {
+    if(isMobileFilters()){
+      if(!filtersOpen){ filtersPane.setAttribute('aria-hidden','true'); }
+    } else {
+      // desktop -> always visible logically but we allow collapse memory
+      filtersPane.setAttribute('aria-hidden', filtersOpen? 'false':'true');
+    }
+  });
+  // Initialize correct state for first load
+  if(isMobileFilters()) { closeFilters(); } else { openFilters(); }
 
   function formatCurrency(v){ return '$'+v.toFixed(2); }
 
@@ -479,6 +552,7 @@
   document.addEventListener('change', e => {
     if(e.target.matches('[data-filter-cat], [data-filter-tag]')) renderProducts();
   });
+  // Filters remain reactive even while pane hidden on mobile.
   searchInput.addEventListener('input', () => { renderProducts(); });
   sortSelect.addEventListener('change', () => { renderProducts(); });
 
@@ -550,7 +624,7 @@
   function closeCart(){ cartDrawer.classList.remove('open'); cartDrawer.setAttribute('aria-hidden','true'); overlay.classList.remove('show'); setTimeout(()=> overlay.hidden=true, 300); cartBtn.setAttribute('aria-expanded','false'); lastFocus && lastFocus.focus(); }
 
   let lastFocus = null;
-  cartBtn.addEventListener('click', ()=> { lastFocus=document.activeElement; openCart(); });
+  cartBtn.addEventListener('click', ()=> { lastFocus=document.activeElement; if(isMobileFilters() && filtersOpen) closeFilters(); openCart(); });
   overlay.addEventListener('click', closeCart);
   closeCartBtn.addEventListener('click', closeCart);
   document.addEventListener('keydown', e => { if(e.key==='Escape' && cartDrawer.classList.contains('open')) closeCart(); });
