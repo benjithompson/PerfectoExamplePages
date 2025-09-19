@@ -49,8 +49,9 @@
     a { color:var(--color-accent); text-decoration:none; }
     a:hover { text-decoration:underline; }
 
-    header { position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:1.2rem; padding:.85rem clamp(1rem,3vw,2.2rem); background:rgba(30,41,59,.9); backdrop-filter:blur(18px); border-bottom:1px solid var(--color-border); box-shadow:var(--shadow-sm); }
-    [data-theme=light] header { background:rgba(255,255,255,.85); }
+  html { overflow-y:scroll; }
+  header { position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:1.2rem; padding:.85rem clamp(1rem,3vw,2.2rem); background:var(--color-surface); border-bottom:1px solid var(--color-border); box-shadow:var(--shadow-sm); }
+  [data-theme=light] header { background:var(--color-surface); }
     .brand { display:flex; align-items:center; gap:.75rem; font-weight:600; letter-spacing:.5px; }
     .brand-badge { background:var(--gradient-accent); color:#fff; padding:.45rem .7rem; border-radius:12px; font-size:.6rem; letter-spacing:1px; font-weight:600; box-shadow:0 0 0 4px rgba(99,102,241,.25); }
     nav.primary { margin-left:auto; display:flex; gap:.2rem; }
@@ -58,11 +59,28 @@
     nav.primary a:hover, nav.primary button:hover, nav.primary a.active { color:var(--color-text); background:var(--color-surface-alt); }
     nav.primary button#cartBtn { display:inline-flex; align-items:center; gap:.5rem; }
     nav.primary button#cartBtn span.count { background:var(--gradient-accent); color:#fff; font-size:.55rem; padding:.2rem .45rem; border-radius:12px; min-width:18px; text-align:center; line-height:1; box-shadow:0 0 0 3px rgba(99,102,241,.3); }
+  .menu-toggle { display:none; background:var(--color-surface-alt); border:1px solid var(--color-border); color:var(--color-text); font:inherit; font-size:1.1rem; width:42px; height:42px; border-radius:12px; cursor:pointer; align-items:center; justify-content:center; }
+  .menu-toggle:focus-visible { outline:2px solid var(--color-accent); outline-offset:2px; }
+  @media (max-width:820px){
+    header { transform:none !important; }
+    .menu-toggle { display:inline-flex; }
+    nav.primary { position:fixed; top:0; bottom:0; right:-280px; width:280px; max-width:85%; display:flex; flex-direction:column; padding:5.5rem 1.1rem 2rem; gap:.35rem; background:var(--color-surface); border-left:1px solid var(--color-border); box-shadow:-6px 0 18px -4px rgba(0,0,0,.55); z-index:1500; transition:right .28s var(--transition); }
+    nav.primary.open { right:0; }
+    nav.primary a, nav.primary button { width:100%; text-align:left; }
+    nav.primary .menu-close { display:inline-flex; }
+    nav.primary .menu-close:hover { background:var(--color-surface); color:var(--color-text); }
+    nav.primary .menu-close:focus-visible { outline:2px solid var(--color-accent); outline-offset:2px; }
+    .menu-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .25s var(--transition); z-index:1400; }
+    .menu-overlay.show { opacity:1; pointer-events:auto; }
+  }
   .pulse { animation:pulse-scale .6s ease; }
   @keyframes pulse-scale { 0%{ transform:scale(1);} 40%{ transform:scale(1.18);} 70%{ transform:scale(.94);} 100%{ transform:scale(1);} }
 
-    .layout { display:grid; grid-template-columns:260px 1fr; max-width:1680px; margin:0 auto; padding:1.8rem clamp(1rem,2.4vw,2.3rem) 4rem; gap:2.2rem; }
-    .sidebar { position:sticky; top:5.4rem; align-self:start; display:flex; flex-direction:column; gap:1.2rem; }
+  .layout { display:grid; grid-template-columns:260px 1fr; max-width:1680px; margin:0 auto; padding:1.8rem clamp(1rem,2.4vw,2.3rem) 4rem; gap:2.2rem; transition:grid-template-columns .35s var(--transition); }
+  .layout.filters-collapsed { grid-template-columns:0 1fr; }
+  .layout.filters-collapsed > .sidebar { opacity:0; pointer-events:none; }
+  .sidebar { position:sticky; top:5.4rem; align-self:start; display:flex; flex-direction:column; gap:1.2rem; transition:width .35s var(--transition), padding .3s var(--transition), opacity .25s var(--transition); }
+  .sidebar.collapsed-desktop { width:0 !important; padding:0 !important; margin:0 !important; opacity:0; pointer-events:none; }
     .sidebar-header { display:none; align-items:center; justify-content:space-between; gap:1rem; padding:0 .2rem .3rem; }
     .close-filters { background:transparent; border:1px solid var(--color-border); color:var(--color-text-dim); font:inherit; font-size:.9rem; width:34px; height:34px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .close-filters:hover { color:var(--color-text); background:var(--color-surface-alt); }
@@ -72,11 +90,11 @@
     /* Offcanvas / collapsible behavior */
     @media (max-width:940px){
       .layout { grid-template-columns:1fr; }
-      .sidebar { position:fixed; top:0; left:0; bottom:0; width:300px; max-width:85%; background:var(--color-surface); padding:1.1rem 1rem 2rem; overflow:auto; box-shadow:0 0 0 1px var(--color-border), 8px 0 28px -6px rgba(0,0,0,.55); transform:translateX(-105%); transition:transform .45s var(--transition); z-index:1300; border-right:1px solid var(--color-border); }
+  .sidebar { position:fixed; top:0; left:0; bottom:0; width:300px; max-width:85%; background:var(--color-surface); padding:1.1rem 1rem 2rem; overflow:auto; box-shadow:0 0 0 1px var(--color-border), 8px 0 28px -6px rgba(0,0,0,.55); transform:translateX(-105%); transition:transform .35s var(--transition); z-index:1300; border-right:1px solid var(--color-border); }
       .sidebar[aria-hidden="false"] { transform:translateX(0); }
       .sidebar-header { display:flex; }
-      body.filters-open { overflow:hidden; }
-      .filters-overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:opacity .35s var(--transition); z-index:1200; }
+  body.filters-open { overflow:hidden; }
+  .filters-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .25s var(--transition); z-index:1200; }
       .filters-overlay.show { opacity:1; pointer-events:auto; }
     }
     /* Narrow desktop collapsible (optional) */
@@ -88,6 +106,7 @@
     .filter-group label { display:flex; align-items:center; gap:.55rem; font-size:.75rem; cursor:pointer; padding:.3rem .35rem; border-radius:8px; }
     .filter-group label:hover { background:var(--color-surface-alt); }
     .filter-group input { accent-color:var(--color-accent); }
+    .sidebar.no-transition { transition:none !important; }
 
   .product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.5rem; }
   /* Multi-row independent carousels (8 item chunks, 4 visible window) */
@@ -137,14 +156,8 @@
   @media (max-width:820px){ .product-row { grid-template-columns:160px 1fr; } .row-right { grid-column:1 / -1; flex-direction:row; justify-content:space-between; align-items:center; width:100%; } }
     .product-card { position:relative; background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius); padding:.9rem .9rem 1.15rem; display:flex; flex-direction:column; gap:.75rem; box-shadow:var(--shadow-sm); overflow:hidden; }
     .product-card:hover { box-shadow:var(--shadow-lg); border-color:var(--color-border-strong); }
-    .media-carousel { position:relative; overflow:hidden; border-radius:12px; aspect-ratio:4/3; background:var(--color-surface-alt); }
-    .media-track { display:flex; height:100%; transition:transform .6s var(--transition); }
-    .media-slide { min-width:100%; position:relative; display:flex; align-items:center; justify-content:center; }
-    .media-slide img { width:100%; height:100%; object-fit:cover; display:block; }
-    .carousel-nav { position:absolute; inset:0; display:flex; align-items:center; justify-content:space-between; pointer-events:none; }
-    .carousel-nav button { pointer-events:auto; background:rgba(0,0,0,.45); border:none; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; backdrop-filter:blur(4px); transition:var(--transition); font-size:.9rem; }
-    .carousel-nav button:hover { background:rgba(0,0,0,.7); }
-    [data-theme=light] .carousel-nav button { background:rgba(0,0,0,.35); }
+  .media-carousel { position:relative; overflow:hidden; border-radius:12px; aspect-ratio:4/3; background:var(--color-surface-alt); }
+  .media-carousel.single-image img { width:100%; height:100%; object-fit:cover; display:block; }
     .price-row { display:flex; align-items:center; gap:.6rem; font-size:.85rem; }
     .price-row .price { font-weight:600; font-size:.95rem; }
     .price-row .orig { text-decoration:line-through; opacity:.5; font-size:.7rem; }
@@ -181,6 +194,7 @@
 
     .overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:opacity .35s var(--transition); z-index:1100; }
     .overlay.show { opacity:1; pointer-events:auto; }
+  /* (scroll lock handled via explicit body classes) */
 
     /* Theme toggle */
     #themeToggle { background:var(--color-surface-alt); border:1px solid var(--color-border); color:var(--color-text-dim); font:inherit; font-size:.65rem; font-weight:600; letter-spacing:.7px; padding:.6rem .85rem; border-radius:var(--radius-pill); cursor:pointer; }
@@ -188,9 +202,9 @@
 
     /* Responsive */
     @media (max-width:1100px){ .layout { grid-template-columns:220px 1fr; padding:1.4rem 1.2rem 4rem; } }
-    @media (max-width:940px){ .layout { grid-template-columns:1fr; padding:1.2rem 1rem 4.2rem; } .sidebar { position:static; flex-direction:row; overflow:auto; padding-bottom:.6rem; }
-      .sidebar::-webkit-scrollbar{ height:8px; }
-      .filter-group { min-width:200px; }
+    @media (max-width:940px){
+      .layout { display:block; grid-template-columns:1fr; padding:1.2rem 1rem 4.2rem; }
+      /* original non-offcanvas horizontal scrolling style no longer needed; fixed offcanvas now handled below */
     }
     @media (max-width:620px){ nav.primary { gap:.4rem; } nav.primary a, nav.primary button { padding:.55rem .75rem; } h1 { font-size:1.9rem; } .product-grid { gap:1.1rem; } }
     @media (max-width:480px){ header { padding:.8rem .9rem; } .product-card { padding:.75rem .75rem 1rem; } .cart-drawer { width:100%; } }
@@ -202,14 +216,19 @@
     <span class="brand-badge">Shop</span>
     <strong>Store Showcase</strong>
   </div>
-  <nav class="primary" aria-label="Primary navigation">
-    <a href="../index.html">Index</a>
-    <a href="elements.html">Elements</a>
-    <a href="orderform.html">Order Form</a>
-    <button id="cartBtn" type="button" aria-haspopup="dialog" aria-expanded="false">Cart <span class="count" id="cartCount">0</span></button>
-    <button id="themeToggle" type="button" aria-pressed="false">Theme</button>
-  </nav>
+  <div class="flex-spacer" style="flex:1 1 auto;"></div>
+  <button id="menuToggle" class="menu-toggle" aria-label="Open menu" aria-controls="primaryNav" aria-expanded="false" style="margin-left:auto;">☰</button>
 </header>
+<nav class="primary" id="primaryNav" aria-label="Primary navigation">
+  <button type="button" class="menu-close" aria-label="Close menu" style="position:absolute;top:.9rem;left:.9rem;background:var(--color-surface-alt);border:1px solid var(--color-border);color:var(--color-text-dim);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">
+    ×
+  </button>
+  <a href="../index.html">Index</a>
+  <a href="elements.html">Elements</a>
+  <a href="orderform.html">Order Form</a>
+  <button id="cartBtn" type="button" aria-haspopup="dialog" aria-expanded="false">Cart <span class="count" id="cartCount">0</span></button>
+  <button id="themeToggle" type="button" aria-pressed="false">Theme</button>
+</nav>
 <main class="layout">
   <aside class="sidebar" aria-label="Filters" id="filtersPane" aria-hidden="false">
     <div class="sidebar-header"><h2 style="margin:0;font-size:.8rem;letter-spacing:.8px;text-transform:uppercase;color:var(--color-text-dim);">Filters</h2><button type="button" class="close-filters" aria-label="Close filters">×</button></div>
@@ -235,10 +254,6 @@
           <option value="newest">Newest</option>
         </select>
       </div>
-    </div>
-    <div class="view-toggle" id="viewToggle" role="group" aria-label="View mode">
-      <button type="button" id="btnGrid" aria-pressed="true">Grid</button>
-      <button type="button" id="btnList" aria-pressed="false">List</button>
     </div>
     <div id="gridwallRows" class="gridwall-rows" aria-live="polite"></div>
     <div class="empty-msg" id="emptyMsg" hidden>No products match your filters.</div>
@@ -396,76 +411,121 @@
   const gridwallRows = document.getElementById('gridwallRows');
   const ROW_SIZE = 8; // chunk size for each independent row carousel
   const DEFAULT_SHOW = 4; // intended visible window
-  const btnGrid = document.getElementById('btnGrid');
-  const btnList = document.getElementById('btnList');
-  const VIEW_KEY='store-view-mode';
-  let viewMode = localStorage.getItem(VIEW_KEY) || 'grid';
+  let viewMode = 'grid';
+  function estimateColumns(){
+    // Look at a hypothetical product card width using current CSS breakpoints; fallback to measuring after render
+    const sample = gridwallRows.querySelector('.product-card');
+    if(sample){
+      const cardW = sample.getBoundingClientRect().width;
+      const containerW = gridwallRows.getBoundingClientRect().width || window.innerWidth;
+      if(cardW) return Math.floor(containerW / cardW);
+    }
+    // rough heuristic: assume min 260px card + gaps
+    const containerW = gridwallRows.getBoundingClientRect().width || window.innerWidth;
+    return Math.floor(containerW / 280);
+  }
+  function evaluateAutoView(){
+    const cols = estimateColumns();
+    viewMode = (cols && cols < 3) ? 'list' : 'grid';
+  }
   const emptyMsg = document.getElementById('emptyMsg');
   const searchInput = document.getElementById('searchInput');
   const sortSelect = document.getElementById('sortSelect');
+  /* Mobile primary menu */
+  const menuToggle = document.getElementById('menuToggle');
+  const primaryNav = document.getElementById('primaryNav');
+  let menuOverlay = document.querySelector('.menu-overlay');
+  if(!menuOverlay){ menuOverlay=document.createElement('div'); menuOverlay.className='menu-overlay'; document.body.appendChild(menuOverlay); }
+  let menuOpen=false; let lastMenuFocus=null;
+  function openMenu(){ if(menuOpen) return; menuOpen=true; primaryNav.classList.add('open'); menuToggle.setAttribute('aria-expanded','true'); menuToggle.setAttribute('aria-label','Close menu'); menuOverlay.classList.add('show'); lastMenuFocus=document.activeElement; const first=primaryNav.querySelector('a,button'); if(first) first.focus(); }
+  function closeMenu(){ if(!menuOpen) return; menuOpen=false; primaryNav.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); menuToggle.setAttribute('aria-label','Open menu'); menuOverlay.classList.remove('show'); if(lastMenuFocus) menuToggle.focus(); }
+  function toggleMenu(){ menuOpen?closeMenu():openMenu(); }
+  menuToggle.addEventListener('click', toggleMenu);
+  menuOverlay.addEventListener('click', closeMenu);
+  const menuCloseBtn = primaryNav.querySelector('.menu-close');
+  if(menuCloseBtn){ menuCloseBtn.addEventListener('click', closeMenu); }
+  window.addEventListener('keydown', e => { if(e.key==='Escape' && menuOpen) closeMenu(); });
+  // Focus trap for menu
+  function trapMenuFocus(e){
+    if(!menuOpen) return;
+    if(e.key==='Tab'){
+      const items=[...primaryNav.querySelectorAll('a,button')].filter(el=>el.offsetParent);
+      if(!items.length) return;
+      const first=items[0], last=items[items.length-1];
+      if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
+      else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
+    }
+  }
+  primaryNav.addEventListener('keydown', trapMenuFocus);
+  // Close menu when navigating via link (immediate UX feedback)
+  primaryNav.addEventListener('click', e => { if(e.target.tagName==='A' && menuOpen) closeMenu(); });
+  // Close menu on resize to desktop
+  window.addEventListener('resize', () => { if(window.matchMedia('(min-width:821px)').matches){ closeMenu(); } });
   const filtersPane = document.getElementById('filtersPane');
   const filtersToggle = document.getElementById('filtersToggle');
   const closeFiltersBtn = document.querySelector('.close-filters');
-  let filtersOpen = true; // desktop default
-  // Create overlay for filters (mobile) separate from cart overlay to avoid conflicts
+  const FILTERS_STATE_KEY='store-filters-open';
+  let filtersOpen = localStorage.getItem(FILTERS_STATE_KEY);
+  if(filtersOpen===null){ filtersOpen = 'true'; }
+  filtersOpen = filtersOpen === 'true';
   let filtersOverlay = document.querySelector('.filters-overlay');
-  if(!filtersOverlay){
-    filtersOverlay = document.createElement('div');
-    filtersOverlay.className='filters-overlay';
-    document.body.appendChild(filtersOverlay);
-  }
-
+  if(!filtersOverlay){ filtersOverlay = document.createElement('div'); filtersOverlay.className='filters-overlay'; document.body.appendChild(filtersOverlay); }
   function isMobileFilters(){ return window.matchMedia('(max-width:940px)').matches; }
-  function openFilters(){
-    filtersOpen = true;
-    filtersPane.setAttribute('aria-hidden','false');
-    filtersToggle.setAttribute('aria-expanded','true');
-    if(isMobileFilters()){
-      document.body.classList.add('filters-open');
-      filtersOverlay.classList.add('show');
-      // focus first interactive element inside
-      const first = filtersPane.querySelector('input,button,select');
-      if(first) first.focus();
+  function applyFiltersState(){
+    const mobile = isMobileFilters();
+    if(mobile){
+      filtersPane.classList.remove('collapsed-desktop');
+      filtersPane.setAttribute('aria-hidden', filtersOpen? 'false':'true');
+      if(filtersOpen){
+        filtersOverlay.classList.add('show'); document.body.classList.add('filters-open');
+      } else {
+        filtersOverlay.classList.remove('show'); document.body.classList.remove('filters-open');
+      }
+    } else { // desktop
+      filtersOverlay.classList.remove('show'); document.body.classList.remove('filters-open');
+      filtersPane.setAttribute('aria-hidden', filtersOpen? 'false':'true');
+      filtersPane.classList.toggle('collapsed-desktop', !filtersOpen);
     }
+    // Expand main content area when collapsed (desktop only)
+    const layoutEl = document.querySelector('.layout');
+    if(layoutEl){ if(!filtersOpen && !mobile){ layoutEl.classList.add('filters-collapsed'); } else { layoutEl.classList.remove('filters-collapsed'); } }
+    filtersToggle.setAttribute('aria-expanded', filtersOpen);
+    filtersToggle.setAttribute('aria-label', filtersOpen? 'Hide filters' : 'Show filters');
+    filtersToggle.textContent = filtersOpen? 'Hide Filters' : 'Show Filters';
   }
-  function closeFilters(){
-    filtersOpen = false;
-    filtersPane.setAttribute('aria-hidden','true');
-    filtersToggle.setAttribute('aria-expanded','false');
-    if(isMobileFilters()){
-      filtersOverlay.classList.remove('show');
-      document.body.classList.remove('filters-open');
-      filtersToggle.focus();
-    }
-  }
-  function toggleFilters(){ filtersOpen ? closeFilters() : openFilters(); }
-  filtersToggle.addEventListener('click', toggleFilters);
+  function openFilters(){ if(!filtersOpen){ filtersOpen=true; localStorage.setItem(FILTERS_STATE_KEY,'true'); applyFiltersState(); const first=filtersPane.querySelector('input,button,select'); if(first) first.focus(); } }
+  function closeFilters(){ if(filtersOpen){ filtersOpen=false; localStorage.setItem(FILTERS_STATE_KEY,'false'); applyFiltersState(); if(isMobileFilters()) filtersToggle.focus(); } }
+  function toggleFilters(){ filtersOpen? closeFilters(): openFilters(); }
+  filtersToggle.addEventListener('click', () => { if(menuOpen) closeMenu(); toggleFilters(); });
   closeFiltersBtn.addEventListener('click', closeFilters);
   filtersOverlay.addEventListener('click', closeFilters);
-  window.addEventListener('keydown', e => { if(e.key==='Escape'){ if(filtersOpen && isMobileFilters()) closeFilters(); }});
-  // Adjust state on resize
-  window.addEventListener('resize', () => {
-    if(isMobileFilters()){
-      if(!filtersOpen){ filtersPane.setAttribute('aria-hidden','true'); }
+  window.addEventListener('keydown', e => { if(e.key==='Escape'){ if(filtersOpen && (isMobileFilters()||!isMobileFilters())) closeFilters(); }});
+  let lastFiltersMode = isMobileFilters();
+  function handleFiltersResize(){
+    const mode = isMobileFilters();
+    if(mode !== lastFiltersMode){
+      filtersPane.classList.add('no-transition');
+      applyFiltersState();
+      requestAnimationFrame(()=> setTimeout(()=> filtersPane.classList.remove('no-transition'), 80));
+      lastFiltersMode = mode;
     } else {
-      // desktop -> always visible logically but we allow collapse memory
-      filtersPane.setAttribute('aria-hidden', filtersOpen? 'false':'true');
+      applyFiltersState();
     }
-  });
-  // Initialize correct state for first load
-  if(isMobileFilters()) { closeFilters(); } else { openFilters(); }
+  }
+  window.addEventListener('resize', () => { clearTimeout(handleFiltersResize._t); handleFiltersResize._t = setTimeout(handleFiltersResize, 60); });
+  applyFiltersState();
 
   function formatCurrency(v){ return '$'+v.toFixed(2); }
 
   function productCardHTML(p){
-    const slides = p.media.map((m,i)=>`<div class=\"media-slide\" data-index=\"${i}\"><img src=\"${m}\" alt=\"${p.name} image ${i+1}\"></div>`).join('');
+    const img = p.media[0];
     const tags = p.tags.slice(0,3).map(t=>`<span class=\"tag\">${t}</span>`).join('');
-    return `<article class=\"product-card\" data-id=\"${p.id}\" data-name=\"${p.name.toLowerCase()}\" data-price=\"${p.price}\" data-created=\"${p.created}\" aria-labelledby=\"ttl-${p.id}\">\n      <div class=\"media-carousel\" data-carousel><div class=\"media-track\">${slides}</div><div class=\"carousel-nav\"><button type=button data-prev aria-label=\"Previous image\">◂</button><button type=button data-next aria-label=\"Next image\">▸</button></div></div>\n      <div class=\"info-overlay\">\n        <h3 id=\"ttl-${p.id}\">${p.name}</h3>\n        <div class=\"price-row\"> <span class=\"price\">${formatCurrency(p.price)}</span>${p.orig?`<span class=\"orig\">${formatCurrency(p.orig)}</span>`:''}</div>\n        <div class=\"tag-row\">${tags}</div>\n        <button class=\"add-btn\" data-add type=\"button\">Add</button>\n      </div>\n    </article>`;
+    return `<article class=\"product-card\" data-id=\"${p.id}\" data-name=\"${p.name.toLowerCase()}\" data-price=\"${p.price}\" data-created=\"${p.created}\" aria-labelledby=\"ttl-${p.id}\">\n      <div class=\"media-carousel single-image\"><img src=\"${img}\" alt=\"${p.name}\" style=\"width:100%;height:100%;object-fit:cover;\" /></div>\n      <div class=\"info-overlay\">\n        <h3 id=\"ttl-${p.id}\">${p.name}</h3>\n        <div class=\"price-row\"> <span class=\"price\">${formatCurrency(p.price)}</span>${p.orig?`<span class=\"orig\">${formatCurrency(p.orig)}</span>`:''}</div>\n        <div class=\"tag-row\">${tags}</div>\n        <button class=\"add-btn\" data-add type=\"button\">Add</button>\n      </div>\n    </article>`;
   }
   function productRowHTML(p){
-    const slides = p.media.map((m,i)=>`<div class=\"media-slide\" data-index=\"${i}\"><img src=\"${m}\" alt=\"${p.name} image ${i+1}\"></div>`).join('');
+    const img = p.media[0];
     const tags = p.tags.map(t=>`<span class=\"tag\">${t}</span>`).join('');
-    return `<article class=\"product-row\" data-id=\"${p.id}\" aria-labelledby=\"row-${p.id}\">\n      <div class=\"media-carousel\" data-carousel><div class=\"media-track\">${slides}</div><div class=\"carousel-nav\"><button type=button data-prev aria-label=\"Previous image\">◂</button><button type=button data-next aria-label=\"Next image\">▸</button></div></div>\n      <div>\n        <h3 id=\"row-${p.id}\">${p.name}</h3>\n        <div class=\"row-meta\">${p.categories.join(', ')}${p.featured?' • Featured':''}</div>\n        <div class=\"row-tags\">${tags}</div>\n      </div>\n      <div class=\"row-right\">\n        <div class=\"price-row\"><span class=\"price\">${formatCurrency(p.price)}</span>${p.orig?`<span class=\"orig\">${formatCurrency(p.orig)}</span>`:''}</div>\n        <button class=\"add-btn\" data-add type=\"button\">Add to Cart</button>\n      </div>\n    </article>`;
+    return `<article class=\"product-row\" data-id=\"${p.id}\" aria-labelledby=\"row-${p.id}\">\n      <div class=\"media-carousel single-image\"><img src=\"${img}\" alt=\"${p.name}\" style=\"width:100%;height:100%;object-fit:cover;\" /></div>\n      <div>\n        <h3 id=\"row-${p.id}\">${p.name}</h3>\n        <div class=\"row-meta\">${p.categories.join(', ')}${p.featured?' • Featured':''}</div>\n        <div class=\"row-tags\">${tags}</div>\n      </div>\n      <div class=\"row-right\">\n        <div class=\"price-row\"><span class=\"price\">${formatCurrency(p.price)}</span>${p.orig?`<span class=\"orig\">${formatCurrency(p.orig)}</span>`:''}</div>\n        <button class=\"add-btn\" data-add type=\"button\">Add to Cart</button>\n      </div>\n    </article>`;
   }
 
   function sortProducts(list){
@@ -530,24 +590,25 @@
     const filters = activeFilters();
     let list = products.filter(p => (!term || p.name.toLowerCase().includes(term)) && matchesFilters(p, filters));
     list = sortProducts(list);
-    document.body.classList.toggle('mode-grid', viewMode==='grid');
-    document.body.classList.toggle('mode-list', viewMode==='list');
-    if(viewMode==='grid'){
-      const rows = chunkRows(list);
-  gridwallRows.innerHTML = rows.map((row,i)=>`<section class=\"row-carousel\" data-row tabindex=\"0\" aria-roledescription=\"carousel\" aria-label=\"Products row ${i+1}\">\n  <div class=\"row-viewport\">\n    <div class=\"row-track\">${row.map(productCardHTML).join('')}<\/div>\n    <div class=\"row-nav\"><button type=\"button\" data-prev-row aria-label=\"Previous items\">◂<\/button><button type=\"button\" data-next-row aria-label=\"Next items\">▸<\/button><\/div>\n  <\/div>\n  <div class=\"row-status\" aria-live=\"polite\"></div>\n<\/section>`).join('');
-    } else {
+    // First attempt: always render grid markup (gives actual widths for estimation)
+    const rows = chunkRows(list);
+    gridwallRows.innerHTML = rows.map((row,i)=>`<section class=\"row-carousel\" data-row tabindex=\"0\" aria-roledescription=\"carousel\" aria-label=\"Products row ${i+1}\">\n  <div class=\"row-viewport\">\n    <div class=\"row-track\">${row.map(productCardHTML).join('')}<\/div>\n    <div class=\"row-nav\"><button type=\"button\" data-prev-row aria-label=\"Previous items\">◂<\/button><button type=\"button\" data-next-row aria-label=\"Next items\">▸<\/button><\/div>\n  <\/div>\n  <div class=\"row-status\" aria-live=\"polite\"></div>\n<\/section>`).join('');
+    // After DOM present, evaluate
+    evaluateAutoView();
+    if(viewMode==='list'){
+      // Re-render as list
       gridwallRows.innerHTML = `<div class=\"product-list\">${list.map(productRowHTML).join('')}</div>`;
+      document.body.classList.add('mode-list');
+      document.body.classList.remove('mode-grid');
+    } else {
+      document.body.classList.add('mode-grid');
+      document.body.classList.remove('mode-list');
     }
     emptyMsg.hidden = list.length>0;
-  initMiniCarousels();
-  if(viewMode==='grid'){ gridwallRows.querySelectorAll('[data-row]').forEach(initRowCarousel); }
+    if(viewMode==='grid'){ gridwallRows.querySelectorAll('[data-row]').forEach(initRowCarousel); }
   }
-  function syncViewButtons(){
-    btnGrid.setAttribute('aria-pressed', viewMode==='grid');
-    btnList.setAttribute('aria-pressed', viewMode==='list');
-  }
-  btnGrid.addEventListener('click', ()=> { if(viewMode!=='grid'){ viewMode='grid'; localStorage.setItem(VIEW_KEY, viewMode); renderProducts(); syncViewButtons(); }});
-  btnList.addEventListener('click', ()=> { if(viewMode!=='list'){ viewMode='list'; localStorage.setItem(VIEW_KEY, viewMode); renderProducts(); syncViewButtons(); }});
+  // Re-evaluate on resize (debounced)
+  let resizeTO=null; window.addEventListener('resize', ()=> { clearTimeout(resizeTO); resizeTO=setTimeout(()=>{ const prev=viewMode; renderProducts(); if(prev!==viewMode){ /* auto switch occurred */ } },120); });
 
   document.addEventListener('change', e => {
     if(e.target.matches('[data-filter-cat], [data-filter-tag]')) renderProducts();
@@ -556,17 +617,7 @@
   searchInput.addEventListener('input', () => { renderProducts(); });
   sortSelect.addEventListener('change', () => { renderProducts(); });
 
-  /* Mini carousels */
-  function initMiniCarousels(){
-    document.querySelectorAll('[data-carousel]').forEach(car => {
-      const track = car.querySelector('.media-track');
-      const slides = [...car.querySelectorAll('.media-slide')];
-      let index = 0; const max = slides.length;
-      function set(i){ index = (i+max)%max; track.style.transform = `translateX(-${index*100}%)`; }
-      car.querySelector('[data-prev]').addEventListener('click', () => set(index-1));
-      car.querySelector('[data-next]').addEventListener('click', () => set(index+1));
-    });
-  }
+  /* Mini carousels removed: single image variant now used */
 
   /* Cart */
   const CART_KEY='store-cart';
@@ -624,7 +675,7 @@
   function closeCart(){ cartDrawer.classList.remove('open'); cartDrawer.setAttribute('aria-hidden','true'); overlay.classList.remove('show'); setTimeout(()=> overlay.hidden=true, 300); cartBtn.setAttribute('aria-expanded','false'); lastFocus && lastFocus.focus(); }
 
   let lastFocus = null;
-  cartBtn.addEventListener('click', ()=> { lastFocus=document.activeElement; if(isMobileFilters() && filtersOpen) closeFilters(); openCart(); });
+  cartBtn.addEventListener('click', ()=> { lastFocus=document.activeElement; if(filtersOpen) closeFilters(); if(menuOpen) closeMenu(); openCart(); });
   overlay.addEventListener('click', closeCart);
   closeCartBtn.addEventListener('click', closeCart);
   document.addEventListener('keydown', e => { if(e.key==='Escape' && cartDrawer.classList.contains('open')) closeCart(); });
@@ -678,9 +729,10 @@
   });
 
   /* Initial */
-  syncViewButtons();
   renderProducts();
   renderCart();
+  // Smoke test: ensure at least one product element rendered
+  if(!document.querySelector('.product-card') && !document.querySelector('.product-row')){ console.warn('No products rendered - check filtering logic'); }
 })();
 </script>
 </body>
