@@ -245,52 +245,10 @@
   <main>
     <div class="tabs" role="tablist" aria-label="Page Sections" id="pageTabs">
       <button role="tab" id="page-tab-1" aria-controls="page-panel-1" aria-selected="true" tabindex="0">Components</button>
+      <button role="tab" id="page-tab-forms" aria-controls="page-panel-forms" aria-selected="false" tabindex="-1">Forms</button>
       <button role="tab" id="page-tab-2" aria-controls="page-panel-2" aria-selected="false" tabindex="-1">Data & Files</button>
     </div>
     <section id="page-panel-1" class="tab-panel active" role="tabpanel" aria-labelledby="page-tab-1">
-    <section class="section-intro">
-      <h1>Modern UI Elements</h1>
-      <p>This page collects a broad set of native + enhanced UI patterns styled minimally and implemented with progressive enhancement and accessibility in mind. Tweak, copy, adapt.</p>
-      <p class="muted" style="font-size:.75rem;">All components are plain HTML/CSS/JS (no frameworks). Theme + state stored in <code>localStorage</code> where appropriate.</p>
-    </section>
-
-    <h2 id="forms">Form Inputs & Validation</h2>
-    <div class="grid cols-3">
-      <div class="panel">
-        <h3>Text Fields</h3>
-        <label for="nameInput">Name <span class="badge">REQ</span></label>
-        <input id="nameInput" type="text" required placeholder="Ada Lovelace" />
-        <div id="nameMsg" class="field-msg">Enter at least 2 characters.</div>
-        <label for="emailInput">Email</label>
-        <input id="emailInput" type="email" placeholder="you@example.com" />
-        <div id="emailMsg" class="field-msg"></div>
-      </div>
-      <div class="panel">
-        <h3>Password Strength</h3>
-        <label for="pwInput">Password</label>
-        <input id="pwInput" type="password" aria-describedby="pwHelp" />
-        <div id="pwHelp" class="field-msg">Min 8 chars incl. number.</div>
-        <div id="pwStrength" class="field-msg"></div>
-        <label for="bioInput">Bio</label>
-        <textarea id="bioInput" maxlength="160" placeholder="Short bio..."></textarea>
-        <div class="field-msg" id="bioCount">0 / 160</div>
-      </div>
-      <div class="panel">
-        <h3>Selects & Combobox</h3>
-        <label for="petSelect">Favorite Pet</label>
-        <select id="petSelect">
-          <option value="">-- choose --</option>
-          <option>Dog</option><option>Cat</option><option>Bird</option><option>Fish</option>
-        </select>
-        <label for="comboInput">Searchable (Combobox)</label>
-        <div class="combo" role="combobox" aria-haspopup="listbox" aria-owns="comboList" aria-expanded="false">
-          <input id="comboInput" type="text" autocomplete="off" aria-autocomplete="list" aria-controls="comboList" placeholder="Type to filter..." />
-          <button type="button" class="toggle" tabindex="-1" aria-label="Toggle options">▾</button>
-          <ul id="comboList" class="combo-list" role="listbox" aria-label="Options"></ul>
-        </div>
-        <div class="field-msg" id="comboMsg">Pick an option.</div>
-      </div>
-    </div>
 
     <h2 id="controls">Controls & Feedback</h2>
     <div class="grid cols-3">
@@ -446,6 +404,45 @@
         <p style="padding:1rem;">Loading map… (If this remains, the map library may be blocked.)</p>
       </div>
     </div>
+    </section>
+    <section id="page-panel-forms" class="tab-panel" role="tabpanel" aria-labelledby="page-tab-forms">
+      <h2 id="forms">Form Inputs & Validation</h2>
+      <div class="grid cols-3">
+        <div class="panel">
+          <h3>Text Fields</h3>
+          <label for="nameInput">Name <span class="badge">REQ</span></label>
+          <input id="nameInput" type="text" required placeholder="Ada Lovelace" />
+          <div id="nameMsg" class="field-msg">Enter at least 2 characters.</div>
+          <label for="emailInput">Email</label>
+          <input id="emailInput" type="email" placeholder="you@example.com" />
+          <div id="emailMsg" class="field-msg"></div>
+        </div>
+        <div class="panel">
+          <h3>Password Strength</h3>
+          <label for="pwInput">Password</label>
+          <input id="pwInput" type="password" aria-describedby="pwHelp" />
+          <div id="pwHelp" class="field-msg">Min 8 chars incl. number.</div>
+          <div id="pwStrength" class="field-msg"></div>
+          <label for="bioInput">Bio</label>
+          <textarea id="bioInput" maxlength="160" placeholder="Short bio..."></textarea>
+          <div class="field-msg" id="bioCount">0 / 160</div>
+        </div>
+        <div class="panel">
+          <h3>Selects & Combobox</h3>
+          <label for="petSelect">Favorite Pet</label>
+          <select id="petSelect">
+            <option value="">-- choose --</option>
+            <option>Dog</option><option>Cat</option><option>Bird</option><option>Fish</option>
+          </select>
+          <label for="comboInput">Searchable (Combobox)</label>
+          <div class="combo" role="combobox" aria-haspopup="listbox" aria-owns="comboList" aria-expanded="false">
+            <input id="comboInput" type="text" autocomplete="off" aria-autocomplete="list" aria-controls="comboList" placeholder="Type to filter..." />
+            <button type="button" class="toggle" tabindex="-1" aria-label="Toggle options">▾</button>
+            <ul id="comboList" class="combo-list" role="listbox" aria-label="Options"></ul>
+          </div>
+          <div class="field-msg" id="comboMsg">Pick an option.</div>
+        </div>
+      </div>
     </section>
     <section id="page-panel-2" class="tab-panel" role="tabpanel" aria-labelledby="page-tab-2">
       <h2>Data Table</h2>
@@ -771,6 +768,7 @@
       const pageTabs = document.querySelectorAll('#pageTabs [role=tab]');
       const pagePanels = [
         document.getElementById('page-panel-1'),
+        document.getElementById('page-panel-forms'),
         document.getElementById('page-panel-2')
       ];
       const PAGE_TAB_KEY = 'ui-page-tab';
