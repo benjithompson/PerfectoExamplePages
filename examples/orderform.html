@@ -78,6 +78,8 @@ p, small { line-height: 1.45; }
   background: var(--color-surface);
   border-bottom:1px solid var(--color-border);
 }
+.back-link { text-decoration:none; color:var(--color-text-light); font-size:.8rem; font-weight:600; letter-spacing:.5px; display:inline-flex; align-items:center; gap:.35rem; padding:.35rem .6rem; border-radius:var(--radius-sm); border:1px solid transparent; }
+.back-link:hover, .back-link:focus-visible { color:var(--color-text); background:var(--color-surface-alt); border-color:var(--color-border); outline:none; }
 .app-footer { margin-top:3rem; border-top:1px solid var(--color-border); border-bottom:none; font-size:.85rem; color:var(--color-text-light); }
 .brand { font-weight:600; font-size:1.1rem; }
 .profile-switcher { display:flex; gap:.5rem; align-items:center; }
@@ -163,7 +165,10 @@ input[required]:user-invalid:focus, textarea[required]:user-invalid:focus {
 </head>
 <body>
   <header class="app-header">
-    <div class="brand">🛒 Order Portal</div>
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <a href="../index.html" class="back-link" aria-label="Back to examples index">← Index</a>
+      <div class="brand">🛒 Order Portal</div>
+    </div>
     <div class="profile-switcher">
       <label for="profileRole" class="visually-hidden">Profile Role</label>
       <select id="profileRole" aria-label="Profile Role">

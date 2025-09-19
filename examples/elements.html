@@ -51,7 +51,9 @@
     h3 { margin:2rem 0 .75rem; font-size:1.05rem; text-transform:uppercase; letter-spacing:.8px; color:var(--color-text-dim); }
     p { max-width:760px; }
 
-    header { position:sticky; top:0; background:linear-gradient(135deg,var(--color-surface),var(--color-surface-alt)); border-bottom:1px solid var(--color-border); padding:.9rem clamp(1rem,3vw,2.2rem); display:flex; gap:1rem; align-items:center; z-index:40; box-shadow:var(--shadow-sm); }
+  header { position:sticky; top:0; background:linear-gradient(135deg,var(--color-surface),var(--color-surface-alt)); border-bottom:1px solid var(--color-border); padding:.9rem clamp(1rem,3vw,2.2rem); display:flex; gap:1rem; align-items:center; z-index:40; box-shadow:var(--shadow-sm); justify-content:space-between; flex-wrap:wrap; }
+  .back-link { text-decoration:none; color:var(--color-text-dim); font-size:.75rem; font-weight:600; letter-spacing:.6px; display:inline-flex; align-items:center; gap:.35rem; padding:.4rem .65rem; border-radius:var(--radius-sm); background:var(--color-surface-alt); border:1px solid var(--color-border); }
+  .back-link:hover, .back-link:focus-visible { color:var(--color-text); background:var(--color-surface); outline:none; }
     .brand { font-weight:600; letter-spacing:.5px; display:flex; align-items:center; gap:.6rem; }
     .brand-badge { background:var(--color-accent); padding:.35rem .6rem; font-size:.6rem; text-transform:uppercase; letter-spacing:1px; border-radius:var(--radius-sm); color:#fff; font-weight:600; }
     main { max-width:1320px; margin:0 auto; padding:2.2rem clamp(1.2rem,3vw,2.5rem) 6rem; display:flex; flex-direction:column; }
@@ -225,15 +227,18 @@
     /* Touch improvements */
     * { -webkit-tap-highlight-color: rgba(0,0,0,0); }
   </style>
-</head>
-<body>
   <header>
-    <div class="brand"><span style="display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:14px;background:var(--color-accent);color:#fff;font-weight:600;box-shadow:0 0 0 4px rgba(37,99,235,.25);">UI</span> <span>Elements Showcase</span> <span class="brand-badge">DEMO</span></div>
-    <button id="themeToggle" class="btn small pill" aria-pressed="false">🌗 Theme</button>
-    <button id="openModalBtn" class="btn small pill primary" data-modal-target="#demoModal">Open Modal</button>
-    <div class="tooltip-wrap">
-      <button class="btn small pill ghost" aria-describedby="tt-help">? Help</button>
-      <span role="tooltip" id="tt-help" class="tooltip">Keyboard friendly patterns included</span>
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <a href="../index.html" class="back-link" aria-label="Back to examples index">← Index</a>
+      <div class="brand"><span style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:14px;background:var(--color-accent);color:#fff;font-weight:600;font-size:.85rem;letter-spacing:.5px;box-shadow:0 0 0 4px rgba(37,99,235,.25);">UI</span>
+        <div style="display:flex;flex-direction:column;line-height:1.05;gap:2px;">
+          <strong style="font-size:.95rem;">Elements Showcase</strong>
+          <span class="brand-badge">Library</span>
+        </div>
+      </div>
+    </div>
+    <button id="themeToggle" type="button" aria-pressed="false" title="Toggle theme" style="margin-left:auto;">🌗 Theme</button>
+  </header>
     </div>
   </header>
   <main>
