@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>UI Elements Showcase</title>
+  <meta name="description" content="Comprehensive modern UI element examples with accessible patterns." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    :root {
+      --font-sans: 'Inter', system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+      --color-bg: #f5f7fb;
+      --color-surface: #ffffff;
+      --color-surface-alt:#f0f3f9;
+      --color-border:#d5dbe4;
+      --color-border-strong:#b1bccb;
+      --color-text:#182230;
+      --color-text-dim:#5a6b80;
+      --color-accent:#2563eb;
+      --color-accent-hover:#1d4ed8;
+      --color-danger:#dc2626;
+      --color-warn:#d97706;
+      --color-success:#15803d;
+      --radius-xs:4px; --radius-sm:6px; --radius:12px; --radius-pill:999px;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px -2px rgba(0,0,0,.15),0 2px 6px -1px rgba(0,0,0,.08);
+      --transition:.18s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="dark"] {
+      --color-bg:#0d1828;
+      --color-surface:#162335;
+      --color-surface-alt:#1e2f45;
+      --color-border:#2b415b;
+      --color-border-strong:#3d5875;
+      --color-text:#f2f7fb;
+      --color-text-dim:#92a6bd;
+      --color-accent:#3b82f6;
+      --color-accent-hover:#2563eb;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.65),0 1px 2px rgba(0,0,0,.5);
+      --shadow-md:0 6px 20px -4px rgba(0,0,0,.7),0 3px 8px -2px rgba(0,0,0,.55);
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text); line-height:1.45; }
+    h1,h2,h3 { line-height:1.15; letter-spacing:.4px; }
+    h1 { font-size:clamp(2rem,3.5vw,2.8rem); margin:0 0 1rem; }
+    h2 { margin:3.5rem 0 1.2rem; font-size:1.45rem; position:relative; }
+    h2:before { content:""; position:absolute; left:0; top:-.6rem; width:48px; height:4px; border-radius:2px; background:linear-gradient(90deg,var(--color-accent),transparent); }
+    h3 { margin:2rem 0 .75rem; font-size:1.05rem; text-transform:uppercase; letter-spacing:.8px; color:var(--color-text-dim); }
+    p { max-width:760px; }
+
+    header { position:sticky; top:0; background:linear-gradient(135deg,var(--color-surface),var(--color-surface-alt)); border-bottom:1px solid var(--color-border); padding:.9rem clamp(1rem,3vw,2.2rem); display:flex; gap:1rem; align-items:center; z-index:40; box-shadow:var(--shadow-sm); }
+    .brand { font-weight:600; letter-spacing:.5px; display:flex; align-items:center; gap:.6rem; }
+    .brand-badge { background:var(--color-accent); padding:.35rem .6rem; font-size:.6rem; text-transform:uppercase; letter-spacing:1px; border-radius:var(--radius-sm); color:#fff; font-weight:600; }
+    main { max-width:1320px; margin:0 auto; padding:2.2rem clamp(1.2rem,3vw,2.5rem) 6rem; display:flex; flex-direction:column; }
+    @supports (padding: env(safe-area-inset-bottom)) {
+      main { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+      header { padding-left: calc(clamp(1rem,3vw,2.2rem) + env(safe-area-inset-left)); padding-right: calc(clamp(1rem,3vw,2.2rem) + env(safe-area-inset-right)); }
+    }
+
+    .section-intro { background:linear-gradient(150deg,var(--color-surface),var(--color-surface-alt)); padding:1.8rem 1.6rem 2rem; border:1px solid var(--color-border); border-radius:var(--radius); box-shadow:var(--shadow-md); }
+
+    .grid { display:grid; gap:1.6rem; }
+    .cols-3 { grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); }
+    .panel { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius); padding:1.1rem 1.1rem 1.35rem; position:relative; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:.9rem; }
+    .panel h3 { margin:0 0 .4rem; font-size:.8rem; letter-spacing:1px; color:var(--color-text-dim); font-weight:600; }
+    .panel code.inline { background:var(--color-surface-alt); padding:.25rem .4rem; border-radius:var(--radius-xs); font-size:.7rem; border:1px solid var(--color-border); }
+
+    label { font-size:.72rem; font-weight:600; letter-spacing:.7px; text-transform:uppercase; display:inline-flex; gap:.35rem; margin-bottom:.35rem; color:var(--color-text-dim); }
+    input[type=text],input[type=email],input[type=password],input[type=search],select,textarea { width:100%; font:inherit; padding:.65rem .75rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-surface-alt); color:var(--color-text); transition:var(--transition); }
+    textarea { resize:vertical; min-height:90px; }
+    input:focus,select:focus,textarea:focus { outline:none; border-color:var(--color-accent); box-shadow:0 0 0 3px rgba(37,99,235,.25); }
+    input.error { border-color:var(--color-danger); box-shadow:0 0 0 3px rgba(220,38,38,.25); }
+    .field-msg { font-size:.65rem; margin-top:.35rem; color:var(--color-text-dim); }
+    .field-msg.error { color:var(--color-danger); }
+    .field-msg.success { color:var(--color-success); }
+
+    .inline-fields { display:flex; gap:.75rem; }
+    .inline-fields > * { flex:1; }
+
+    button,.btn { font:inherit; font-weight:600; letter-spacing:.7px; text-transform:uppercase; font-size:.65rem; padding:.7rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--color-border); background:var(--color-surface-alt); color:var(--color-text-dim); cursor:pointer; display:inline-flex; gap:.45rem; align-items:center; transition:var(--transition); position:relative; }
+  button:focus-visible,.btn:focus-visible { outline:2px solid var(--color-accent); outline-offset:2px; }
+    button:hover,.btn:hover { color:var(--color-text); border-color:var(--color-accent); }
+    .btn.primary { background:var(--color-accent); color:#fff; border-color:var(--color-accent); }
+    .btn.primary:hover { background:var(--color-accent-hover); }
+    .btn.danger { background:var(--color-danger); border-color:var(--color-danger); color:#fff; }
+    .btn.outline { background:transparent; }
+    .btn.ghost { background:transparent; border-color:transparent; }
+    .btn.ghost:hover { background:var(--color-surface-alt); border-color:var(--color-border); }
+    .btn.small { padding:.45rem .7rem; font-size:.55rem; }
+    .btn.pill { border-radius:var(--radius-pill); }
+    .btn.loading { pointer-events:none; opacity:.7; }
+    .btn.loading:after { content:""; width:14px; height:14px; border:2px solid rgba(255,255,255,.5); border-top-color:#fff; border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    a { color:var(--color-accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+
+    /* ComboBox (searchable select) */
+    .combo { position:relative; }
+    .combo input[type=text] { padding-right:2.2rem; }
+    .combo button.toggle { position:absolute; top:2px; right:2px; bottom:2px; border:none; background:transparent; width:32px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:var(--color-text-dim); }
+    .combo button.toggle:hover { background:var(--color-surface); }
+    .combo-list { position:absolute; z-index:60; left:0; right:0; top:100%; margin:.25rem 0 0; background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-sm); max-height:220px; overflow:auto; box-shadow:var(--shadow-md); padding:.3rem 0; display:none; }
+    .combo-list[aria-expanded="true"] { display:block; }
+    .combo-option { padding:.55rem .8rem; font-size:.8rem; cursor:pointer; display:flex; align-items:center; gap:.5rem; }
+    .combo-option[aria-selected="true"], .combo-option:hover { background:var(--color-accent); color:#fff; }
+
+    /* Slider */
+    input[type=range] { width:100%; accent-color:var(--color-accent); }
+    .range-output { font-size:.65rem; font-weight:600; letter-spacing:.5px; }
+
+    /* Scrollable pane */
+    .scroll-box { max-height:170px; overflow:auto; border:1px solid var(--color-border); background:var(--color-surface-alt); padding:.9rem .85rem; border-radius:var(--radius-sm); font-size:.8rem; line-height:1.45; }
+
+    /* Tabs */
+    .tabs { display:flex; gap:.4rem; border-bottom:1px solid var(--color-border); margin-bottom:1rem; }
+    .tabs button { background:transparent; border:none; border-bottom:3px solid transparent; border-radius:0; font-size:.7rem; padding:.7rem 1rem; color:var(--color-text-dim); }
+  .tabs button:focus-visible { outline:none; box-shadow:inset 0 -3px 0 0 var(--color-accent); }
+    .tabs button[aria-selected="true"] { color:var(--color-text); border-color:var(--color-accent); font-weight:600; }
+    .tab-panel { display:none; animation:fade .25s ease; }
+    .tab-panel.active { display:block; }
+
+    /* Accordion */
+    .accordion-item { border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-surface); }
+    .accordion-item + .accordion-item { margin-top:.6rem; }
+    .accordion-header { margin:0; }
+    .accordion-button { width:100%; text-align:left; background:var(--color-surface-alt); border:none; padding:.8rem 1rem; font:inherit; font-size:.72rem; letter-spacing:.7px; text-transform:uppercase; font-weight:600; display:flex; justify-content:space-between; align-items:center; cursor:pointer; border-radius:var(--radius-sm) var(--radius-sm) 0 0; }
+    .accordion-button:hover { background:var(--color-surface); }
+    .accordion-content { display:none; padding:.9rem 1rem 1.1rem; font-size:.85rem; border-top:1px solid var(--color-border); }
+    .accordion-item.open .accordion-content { display:block; }
+
+    /* Tooltip */
+    .tooltip-wrap { position:relative; display:inline-block; }
+    .tooltip { position:absolute; left:50%; transform:translate(-50%,4px); bottom:100%; background:#111; color:#fff; padding:.4rem .55rem; font-size:.6rem; font-weight:500; letter-spacing:.6px; border-radius:4px; white-space:nowrap; opacity:0; pointer-events:none; transition:var(--transition); box-shadow:var(--shadow-sm); }
+    .tooltip-wrap:hover .tooltip, .tooltip-wrap:focus-within .tooltip { opacity:1; transform:translate(-50%,-4px); }
+
+    /* Modal */
+  .modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(6px); display:none; align-items:flex-start; justify-content:center; padding:8vh 1rem 2rem; z-index:1200; }
+    .modal-backdrop.show { display:flex; }
+    .modal { background:var(--color-surface); width:100%; max-width:560px; border-radius:var(--radius); border:1px solid var(--color-border); padding:1.5rem 1.5rem 1.8rem; box-shadow:var(--shadow-md); position:relative; animation:pop .35s cubic-bezier(.4,0,.2,1); }
+    @keyframes pop { from { opacity:0; transform:translateY(14px) scale(.96);} to { opacity:1; transform:translateY(0) scale(1);} }
+    .modal h2 { margin:0 0 .9rem; font-size:1.35rem; }
+    .modal-close { position:absolute; top:8px; right:8px; background:transparent; border:none; font-size:1rem; color:var(--color-text-dim); cursor:pointer; padding:.4rem; border-radius:var(--radius-sm); }
+    .modal-close:hover { background:var(--color-surface-alt); color:var(--color-text); }
+
+    /* Notification / Toast */
+    .toasts { position:fixed; right:1rem; bottom:1rem; display:flex; flex-direction:column; gap:.6rem; z-index:100; }
+    .toast { background:var(--color-surface); border:1px solid var(--color-border); padding:.75rem .85rem .8rem; font-size:.7rem; display:flex; gap:.65rem; align-items:flex-start; border-radius:var(--radius-sm); box-shadow:var(--shadow-md); animation:fade .35s ease; min-width:240px; }
+    .toast.success { border-color:var(--color-success); }
+    .toast.error { border-color:var(--color-danger); }
+    .toast button { border:none; background:transparent; font-size:.8rem; margin-left:auto; color:var(--color-text-dim); padding:.25rem; }
+    .toast button:hover { color:var(--color-text); }
+
+  /* Carousel */
+  .carousel { position:relative; overflow:hidden; border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); box-shadow:var(--shadow-sm); }
+  .carousel-track { display:flex; transition:transform .6s var(--transition); will-change:transform; }
+  .carousel-slide { min-width:100%; position:relative; user-select:none; }
+  .carousel-slide img { width:100%; height:340px; object-fit:cover; display:block; }
+  .carousel-caption { position:absolute; left:0; right:0; bottom:0; background:linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,0)); color:#fff; padding:1.2rem 1rem .9rem; font-size:.8rem; letter-spacing:.5px; }
+  .carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(15,23,42,.55); color:#fff; border:none; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(4px); transition:var(--transition); }
+  .carousel-btn:hover { background:rgba(15,23,42,.75); }
+  .carousel-btn:focus { outline:2px solid var(--color-accent); outline-offset:2px; }
+  .carousel-btn.prev { left:.65rem; }
+  .carousel-btn.next { right:.65rem; }
+  .carousel-indicators { position:absolute; left:50%; bottom:8px; transform:translateX(-50%); display:flex; gap:.5rem; }
+  .carousel-indicators button { width:12px; height:12px; border-radius:50%; border:1px solid var(--color-border-strong); background:var(--color-surface-alt); padding:0; cursor:pointer; transition:var(--transition); }
+  .carousel-indicators button[aria-current="true"] { background:var(--color-accent); border-color:var(--color-accent); box-shadow:0 0 0 3px rgba(37,99,235,.4); }
+  .carousel[aria-busy="true"] { opacity:.6; }
+  .carousel-status { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  .carousel-pause { position:absolute; top:8px; right:8px; font-size:.55rem; padding:.4rem .6rem; background:rgba(0,0,0,.55); color:#fff; border:none; border-radius:var(--radius-pill); letter-spacing:.7px; cursor:pointer; }
+  .carousel-pause:hover { background:rgba(0,0,0,.75); }
+
+  /* Map */
+  #mapSection .panel { overflow:hidden; }
+  #demoMap { height:360px; width:100%; border:1px solid var(--color-border); border-radius:var(--radius); }
+  body.lightbox-open main { filter:blur(3px) brightness(.85); transition:var(--transition); }
+  body.lightbox-open header { filter:blur(3px) brightness(.85); }
+  body.lightbox-open #demoMap, body.lightbox-open .leaflet-pane { filter:blur(4px) brightness(.6); }
+
+    /* Utility */
+    .flex { display:flex; }
+    .gap-s { gap:.5rem; }
+    .gap { gap:.9rem; }
+    .wrap { flex-wrap:wrap; }
+    .muted { color:var(--color-text-dim); }
+    .badge { background:var(--color-accent); color:#fff; font-size:.55rem; padding:.25rem .45rem; border-radius:20px; letter-spacing:.7px; font-weight:600; }
+    .divider { height:1px; background:var(--color-border); margin:2.1rem 0; }
+    @keyframes fade { from { opacity:0; transform:translateY(4px);} to { opacity:1; transform:translateY(0);} }
+
+    footer { margin-top:4rem; padding:2rem 0 4rem; font-size:.65rem; text-align:center; color:var(--color-text-dim); }
+
+    @media (max-width:940px){
+      main { padding:1.8rem 1.1rem 4.2rem; }
+      .grid.cols-3 { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
+      .carousel-slide img { height:300px; }
+      #demoMap { height:300px; }
+    }
+    @media (max-width:640px){
+      header { flex-wrap:wrap; }
+      main { padding:1.6rem 1rem 4.5rem; }
+      .grid.cols-3 { grid-template-columns:1fr; }
+      .gallery { grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) !important; }
+      .carousel-slide img { height:240px; }
+      #demoMap { height:240px; }
+      button,.btn { padding:.75rem 1rem; font-size:.62rem; }
+      .tabs button { padding:.6rem .8rem; }
+    }
+    @media (max-width:420px){
+      .carousel-slide img { height:200px; }
+      #demoMap { height:200px; }
+      .section-intro { padding:1.4rem 1.1rem 1.6rem; }
+    }
+    @media (hover:none){
+      .tooltip { display:none !important; }
+      .carousel-btn { background:rgba(15,23,42,.4); }
+    }
+    /* Reduce motion preference */
+    @media (prefers-reduced-motion: reduce){
+      .carousel-track { transition:none; }
+      .carousel-slide img { animation:none; }
+    }
+    /* Touch improvements */
+    * { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><span style="display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:14px;background:var(--color-accent);color:#fff;font-weight:600;box-shadow:0 0 0 4px rgba(37,99,235,.25);">UI</span> <span>Elements Showcase</span> <span class="brand-badge">DEMO</span></div>
+    <button id="themeToggle" class="btn small pill" aria-pressed="false">🌗 Theme</button>
+    <button id="openModalBtn" class="btn small pill primary" data-modal-target="#demoModal">Open Modal</button>
+    <div class="tooltip-wrap">
+      <button class="btn small pill ghost" aria-describedby="tt-help">? Help</button>
+      <span role="tooltip" id="tt-help" class="tooltip">Keyboard friendly patterns included</span>
+    </div>
+  </header>
+  <main>
+    <section class="section-intro">
+      <h1>Modern UI Elements</h1>
+      <p>This page collects a broad set of native + enhanced UI patterns styled minimally and implemented with progressive enhancement and accessibility in mind. Tweak, copy, adapt.</p>
+      <p class="muted" style="font-size:.75rem;">All components are plain HTML/CSS/JS (no frameworks). Theme + state stored in <code>localStorage</code> where appropriate.</p>
+    </section>
+
+    <h2 id="forms">Form Inputs & Validation</h2>
+    <div class="grid cols-3">
+      <div class="panel">
+        <h3>Text Fields</h3>
+        <label for="nameInput">Name <span class="badge">REQ</span></label>
+        <input id="nameInput" type="text" required placeholder="Ada Lovelace" />
+        <div id="nameMsg" class="field-msg">Enter at least 2 characters.</div>
+        <label for="emailInput">Email</label>
+        <input id="emailInput" type="email" placeholder="you@example.com" />
+        <div id="emailMsg" class="field-msg"></div>
+      </div>
+      <div class="panel">
+        <h3>Password Strength</h3>
+        <label for="pwInput">Password</label>
+        <input id="pwInput" type="password" aria-describedby="pwHelp" />
+        <div id="pwHelp" class="field-msg">Min 8 chars incl. number.</div>
+        <div id="pwStrength" class="field-msg"></div>
+        <label for="bioInput">Bio</label>
+        <textarea id="bioInput" maxlength="160" placeholder="Short bio..."></textarea>
+        <div class="field-msg" id="bioCount">0 / 160</div>
+      </div>
+      <div class="panel">
+        <h3>Selects & Combobox</h3>
+        <label for="petSelect">Favorite Pet</label>
+        <select id="petSelect">
+          <option value="">-- choose --</option>
+          <option>Dog</option><option>Cat</option><option>Bird</option><option>Fish</option>
+        </select>
+        <label for="comboInput">Searchable (Combobox)</label>
+        <div class="combo" role="combobox" aria-haspopup="listbox" aria-owns="comboList" aria-expanded="false">
+          <input id="comboInput" type="text" autocomplete="off" aria-autocomplete="list" aria-controls="comboList" placeholder="Type to filter..." />
+          <button type="button" class="toggle" tabindex="-1" aria-label="Toggle options">▾</button>
+          <ul id="comboList" class="combo-list" role="listbox" aria-label="Options"></ul>
+        </div>
+        <div class="field-msg" id="comboMsg">Pick an option.</div>
+      </div>
+    </div>
+
+    <h2 id="controls">Controls & Feedback</h2>
+    <div class="grid cols-3">
+      <div class="panel">
+        <h3>Buttons</h3>
+        <div class="flex gap wrap">
+          <button class="btn primary" id="demoPrimaryBtn">Primary</button>
+          <button class="btn outline">Outline</button>
+          <button class="btn ghost">Ghost</button>
+          <button class="btn danger">Danger</button>
+          <button class="btn pill">Pill</button>
+          <button class="btn small">Small</button>
+          <button class="btn primary loading" aria-live="polite">Loading</button>
+        </div>
+        <div class="divider"></div>
+        <div class="flex gap wrap">
+          <div class="tooltip-wrap">
+            <button class="btn small ghost" aria-describedby="tt-a">Hover</button>
+            <span class="tooltip" id="tt-a" role="tooltip">Tooltip text</span>
+          </div>
+          <div class="tooltip-wrap">
+            <button class="btn small ghost" aria-describedby="tt-b">⌘K</button>
+            <span class="tooltip" id="tt-b" role="tooltip">Shortcut hint</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Range & Output</h3>
+        <label for="volumeRange">Volume</label>
+        <input id="volumeRange" type="range" min="0" max="100" value="35" />
+        <div class="range-output">Value: <span id="rangeVal">35</span></div>
+        <label for="colorInput">Favorite Color</label>
+        <input id="colorInput" type="color" value="#2563eb" />
+        <label><input type="checkbox" id="notifyChk" /> Email me updates</label>
+        <label><input type="radio" name="plan" value="basic" checked /> Basic</label>
+        <label><input type="radio" name="plan" value="pro" /> Pro</label>
+        <label><input type="radio" name="plan" value="team" /> Team</label>
+      </div>
+      <div class="panel">
+        <h3>Scrollable Pane</h3>
+        <div class="scroll-box" aria-label="Scrollable content" tabindex="0">
+          <strong>Lorem Ipsum</strong><br />
+          Reusable area to test scrolling, focus visuals and keyboard navigation. <br /><br />
+          1. Vestibulum id ligula porta felis euismod semper.<br />
+          2. Aenean lacinia bibendum nulla sed consectetur.<br />
+          3. Etiam porta sem malesuada magna mollis euismod.<br />
+          4. Cras mattis consectetur purus sit amet fermentum.<br />
+          5. Donec sed odio dui. Nulla vitae elit libero.<br />
+          6. Praesent commodo cursus magna, vel scelerisque nisl consectetur.<br />
+          7. Curabitur blandit tempus porttitor. <br />
+          8. Maecenas faucibus mollis interdum.<br />
+          9. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.<br />
+          10. Cras justo odio, dapibus ac facilisis in, egestas eget quam.<br />
+        </div>
+      </div>
+    </div>
+
+    <h2 id="navigation">Tabs, Accordion & Links</h2>
+    <div class="panel">
+      <div class="tabs" role="tablist" aria-label="Sample Tabs">
+        <button role="tab" id="tab-1" aria-controls="panel-1" aria-selected="true" tabindex="0">Overview</button>
+        <button role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false" tabindex="-1">Details</button>
+        <button role="tab" id="tab-3" aria-controls="panel-3" aria-selected="false" tabindex="-1">Code</button>
+      </div>
+      <div id="panel-1" class="tab-panel active" role="tabpanel" aria-labelledby="tab-1">Simple accessible tab pattern with keyboard arrow navigation.</div>
+      <div id="panel-2" class="tab-panel" role="tabpanel" aria-labelledby="tab-2">Second panel content. Add longer prose to test layout wrapping & focus retention.</div>
+      <div id="panel-3" class="tab-panel" role="tabpanel" aria-labelledby="tab-3"><code class="inline">console.log('Hello Tabs')</code></div>
+      <div class="divider"></div>
+      <div class="accordion" id="demoAccordion">
+        <div class="accordion-item">
+          <h4 class="accordion-header"><button class="accordion-button" aria-expanded="false">What is this?<span>▾</span></button></h4>
+          <div class="accordion-content">An accessible accordion; each item toggles visibility, and only JS adds open/close classes.</div>
+        </div>
+        <div class="accordion-item">
+          <h4 class="accordion-header"><button class="accordion-button" aria-expanded="false">Why minimal JS?<span>▾</span></button></h4>
+          <div class="accordion-content">Keeping logic tiny makes it easy to transplant into other stacks or extend progressively.</div>
+        </div>
+        <div class="accordion-item">
+          <h4 class="accordion-header"><button class="accordion-button" aria-expanded="false">Can I add animation?<span>▾</span></button></h4>
+          <div class="accordion-content">Yes: height transitions or clip-path reveals would be simple additions.</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <p>Inline <a href="#" onclick="return false;">link example</a> and a <a href="https://developer.mozilla.org/" target="_blank" rel="noopener">MDN external link</a>.</p>
+    </div>
+
+    <h2 id="dialogs">Modal & Notifications</h2>
+    <div class="panel">
+      <p>Use the header button to open a modal. Trigger toasts with the buttons below.</p>
+      <div class="flex gap wrap">
+        <button class="btn primary" id="toastSuccessBtn">Show Success</button>
+        <button class="btn danger" id="toastErrorBtn">Show Error</button>
+      </div>
+    </div>
+
+    <h2 id="carousel">Carousel</h2>
+    <div class="panel">
+      <p style="margin-top:0;" class="muted">Accessible, keyboard-friendly carousel with auto-rotate (pauses on hover, focus or manual navigation).</p>
+      <div class="carousel" id="demoCarousel" aria-roledescription="carousel" aria-label="Scenic images" aria-live="off">
+        <div class="carousel-track">
+          <div class="carousel-slide" data-index="0" aria-hidden="false">
+            <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=60" alt="Mountain lake at sunrise" />
+            <div class="carousel-caption">Mountain Lake</div>
+          </div>
+          <div class="carousel-slide" data-index="1" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=60" alt="Desert dunes under blue sky" />
+            <div class="carousel-caption">Desert Dunes</div>
+          </div>
+            <div class="carousel-slide" data-index="2" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=60" alt="Forest path with light beams" />
+            <div class="carousel-caption">Forest Path</div>
+          </div>
+          <div class="carousel-slide" data-index="3" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=60" alt="Ocean wave curling" />
+            <div class="carousel-caption">Ocean Wave</div>
+          </div>
+        </div>
+        <button class="carousel-btn prev" aria-label="Previous slide" data-carousel-prev>◂</button>
+        <button class="carousel-btn next" aria-label="Next slide" data-carousel-next>▸</button>
+        <div class="carousel-indicators" role="tablist" aria-label="Select slide">
+          <button type="button" aria-label="Go to slide 1" aria-current="true" data-carousel-indicator="0"></button>
+          <button type="button" aria-label="Go to slide 2" data-carousel-indicator="1"></button>
+          <button type="button" aria-label="Go to slide 3" data-carousel-indicator="2"></button>
+          <button type="button" aria-label="Go to slide 4" data-carousel-indicator="3"></button>
+        </div>
+        <button class="carousel-pause" id="carouselPauseBtn" aria-pressed="false">Pause</button>
+        <div class="carousel-status" aria-live="polite" id="carouselStatus"></div>
+      </div>
+    </div>
+
+    <h2 id="map">Map</h2>
+    <div class="panel" id="mapSection">
+      <p class="muted" style="margin-top:0;">Interactive Leaflet map with a marker and accessible fallback text.</p>
+      <div id="demoMap" role="region" aria-label="Map showing a sample location">
+        <p style="padding:1rem;">Loading map… (If this remains, the map library may be blocked.)</p>
+      </div>
+    </div>
+
+    <h2 id="gallery">Image Gallery</h2>
+    <div class="panel">
+      <p class="muted" style="margin-top:0;">Click a thumbnail to view it larger. ESC or outside click closes. Arrow keys navigate while open.</p>
+      <div class="gallery" id="imageGallery" style="display:grid;gap:.75rem;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));">
+        <button class="gallery-item" data-full="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1400&q=60" aria-label="Open Mountain Lake image" style="padding:0;border:none;background:none;cursor:pointer;">
+          <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=300&q=40" alt="Mountain lake" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--color-border);" />
+        </button>
+        <button class="gallery-item" data-full="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1400&q=60" aria-label="Open Desert Dunes image" style="padding:0;border:none;background:none;cursor:pointer;">
+          <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=300&q=40" alt="Desert dunes" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--color-border);" />
+        </button>
+        <button class="gallery-item" data-full="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=60" aria-label="Open Forest Path image" style="padding:0;border:none;background:none;cursor:pointer;">
+          <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=300&q=40" alt="Forest path" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--color-border);" />
+        </button>
+        <button class="gallery-item" data-full="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=60" aria-label="Open Ocean Wave image" style="padding:0;border:none;background:none;cursor:pointer;">
+          <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=300&q=40" alt="Ocean wave" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--color-border);" />
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Structure -->
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal" id="demoModal">
+      <button class="modal-close" aria-label="Close modal" data-close-modal>&times;</button>
+      <h2 id="modalTitle">Example Modal</h2>
+      <p>This is a lightweight, theme-aware modal dialog. Focus is trapped while open, ESC closes it, and focus returns to the invoking button on close.</p>
+      <div class="flex gap wrap">
+        <button class="btn primary" data-close-modal>Accept</button>
+        <button class="btn outline" data-close-modal>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toasts" aria-live="polite" aria-atomic="false" id="toastRegion"></div>
+
+  <footer>&copy; <span id="year"></span> UI Elements Showcase</footer>
+
+  <script>
+  (function(){
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('themeToggle');
+    const themeKey = 'ui-theme';
+    const saved = localStorage.getItem(themeKey);
+    function applyTheme(t){ root.setAttribute('data-theme', t); themeBtn.setAttribute('aria-pressed', String(t==='dark')); }
+    if(saved) { applyTheme(saved); } else if(window.matchMedia('(prefers-color-scheme: dark)').matches) { applyTheme('dark'); }
+    themeBtn.addEventListener('click', () => { const cur = root.getAttribute('data-theme')==='dark' ? 'dark':'light'; const next = cur==='dark'?'light':'dark'; applyTheme(next); localStorage.setItem(themeKey,next); });
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* Validation */
+    const nameInput = document.getElementById('nameInput');
+    const nameMsg = document.getElementById('nameMsg');
+    nameInput.addEventListener('input', () => {
+      const v = nameInput.value.trim();
+      if(v.length < 2){ nameInput.classList.add('error'); nameMsg.textContent = 'Name too short.'; nameMsg.classList.add('error'); }
+      else { nameInput.classList.remove('error'); nameMsg.textContent = 'Looks good.'; nameMsg.classList.remove('error'); nameMsg.classList.add('success'); }
+    });
+
+    const emailInput = document.getElementById('emailInput');
+    const emailMsg = document.getElementById('emailMsg');
+    emailInput.addEventListener('input', () => {
+      const v = emailInput.value.trim();
+      if(!v){ emailMsg.textContent = ''; emailInput.classList.remove('error'); return; }
+      const ok = /.+@.+\..+/.test(v);
+      if(!ok){ emailInput.classList.add('error'); emailMsg.textContent = 'Invalid email.'; emailMsg.classList.add('error'); }
+      else { emailInput.classList.remove('error'); emailMsg.textContent = 'Valid email.'; emailMsg.classList.remove('error'); emailMsg.classList.add('success'); }
+    });
+
+    const pwInput = document.getElementById('pwInput');
+    const pwStrength = document.getElementById('pwStrength');
+    pwInput.addEventListener('input', () => {
+      const v = pwInput.value;
+      let score = 0;
+      if(v.length >= 8) score++;
+      if(/[0-9]/.test(v)) score++;
+      if(/[A-Z]/.test(v)) score++;
+      if(/[^A-Za-z0-9]/.test(v)) score++;
+      pwStrength.textContent = v ? 'Strength: ' + ['Weak','Fair','Good','Strong'][score-1] : '';
+      pwStrength.className = 'field-msg ' + (score>=3 ? 'success' : score? 'error':'');
+    });
+
+    const bioInput = document.getElementById('bioInput');
+    const bioCount = document.getElementById('bioCount');
+    bioInput.addEventListener('input', () => { bioCount.textContent = bioInput.value.length + ' / 160'; });
+
+    /* Range */
+    const range = document.getElementById('volumeRange');
+    const rangeVal = document.getElementById('rangeVal');
+    range.addEventListener('input', () => { rangeVal.textContent = range.value; });
+
+    /* Combobox */
+    const comboData = ['Alpine','Birch','Cedar','Dogwood','Elm','Fir','Ginkgo','Hemlock','Ironwood','Juniper','Linden','Maple','Oak','Pine','Redwood','Spruce','Sycamore','Willow'];
+    const comboWrap = document.querySelector('.combo');
+    const comboInput = document.getElementById('comboInput');
+    const comboList = document.getElementById('comboList');
+    const comboMsg = document.getElementById('comboMsg');
+    const comboToggle = comboWrap.querySelector('button.toggle');
+    let comboOpen = false, comboActiveIndex = -1, comboFiltered = comboData.slice();
+
+    function renderCombo(){
+      comboList.innerHTML = '';
+      comboFiltered.forEach((opt,i) => {
+        const li = document.createElement('li');
+        li.role = 'option';
+        li.className = 'combo-option';
+        li.textContent = opt;
+        li.id = 'combo-opt-'+i;
+        li.setAttribute('aria-selected', String(i===comboActiveIndex));
+        li.addEventListener('mousedown', e => { e.preventDefault(); selectCombo(opt); });
+        comboList.appendChild(li);
+      });
+    }
+    function openCombo(){ comboOpen = true; comboWrap.setAttribute('aria-expanded','true'); comboList.setAttribute('aria-expanded','true'); }
+    function closeCombo(){ comboOpen = false; comboWrap.setAttribute('aria-expanded','false'); comboList.removeAttribute('aria-expanded'); comboActiveIndex=-1; }
+    function filterCombo(){
+      const q = comboInput.value.trim().toLowerCase();
+      comboFiltered = !q ? comboData.slice() : comboData.filter(v => v.toLowerCase().includes(q));
+      comboActiveIndex = -1;
+      renderCombo();
+    }
+    function selectCombo(val){ comboInput.value = val; comboMsg.textContent = 'Selected: '+val; comboMsg.classList.add('success'); closeCombo(); comboInput.focus(); }
+
+    comboInput.addEventListener('input', () => { filterCombo(); if(!comboOpen) openCombo(); });
+    comboInput.addEventListener('keydown', e => {
+      if(e.key === 'ArrowDown'){ if(!comboOpen){ openCombo(); filterCombo(); } comboActiveIndex = Math.min(comboFiltered.length-1, comboActiveIndex+1); updateActive(); e.preventDefault(); }
+      else if(e.key === 'ArrowUp'){ if(comboOpen){ comboActiveIndex = Math.max(0, comboActiveIndex-1); updateActive(); e.preventDefault(); } }
+      else if(e.key === 'Enter'){ if(comboOpen && comboActiveIndex>=0){ selectCombo(comboFiltered[comboActiveIndex]); e.preventDefault(); } }
+      else if(e.key === 'Escape'){ if(comboOpen){ closeCombo(); e.preventDefault(); } }
+    });
+    function updateActive(){
+      [...comboList.children].forEach((li,i)=> li.setAttribute('aria-selected', String(i===comboActiveIndex)));
+      if(comboActiveIndex>=0){ const el = document.getElementById('combo-opt-'+comboActiveIndex); el && el.scrollIntoView({block:'nearest'}); }
+    }
+    document.addEventListener('click', e => { if(!comboWrap.contains(e.target)) closeCombo(); });
+    comboToggle.addEventListener('click', () => { comboOpen? closeCombo() : (filterCombo(), openCombo(), comboInput.focus()); });
+    filterCombo();
+
+    /* Tabs */
+    const tabs = document.querySelectorAll('[role=tab]');
+    const panels = document.querySelectorAll('.tab-panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => activateTab(tab));
+      tab.addEventListener('keydown', e => {
+        const idx = [...tabs].indexOf(tab);
+        if(e.key==='ArrowRight'){ const next = tabs[(idx+1)%tabs.length]; next.focus(); activateTab(next); }
+        else if(e.key==='ArrowLeft'){ const prev = tabs[(idx-1+tabs.length)%tabs.length]; prev.focus(); activateTab(prev); }
+      });
+    });
+    function activateTab(tab){
+      tabs.forEach(t => { t.setAttribute('aria-selected','false'); t.tabIndex=-1; });
+      panels.forEach(p => p.classList.remove('active'));
+      tab.setAttribute('aria-selected','true'); tab.tabIndex=0; document.getElementById(tab.getAttribute('aria-controls')).classList.add('active');
+    }
+
+    /* Accordion */
+    document.querySelectorAll('.accordion-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.accordion-item');
+        const open = item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(open));
+      });
+    });
+
+    /* Modal */
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const modal = document.getElementById('demoModal');
+    let lastFocus = null;
+    function openModal(){ lastFocus=document.activeElement; modalBackdrop.classList.add('show'); modalBackdrop.removeAttribute('aria-hidden'); trapFocus(modal); modal.querySelector('button[data-close-modal]')?.focus(); }
+    function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); lastFocus && lastFocus.focus(); }
+    openModalBtn.addEventListener('click', openModal);
+    modalBackdrop.addEventListener('click', e => { if(e.target===modalBackdrop) closeModal(); });
+    modal.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', closeModal));
+    document.addEventListener('keydown', e => { if(e.key==='Escape' && modalBackdrop.classList.contains('show')) closeModal(); });
+
+    function trapFocus(container){
+      const focusable = () => [...container.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(el => !el.disabled && el.offsetParent);
+      function handle(e){
+        if(e.key==='Tab'){
+          const f = focusable(); if(!f.length) return; const first=f[0], last=f[f.length-1];
+          if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
+          else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
+        }
+      }
+      container.addEventListener('keydown', handle);
+    }
+
+    /* Toasts */
+    const toastRegion = document.getElementById('toastRegion');
+    function showToast(type, msg){
+      const div = document.createElement('div');
+      div.className = 'toast ' + type;
+      div.innerHTML = `<strong>${type==='success'?'✓':'⚠'}</strong><span>${msg}</span><button aria-label="Dismiss">×</button>`;
+      const btn = div.querySelector('button');
+      btn.addEventListener('click', () => dismiss());
+      function dismiss(){ div.style.opacity=0; setTimeout(()=>div.remove(), 180); }
+      toastRegion.appendChild(div);
+      setTimeout(dismiss, 4500);
+    }
+    document.getElementById('toastSuccessBtn').addEventListener('click', () => showToast('success','Saved successfully.'));
+    document.getElementById('toastErrorBtn').addEventListener('click', () => showToast('error','Something went wrong.'));
+
+    // Demo primary button loading simulation
+    const primaryBtn = document.getElementById('demoPrimaryBtn');
+    primaryBtn.addEventListener('click', () => {
+      if(primaryBtn.classList.contains('loading')) return; primaryBtn.classList.add('loading'); const txt=primaryBtn.textContent; primaryBtn.textContent='Working'; setTimeout(()=>{ primaryBtn.classList.remove('loading'); primaryBtn.textContent=txt; showToast('success','Action completed.'); }, 1800);
+    });
+
+    /* Carousel */
+    (function(){
+      const carousel = document.getElementById('demoCarousel');
+      if(!carousel) return;
+      const track = carousel.querySelector('.carousel-track');
+      const slides = [...carousel.querySelectorAll('.carousel-slide')];
+      const prevBtn = carousel.querySelector('[data-carousel-prev]');
+      const nextBtn = carousel.querySelector('[data-carousel-next]');
+      const indicators = [...carousel.querySelectorAll('[data-carousel-indicator]')];
+      const status = document.getElementById('carouselStatus');
+      const pauseBtn = document.getElementById('carouselPauseBtn');
+      let index = 0;
+      let auto = true;
+      let timer = null;
+      const ROTATE_MS = 5000;
+  let startX = null; let isPointer = false; let deltaX = 0; const SWIPE_THRESHOLD = 60;
+
+      function setIndex(i, user=false){
+        index = (i+slides.length)%slides.length;
+        track.style.transform = `translateX(-${index*100}%)`;
+        slides.forEach((s,si) => s.setAttribute('aria-hidden', String(si!==index)));
+        indicators.forEach(ind => ind.setAttribute('aria-current', ind.dataset.carouselIndicator==index));
+        status.textContent = `Slide ${index+1} of ${slides.length}`;
+        if(user){ auto = false; pauseBtn.textContent='Play'; pauseBtn.setAttribute('aria-pressed','true'); }
+      }
+      function next(user=false){ setIndex(index+1, user); }
+      function prev(user=false){ setIndex(index-1, user); }
+      prevBtn.addEventListener('click', () => prev(true));
+      nextBtn.addEventListener('click', () => next(true));
+      indicators.forEach(btn => btn.addEventListener('click', () => setIndex(parseInt(btn.dataset.carouselIndicator,10), true)));
+      carousel.addEventListener('keydown', e => {
+        if(e.key==='ArrowRight'){ next(true); }
+        else if(e.key==='ArrowLeft'){ prev(true); }
+      });
+      function start(){ if(timer) return; timer = setInterval(()=>{ if(auto) next(false); }, ROTATE_MS); }
+      function stop(){ clearInterval(timer); timer=null; }
+      carousel.addEventListener('pointerenter', () => { auto=false; pauseBtn.textContent='Play'; pauseBtn.setAttribute('aria-pressed','true'); });
+      carousel.addEventListener('focusin', () => { auto=false; pauseBtn.textContent='Play'; pauseBtn.setAttribute('aria-pressed','true'); });
+      carousel.addEventListener('pointerleave', () => { if(pauseBtn.getAttribute('aria-pressed')==='false'){ auto=true; } });
+      pauseBtn.addEventListener('click', () => {
+        const pressed = pauseBtn.getAttribute('aria-pressed')==='true';
+        if(pressed){ auto=true; pauseBtn.textContent='Pause'; pauseBtn.setAttribute('aria-pressed','false'); }
+        else { auto=false; pauseBtn.textContent='Play'; pauseBtn.setAttribute('aria-pressed','true'); }
+      });
+      // Swipe support (pointer events)
+      track.addEventListener('pointerdown', e => { startX = e.clientX; isPointer=true; deltaX=0; track.style.transition='none'; });
+      window.addEventListener('pointermove', e => { if(!isPointer) return; deltaX = e.clientX - startX; track.style.transform = `translateX(calc(-${index*100}% + ${deltaX}px))`; });
+      window.addEventListener('pointerup', () => { if(!isPointer) return; track.style.transition='transform .6s var(--transition)'; if(Math.abs(deltaX) > SWIPE_THRESHOLD){ if(deltaX < 0) next(true); else prev(true); } else { track.style.transform = `translateX(-${index*100}%)`; } startX=null; isPointer=false; deltaX=0; });
+      window.addEventListener('pointercancel', () => { if(!isPointer) return; track.style.transition='transform .6s var(--transition)'; track.style.transform = `translateX(-${index*100}%)`; startX=null; isPointer=false; });
+      setIndex(0);
+      start();
+    })();
+
+    /* Map */
+    (function(){
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+      script.crossOrigin = '';
+      script.onload = initMap;
+      document.head.appendChild(script);
+      function initMap(){
+        if(!window.L) return;
+        const map = L.map('demoMap',{ scrollWheelZoom:false }).setView([37.7749,-122.4194], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+        L.marker([37.7749,-122.4194]).addTo(map).bindPopup('Sample Marker: San Francisco').openPopup();
+      }
+    })();
+
+    /* Gallery Lightbox */
+    (function(){
+      const gallery = document.getElementById('imageGallery');
+      if(!gallery) return;
+      const items = [...gallery.querySelectorAll('.gallery-item')];
+      let currentIndex = -1;
+      // Reuse existing modal backdrop but create a dedicated lightbox container appended once
+      const lbBackdrop = document.createElement('div');
+      lbBackdrop.className='modal-backdrop';
+      lbBackdrop.setAttribute('aria-hidden','true');
+      lbBackdrop.innerHTML = `<div class="modal" style="max-width:900px;padding:0;overflow:hidden;" role="dialog" aria-modal="true" aria-label="Image viewer"><button class="modal-close" aria-label="Close viewer" data-lb-close>&times;</button><figure style="margin:0;position:relative;"> <img id="lightboxImg" alt="" style="max-width:100%;display:block;width:100%;height:auto;" /> <figcaption id="lightboxCaption" style="padding:.75rem 1rem;font-size:.7rem;letter-spacing:.5px;background:var(--color-surface-alt);border-top:1px solid var(--color-border);"></figcaption></figure><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;pointer-events:none;">
+      <button type="button" data-lb-prev class="carousel-btn prev" style="pointer-events:auto;">◂</button><button type="button" data-lb-next class="carousel-btn next" style="pointer-events:auto;">▸</button></div></div>`;
+      document.body.appendChild(lbBackdrop);
+      const imgEl = lbBackdrop.querySelector('#lightboxImg');
+      const capEl = lbBackdrop.querySelector('#lightboxCaption');
+      const prevBtn = lbBackdrop.querySelector('[data-lb-prev]');
+      const nextBtn = lbBackdrop.querySelector('[data-lb-next]');
+      const closeBtns = lbBackdrop.querySelectorAll('[data-lb-close]');
+      let lastFocus = null;
+  function open(i){ currentIndex=i; const btn=items[i]; const full=btn.getAttribute('data-full'); const thumb=btn.querySelector('img'); imgEl.src=full; imgEl.alt=thumb.alt; capEl.textContent=thumb.alt; lbBackdrop.classList.add('show'); lbBackdrop.removeAttribute('aria-hidden'); document.body.classList.add('lightbox-open'); lastFocus=document.activeElement; nextBtn.focus(); }
+  function close(){ lbBackdrop.classList.remove('show'); lbBackdrop.setAttribute('aria-hidden','true'); document.body.classList.remove('lightbox-open'); lastFocus && lastFocus.focus(); }
+      function nav(delta){ open((currentIndex+delta+items.length)%items.length); }
+      items.forEach((btn,i)=> btn.addEventListener('click', () => open(i)));
+      prevBtn.addEventListener('click', ()=> nav(-1));
+      nextBtn.addEventListener('click', ()=> nav(1));
+      closeBtns.forEach(b=> b.addEventListener('click', close));
+      lbBackdrop.addEventListener('click', e => { if(e.target===lbBackdrop) close(); });
+      document.addEventListener('keydown', e => {
+        if(!lbBackdrop.classList.contains('show')) return;
+        if(e.key==='Escape') close();
+        else if(e.key==='ArrowRight') nav(1);
+        else if(e.key==='ArrowLeft') nav(-1);
+      });
+    })();
+
+  })();
+  </script>
+</body>
+</html>
