@@ -82,26 +82,32 @@
   ]));
 
   sections.push(card('Shipping Address', [
-    ['Line 1', data.shippingAddress1],
-    ['Line 2', data.shippingAddress2],
-    ['City', data.shippingCity],
-    ['State', data.shippingState],
-    ['Postal Code', data.shippingPostal]
+    ['Line 1', data.shipAddress1],
+    ['Line 2', data.shipAddress2],
+    ['City', data.shipCity],
+    ['State', data.shipState],
+    ['Postal Code', data.shipPostal],
+    ['Country', data.shipCountry]
   ]));
 
   sections.push(card('Billing Address', [
     ['Use Shipping?', yesNo(data.sameAsShipping)],
-    ['Line 1', data.billingAddress1],
-    ['Line 2', data.billingAddress2],
-    ['City', data.billingCity],
-    ['State', data.billingState],
-    ['Postal Code', data.billingPostal]
+    ['Line 1', data.billAddress1],
+    ['Line 2', data.billAddress2],
+    ['City', data.billCity],
+    ['State', data.billState],
+    ['Postal Code', data.billPostal],
+    ['Country', data.billCountry]
   ]));
 
   sections.push(card('Order Details', [
-    ['Product ID', data.productId],
-    ['Quantity', data.quantity],
-    ['Expedite?', yesNo(data.expedite)]
+    ['Order #', data.orderNumber],
+    ['Order Date', data.orderDate],
+    ['Ship Method', data.shipMethod],
+    ['Currency', data.currency],
+    ['Discount Code', data.discountCode],
+    ['Sales Rep', data.salesRep],
+    ['Special Instructions', data.specialInstructions]
   ]));
 
   sections.push(card('Payment (Masked)', [

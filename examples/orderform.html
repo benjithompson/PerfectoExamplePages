@@ -175,6 +175,7 @@ input[required]:user-invalid:focus, textarea[required]:user-invalid:focus {
         <option value="standard" selected>Standard User</option>
         <option value="admin">Administrator</option>
       </select>
+      <button id="autofillBtn" type="button" class="secondary" style="font-size:.7rem;">Autofill</button>
       <button id="toggleTheme" type="button" class="ghost-btn" aria-pressed="false" aria-label="Toggle color theme">🌗</button>
     </div>
   </header>
@@ -249,7 +250,7 @@ input[required]:user-invalid:focus, textarea[required]:user-invalid:focus {
             <input id="shipCountry" name="shipCountry" required autocomplete="country-name" />
           </div>
           <div class="form-control col-span-4 inline">
-            <input type="checkbox" id="copyToBilling" />
+            <input type="checkbox" id="copyToBilling" name="sameAsShipping" />
             <label for="copyToBilling">Use shipping address as billing</label>
           </div>
         </div>
@@ -260,28 +261,28 @@ input[required]:user-invalid:focus, textarea[required]:user-invalid:focus {
         <legend>Billing Address</legend>
         <div class="grid cols-4">
           <div class="form-control col-span-2">
-            <label for="billAddress1">Address Line 1 <span class="req">*</span></label>
-            <input id="billAddress1" name="billAddress1" required autocomplete="address-line1" />
+            <label for="billAddress1">Address Line 1 <span class="req" data-bill-req>*</span></label>
+            <input id="billAddress1" name="billAddress1" required autocomplete="address-line1" data-bill-req />
           </div>
           <div class="form-control col-span-2">
             <label for="billAddress2">Address Line 2</label>
             <input id="billAddress2" name="billAddress2" autocomplete="address-line2" />
           </div>
           <div class="form-control">
-            <label for="billCity">City <span class="req">*</span></label>
-            <input id="billCity" name="billCity" required autocomplete="address-level2" />
+            <label for="billCity">City <span class="req" data-bill-req>*</span></label>
+            <input id="billCity" name="billCity" required autocomplete="address-level2" data-bill-req />
           </div>
           <div class="form-control">
-            <label for="billState">State/Prov <span class="req">*</span></label>
-            <input id="billState" name="billState" required autocomplete="address-level1" />
+            <label for="billState">State/Prov <span class="req" data-bill-req>*</span></label>
+            <input id="billState" name="billState" required autocomplete="address-level1" data-bill-req />
           </div>
           <div class="form-control">
-            <label for="billPostal">Postal Code <span class="req">*</span></label>
-            <input id="billPostal" name="billPostal" required autocomplete="postal-code" />
+            <label for="billPostal">Postal Code <span class="req" data-bill-req>*</span></label>
+            <input id="billPostal" name="billPostal" required autocomplete="postal-code" data-bill-req />
           </div>
             <div class="form-control">
-            <label for="billCountry">Country <span class="req">*</span></label>
-            <input id="billCountry" name="billCountry" required autocomplete="country-name" />
+            <label for="billCountry">Country <span class="req" data-bill-req>*</span></label>
+            <input id="billCountry" name="billCountry" required autocomplete="country-name" data-bill-req />
           </div>
         </div>
       </fieldset>
@@ -385,6 +386,7 @@ input[required]:user-invalid:focus, textarea[required]:user-invalid:focus {
   const resultSection = document.getElementById('result');
   const resultPre = document.getElementById('resultPre');
   const toggleThemeBtn = document.getElementById('toggleTheme');
+  const autofillBtn = document.getElementById('autofillBtn');
   const yearEl = document.getElementById('year');
   yearEl.textContent = new Date().getFullYear();
 
@@ -405,6 +407,15 @@ input[required]:user-invalid:focus, textarea[required]:user-invalid:focus {
     });
     // Billing fieldset hidden for standard users
     billingFieldset.style.display = isAdmin ? '' : 'none';
+    // Toggle required state dynamically for billing fields
+    const billingReq = billingFieldset.querySelectorAll('[data-bill-req]');
+    billingReq.forEach(el => {
+      if(isAdmin){
+        el.setAttribute('required','required');
+      } else {
+        el.removeAttribute('required');
+      }
+    });
   }
 
   profileRole.addEventListener('change', e => applyRole(e.target.value));
@@ -507,6 +518,39 @@ input[required]:user-invalid:focus, textarea[required]:user-invalid:focus {
   cvv.addEventListener('input', () => {
     cvv.value = cvv.value.replace(/\D/g,'').slice(0,4);
   });
+
+  // Autofill sample data
+  function autofill(){
+    const set = (id,val) => { const el = document.getElementById(id); if(el){ el.value = val; el.dispatchEvent(new Event('input',{bubbles:true})); } };
+    set('customerId','CUST-'+Math.floor(1000+Math.random()*9000));
+    set('firstName','Jane');
+    set('lastName','Doe');
+    set('email','jane.doe@example.com');
+    set('phone','555-123-9876');
+    set('accountType','retail');
+    set('shipAddress1','742 Evergreen Terrace');
+    set('shipAddress2','Suite 5');
+    set('shipCity','Springfield');
+    set('shipState','IL');
+    set('shipPostal','62704');
+    set('shipCountry','USA');
+    // Copy to billing
+    copyToBilling.checked = true; copyToBilling.dispatchEvent(new Event('change'));
+    set('orderNumber','ORD-'+Date.now());
+    set('orderDate', new Date().toISOString().slice(0,10));
+    set('shipMethod','Ground');
+    set('currency','USD');
+    set('specialInstructions','Leave at side door.');
+    set('discountCode','WELCOME10');
+    set('salesRep','SR-104');
+    set('cardName','Jane A Doe');
+    set('cardNumber','4111 1111 1111 1111');
+    set('exp','12/29');
+    set('cvv','123');
+    set('billingNotes','Customer prefers afternoon deliveries.');
+    profileRole.value = 'standard'; applyRole('standard');
+  }
+  autofillBtn.addEventListener('click', autofill);
 })();
   </script>
 </body>
