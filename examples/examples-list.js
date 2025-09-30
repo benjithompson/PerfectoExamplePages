@@ -6,6 +6,7 @@ window.EXAMPLES = [
   { file: 'orderform.html', name: 'Order Form' },
   { file: 'elements.html', name: 'UI Elements' },
   { file: 'store.html', name: 'Store Showcase' },
+  { file: 'w2.html', name: 'W-2 Tax Form' },
   { file: 'http://dbankdemo.com/bank', name: 'Bank Demo' },
   { file: 'https://blazedemo.com', name: 'Blaze Travel' },
   { file: 'https://demoblaze.com', name: 'Blaze Store' }

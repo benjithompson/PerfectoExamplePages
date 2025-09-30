@@ -1,0 +1,191 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: W2
+      - generic [ref=e6]:
+        - strong [ref=e7]: TaxPro Online
+        - generic [ref=e8]: Tax Document Center
+  - generic [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]: ✓
+      - generic [ref=e12]:
+        - heading "W-2 Form Submitted Successfully!" [level=1] [ref=e13]
+        - paragraph [ref=e14]: Your W-2 information has been recorded. Review the details below and save or print for your records.
+    - generic [ref=e15]:
+      - generic [ref=e16]: ℹ️
+      - generic [ref=e17]:
+        - strong [ref=e18]: "Next Steps:"
+        - text: Review this summary carefully. You can print this page for your records or go back to make changes.
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - heading "W-2 Summary" [level=2] [ref=e21]
+        - generic [ref=e22]: 📅 Tax Year 2024
+      - generic [ref=e23]:
+        - heading "Employer Information" [level=3] [ref=e24]
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - generic [ref=e27]:
+              - generic [ref=e28]: b
+              - text: EIN
+            - generic [ref=e29]: 12-3456789
+          - generic [ref=e30]:
+            - generic [ref=e31]:
+              - generic [ref=e32]: c
+              - text: Employer Name
+            - generic [ref=e33]: Tech Corp Inc
+          - generic [ref=e34]:
+            - generic [ref=e35]: Address
+            - generic [ref=e36]: 123 Business Ave
+          - generic [ref=e37]:
+            - generic [ref=e38]: City, State ZIP
+            - generic [ref=e39]: San Francisco, CA, 94105
+          - generic [ref=e40]:
+            - generic [ref=e41]: Control Number
+            - generic [ref=e42]: Not provided
+      - generic [ref=e43]:
+        - heading "Employee Information" [level=3] [ref=e44]
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - generic [ref=e47]:
+              - generic [ref=e48]: a
+              - text: SSN
+            - generic [ref=e49]: 123-45-6789
+          - generic [ref=e50]:
+            - generic [ref=e51]:
+              - generic [ref=e52]: e
+              - text: Employee Name
+            - generic [ref=e53]: Jane Smith
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - generic [ref=e56]: f
+              - text: Address
+            - generic [ref=e57]: 456 Main Street, Apt 5B
+          - generic [ref=e58]:
+            - generic [ref=e59]: City, State ZIP
+            - generic [ref=e60]: Oakland, CA, 94612
+      - generic [ref=e61]:
+        - heading "Federal Wages and Tax Withholding" [level=3] [ref=e62]
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - generic [ref=e66]: "1"
+              - text: Wages, Tips, Other Compensation
+            - generic [ref=e67]: $85,000.00
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - generic [ref=e70]: "2"
+              - text: Federal Income Tax Withheld
+            - generic [ref=e71]: $12,750.00
+          - generic [ref=e72]:
+            - generic [ref=e73]:
+              - generic [ref=e74]: "3"
+              - text: Social Security Wages
+            - generic [ref=e75]: $85,000.00
+          - generic [ref=e76]:
+            - generic [ref=e77]:
+              - generic [ref=e78]: "4"
+              - text: Social Security Tax Withheld
+            - generic [ref=e79]: $5,270.00
+          - generic [ref=e80]:
+            - generic [ref=e81]:
+              - generic [ref=e82]: "5"
+              - text: Medicare Wages and Tips
+            - generic [ref=e83]: $85,000.00
+          - generic [ref=e84]:
+            - generic [ref=e85]:
+              - generic [ref=e86]: "6"
+              - text: Medicare Tax Withheld
+            - generic [ref=e87]: $1,232.50
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - generic [ref=e90]: "7"
+              - text: Social Security Tips
+            - generic [ref=e91]: $0.00
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - generic [ref=e94]: "8"
+              - text: Allocated Tips
+            - generic [ref=e95]: $0.00
+          - generic [ref=e96]:
+            - generic [ref=e97]:
+              - generic [ref=e98]: "10"
+              - text: Dependent Care Benefits
+            - generic [ref=e99]: $0.00
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - generic [ref=e102]: "11"
+              - text: Nonqualified Plans
+            - generic [ref=e103]: $0.00
+          - generic [ref=e104]:
+            - generic [ref=e105]:
+              - generic [ref=e106]: 12a
+              - text: Code & Amount
+            - generic [ref=e107]: Not provided
+          - generic [ref=e108]:
+            - generic [ref=e109]:
+              - generic [ref=e110]: "13"
+              - text: Status Indicators
+            - generic [ref=e111]: Retirement Plan
+      - generic [ref=e112]:
+        - heading "State and Local Tax Information" [level=3] [ref=e113]
+        - generic [ref=e114]:
+          - generic [ref=e115]:
+            - generic [ref=e116]:
+              - generic [ref=e117]: "15"
+              - text: State
+            - generic [ref=e118]: Not provided
+          - generic [ref=e119]:
+            - generic [ref=e120]: Employer's State ID
+            - generic [ref=e121]: Not provided
+          - generic [ref=e122]:
+            - generic [ref=e123]:
+              - generic [ref=e124]: "16"
+              - text: State Wages, Tips, etc.
+            - generic [ref=e125]: $85,000.00
+          - generic [ref=e126]:
+            - generic [ref=e127]:
+              - generic [ref=e128]: "17"
+              - text: State Income Tax
+            - generic [ref=e129]: $4,250.00
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - generic [ref=e132]: "18"
+              - text: Local Wages, Tips, etc.
+            - generic [ref=e133]: $0.00
+          - generic [ref=e134]:
+            - generic [ref=e135]:
+              - generic [ref=e136]: "19"
+              - text: Local Income Tax
+            - generic [ref=e137]: $0.00
+          - generic [ref=e138]:
+            - generic [ref=e139]:
+              - generic [ref=e140]: "20"
+              - text: Locality Name
+            - generic [ref=e141]: Not provided
+      - generic [ref=e142]:
+        - heading "Total Tax Withholding Summary" [level=3] [ref=e143]
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - generic [ref=e146]: Federal Tax
+            - generic [ref=e147]: $12,750.00
+          - generic [ref=e148]:
+            - generic [ref=e149]: Social Security Tax
+            - generic [ref=e150]: $5,270.00
+          - generic [ref=e151]:
+            - generic [ref=e152]: Medicare Tax
+            - generic [ref=e153]: $1,232.50
+          - generic [ref=e154]:
+            - generic [ref=e155]: State Tax
+            - generic [ref=e156]: $4,250.00
+      - generic [ref=e157]:
+        - button "🖨️ Print Summary" [active] [ref=e158] [cursor=pointer]
+        - link "← Edit W-2 Form" [ref=e159] [cursor=pointer]:
+          - /url: w2.html
+        - link "Back to Examples" [ref=e160] [cursor=pointer]:
+          - /url: ../index.html
+  - contentinfo [ref=e161]:
+    - paragraph [ref=e162]: © 2024 TaxPro Online. For demonstration purposes only. Not for actual tax filing.
+```

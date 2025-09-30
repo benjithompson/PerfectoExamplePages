@@ -1,0 +1,24 @@
+{
+  "name": "perfecto-example-pages-tests",
+  "version": "1.0.0",
+  "description": "Playwright tests for example pages",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:w2": "playwright test tests/w2.spec.js",
+    "test:w2:headed": "playwright test tests/w2.spec.js --headed",
+    "report": "playwright show-report"
+  },
+  "keywords": [
+    "playwright",
+    "testing",
+    "e2e"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

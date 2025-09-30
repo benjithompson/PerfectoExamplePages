@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>W-2 Wage and Tax Statement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+/* Base Design Tokens */
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f1f5f9;
+  --color-border: #cbd5e1;
+  --color-border-strong: #94a3b8;
+  --color-text: #0f172a;
+  --color-text-light: #64748b;
+  --color-text-muted: #94a3b8;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-subtle: #dbeafe;
+  --color-success: #16a34a;
+  --color-success-bg: #dcfce7;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fee2e2;
+  --color-warning: #ea580c;
+  --color-warning-bg: #fed7aa;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+  --focus-ring: 0 0 0 3px rgba(37,99,235,.25);
+  --transition: .2s cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"] {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-surface-alt: #334155;
+  --color-border: #475569;
+  --color-border-strong: #64748b;
+  --color-text: #f1f5f9;
+  --color-text-light: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #60a5fa;
+  --color-accent-subtle: #1e3a8a;
+  --color-success: #22c55e;
+  --color-success-bg: #14532d;
+  --color-danger: #ef4444;
+  --color-danger-bg: #7f1d1d;
+  --color-warning: #f97316;
+  --color-warning-bg: #7c2d12;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text); line-height:1.6; min-height:100vh; }
+
+.container { max-width:1000px; margin:0 auto; padding:2rem 1.5rem; }
+header { background:var(--color-surface); border-bottom:1px solid var(--color-border); padding:1.5rem 0; margin-bottom:2rem; box-shadow:var(--shadow-sm); }
+.header-content { max-width:1000px; margin:0 auto; padding:0 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+.logo { display:flex; align-items:center; gap:.75rem; }
+.logo-icon { width:42px; height:42px; background:linear-gradient(135deg, var(--color-accent), #1d4ed8); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:1.1rem; box-shadow:0 2px 8px rgba(37,99,235,.3); }
+.logo-text { display:flex; flex-direction:column; line-height:1.2; }
+.logo-text strong { font-size:1.15rem; font-weight:700; color:var(--color-text); }
+.logo-text span { font-size:.75rem; color:var(--color-text-light); letter-spacing:.3px; }
+.back-link { display:inline-flex; align-items:center; gap:.4rem; font-size:.85rem; color:var(--color-text-light); text-decoration:none; padding:.5rem .75rem; border-radius:var(--radius-sm); transition:var(--transition); }
+.back-link:hover { background:var(--color-surface-alt); color:var(--color-text); }
+
+.form-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:2rem; box-shadow:var(--shadow-md); }
+.form-header { margin-bottom:2rem; padding-bottom:1.5rem; border-bottom:2px solid var(--color-border); }
+.form-title { font-size:1.75rem; font-weight:700; color:var(--color-text); margin-bottom:.5rem; }
+.form-subtitle { font-size:.95rem; color:var(--color-text-light); }
+.tax-year-badge { display:inline-flex; align-items:center; padding:.35rem .7rem; background:var(--color-accent-subtle); color:var(--color-accent); border-radius:var(--radius-md); font-size:.8rem; font-weight:600; margin-top:.75rem; }
+
+.form-section { margin-bottom:2rem; }
+.section-title { font-size:1.05rem; font-weight:600; color:var(--color-text); margin-bottom:1rem; padding:.5rem .75rem; background:var(--color-surface-alt); border-left:3px solid var(--color-accent); border-radius:var(--radius-sm); }
+.section-help { font-size:.8rem; color:var(--color-text-muted); margin-bottom:1rem; padding:.5rem .75rem; background:var(--color-accent-subtle); border-radius:var(--radius-sm); }
+
+.form-grid { display:grid; gap:1.25rem; }
+.form-grid.cols-2 { grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); }
+.form-grid.cols-3 { grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); }
+
+.form-group { display:flex; flex-direction:column; gap:.4rem; }
+.form-label { font-size:.85rem; font-weight:600; color:var(--color-text-light); display:flex; align-items:center; gap:.35rem; }
+.form-label .required { color:var(--color-danger); }
+.form-label .box-number { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; background:var(--color-accent); color:#fff; border-radius:4px; font-size:.7rem; font-weight:700; }
+.form-input, .form-select { font-family:inherit; font-size:.9rem; padding:.7rem .85rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-surface); color:var(--color-text); transition:var(--transition); width:100%; }
+.form-input:focus, .form-select:focus { outline:none; border-color:var(--color-accent); box-shadow:var(--focus-ring); }
+.form-input.error { border-color:var(--color-danger); background:var(--color-danger-bg); }
+.form-input::placeholder { color:var(--color-text-muted); }
+.field-error { font-size:.75rem; color:var(--color-danger); display:none; }
+.field-error.show { display:block; }
+.field-hint { font-size:.75rem; color:var(--color-text-muted); }
+
+.checkbox-group { display:flex; align-items:center; gap:.5rem; margin-top:.5rem; }
+.checkbox-group input[type="checkbox"] { width:18px; height:18px; cursor:pointer; accent-color:var(--color-accent); }
+.checkbox-group label { font-size:.85rem; color:var(--color-text-light); cursor:pointer; }
+
+.button-group { display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap; }
+.btn { font-family:inherit; font-size:.9rem; font-weight:600; padding:.85rem 1.75rem; border-radius:var(--radius-md); border:none; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; justify-content:center; gap:.5rem; text-decoration:none; }
+.btn-primary { background:var(--color-accent); color:#fff; box-shadow:0 2px 6px rgba(37,99,235,.3); }
+.btn-primary:hover { background:var(--color-accent-hover); transform:translateY(-1px); box-shadow:0 4px 12px rgba(37,99,235,.4); }
+.btn-secondary { background:var(--color-surface-alt); color:var(--color-text); border:1px solid var(--color-border); }
+.btn-secondary:hover { background:var(--color-border); }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+
+.alert { padding:1rem 1.25rem; border-radius:var(--radius-md); margin-bottom:1.5rem; display:flex; align-items:flex-start; gap:.75rem; }
+.alert-warning { background:var(--color-warning-bg); border-left:4px solid var(--color-warning); color:var(--color-text); }
+.alert-icon { font-size:1.25rem; }
+
+footer { text-align:center; padding:2rem 1rem; color:var(--color-text-muted); font-size:.85rem; border-top:1px solid var(--color-border); margin-top:3rem; }
+
+@media (max-width: 640px) {
+  .container { padding:1rem; }
+  .form-card { padding:1.5rem 1rem; }
+  .form-grid.cols-2, .form-grid.cols-3 { grid-template-columns:1fr; }
+  .button-group { flex-direction:column; }
+  .btn { width:100%; }
+}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">W2</div>
+        <div class="logo-text">
+          <strong>TaxPro Online</strong>
+          <span>Tax Document Center</span>
+        </div>
+      </div>
+      <a href="../index.html" class="back-link">← Back to Examples</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="form-card">
+      <div class="form-header">
+        <h1 class="form-title">W-2 Wage and Tax Statement</h1>
+        <p class="form-subtitle">Enter your W-2 information exactly as it appears on your form</p>
+        <div class="tax-year-badge">📅 Tax Year 2024</div>
+      </div>
+
+      <div class="alert alert-warning">
+        <span class="alert-icon">ℹ️</span>
+        <div>
+          <strong>Important:</strong> Make sure to enter all information exactly as shown on your W-2 form. This information will be used to calculate your tax return.
+        </div>
+      </div>
+
+      <form id="w2Form" novalidate>
+        <!-- Employer Information -->
+        <div class="form-section">
+          <h2 class="section-title">Employer Information</h2>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">b</span>
+                Employer Identification Number (EIN) <span class="required">*</span>
+              </label>
+              <input type="text" id="ein" name="ein" class="form-input" placeholder="12-3456789" pattern="\d{2}-?\d{7}" required />
+              <span class="field-hint">Format: 12-3456789</span>
+              <span class="field-error">Please enter a valid EIN (XX-XXXXXXX)</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">c</span>
+                Employer's Name <span class="required">*</span>
+              </label>
+              <input type="text" id="employerName" name="employerName" class="form-input" placeholder="ABC Corporation" required />
+              <span class="field-error">Employer name is required</span>
+            </div>
+          </div>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">Employer's Address</label>
+              <input type="text" id="employerAddress" name="employerAddress" class="form-input" placeholder="123 Business St" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">City</label>
+              <input type="text" id="employerCity" name="employerCity" class="form-input" placeholder="New York" />
+            </div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label class="form-label">State</label>
+              <select id="employerState" name="employerState" class="form-select">
+                <option value="">Select State</option>
+                <option value="AL">Alabama</option>
+                <option value="AK">Alaska</option>
+                <option value="AZ">Arizona</option>
+                <option value="AR">Arkansas</option>
+                <option value="CA">California</option>
+                <option value="CO">Colorado</option>
+                <option value="CT">Connecticut</option>
+                <option value="DE">Delaware</option>
+                <option value="FL">Florida</option>
+                <option value="GA">Georgia</option>
+                <option value="HI">Hawaii</option>
+                <option value="ID">Idaho</option>
+                <option value="IL">Illinois</option>
+                <option value="IN">Indiana</option>
+                <option value="IA">Iowa</option>
+                <option value="KS">Kansas</option>
+                <option value="KY">Kentucky</option>
+                <option value="LA">Louisiana</option>
+                <option value="ME">Maine</option>
+                <option value="MD">Maryland</option>
+                <option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option>
+                <option value="MN">Minnesota</option>
+                <option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option>
+                <option value="MT">Montana</option>
+                <option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option>
+                <option value="NH">New Hampshire</option>
+                <option value="NJ">New Jersey</option>
+                <option value="NM">New Mexico</option>
+                <option value="NY">New York</option>
+                <option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option>
+                <option value="OH">Ohio</option>
+                <option value="OK">Oklahoma</option>
+                <option value="OR">Oregon</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="RI">Rhode Island</option>
+                <option value="SC">South Carolina</option>
+                <option value="SD">South Dakota</option>
+                <option value="TN">Tennessee</option>
+                <option value="TX">Texas</option>
+                <option value="UT">Utah</option>
+                <option value="VT">Vermont</option>
+                <option value="VA">Virginia</option>
+                <option value="WA">Washington</option>
+                <option value="WV">West Virginia</option>
+                <option value="WI">Wisconsin</option>
+                <option value="WY">Wyoming</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ZIP Code</label>
+              <input type="text" id="employerZip" name="employerZip" class="form-input" placeholder="10001" pattern="\d{5}" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Control Number</label>
+              <input type="text" id="controlNumber" name="controlNumber" class="form-input" placeholder="Optional" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Employee Information -->
+        <div class="form-section">
+          <h2 class="section-title">Employee Information</h2>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">a</span>
+                Employee Social Security Number <span class="required">*</span>
+              </label>
+              <input type="text" id="ssn" name="ssn" class="form-input" placeholder="123-45-6789" pattern="\d{3}-?\d{2}-?\d{4}" required />
+              <span class="field-hint">Format: 123-45-6789</span>
+              <span class="field-error">Please enter a valid SSN (XXX-XX-XXXX)</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">e</span>
+                Employee Name <span class="required">*</span>
+              </label>
+              <input type="text" id="employeeName" name="employeeName" class="form-input" placeholder="John Doe" required />
+              <span class="field-error">Employee name is required</span>
+            </div>
+          </div>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">f</span>
+                Employee Address
+              </label>
+              <input type="text" id="employeeAddress" name="employeeAddress" class="form-input" placeholder="456 Main St, Apt 2B" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">City</label>
+              <input type="text" id="employeeCity" name="employeeCity" class="form-input" placeholder="Brooklyn" />
+            </div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label class="form-label">State</label>
+              <select id="employeeState" name="employeeState" class="form-select">
+                <option value="">Select State</option>
+                <option value="AL">Alabama</option>
+                <option value="AK">Alaska</option>
+                <option value="AZ">Arizona</option>
+                <option value="AR">Arkansas</option>
+                <option value="CA">California</option>
+                <option value="CO">Colorado</option>
+                <option value="CT">Connecticut</option>
+                <option value="DE">Delaware</option>
+                <option value="FL">Florida</option>
+                <option value="GA">Georgia</option>
+                <option value="HI">Hawaii</option>
+                <option value="ID">Idaho</option>
+                <option value="IL">Illinois</option>
+                <option value="IN">Indiana</option>
+                <option value="IA">Iowa</option>
+                <option value="KS">Kansas</option>
+                <option value="KY">Kentucky</option>
+                <option value="LA">Louisiana</option>
+                <option value="ME">Maine</option>
+                <option value="MD">Maryland</option>
+                <option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option>
+                <option value="MN">Minnesota</option>
+                <option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option>
+                <option value="MT">Montana</option>
+                <option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option>
+                <option value="NH">New Hampshire</option>
+                <option value="NJ">New Jersey</option>
+                <option value="NM">New Mexico</option>
+                <option value="NY">New York</option>
+                <option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option>
+                <option value="OH">Ohio</option>
+                <option value="OK">Oklahoma</option>
+                <option value="OR">Oregon</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="RI">Rhode Island</option>
+                <option value="SC">South Carolina</option>
+                <option value="SD">South Dakota</option>
+                <option value="TN">Tennessee</option>
+                <option value="TX">Texas</option>
+                <option value="UT">Utah</option>
+                <option value="VT">Vermont</option>
+                <option value="VA">Virginia</option>
+                <option value="WA">Washington</option>
+                <option value="WV">West Virginia</option>
+                <option value="WI">Wisconsin</option>
+                <option value="WY">Wyoming</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ZIP Code</label>
+              <input type="text" id="employeeZip" name="employeeZip" class="form-input" placeholder="11201" pattern="\d{5}" />
+            </div>
+            <div class="form-group"></div>
+          </div>
+        </div>
+
+        <!-- Wages and Tax Information -->
+        <div class="form-section">
+          <h2 class="section-title">Wages and Tax Information</h2>
+          <p class="section-help">💡 Enter all dollar amounts without commas (e.g., 65000.00)</p>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">1</span>
+                Wages, tips, other compensation <span class="required">*</span>
+              </label>
+              <input type="number" id="wages" name="wages" class="form-input" placeholder="65000.00" step="0.01" min="0" required />
+              <span class="field-error">Please enter a valid amount</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">2</span>
+                Federal income tax withheld <span class="required">*</span>
+              </label>
+              <input type="number" id="federalTax" name="federalTax" class="form-input" placeholder="8750.00" step="0.01" min="0" required />
+              <span class="field-error">Please enter a valid amount</span>
+            </div>
+          </div>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">3</span>
+                Social security wages
+              </label>
+              <input type="number" id="socialSecurityWages" name="socialSecurityWages" class="form-input" placeholder="65000.00" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">4</span>
+                Social security tax withheld
+              </label>
+              <input type="number" id="socialSecurityTax" name="socialSecurityTax" class="form-input" placeholder="4030.00" step="0.01" min="0" />
+            </div>
+          </div>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">5</span>
+                Medicare wages and tips
+              </label>
+              <input type="number" id="medicareWages" name="medicareWages" class="form-input" placeholder="65000.00" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">6</span>
+                Medicare tax withheld
+              </label>
+              <input type="number" id="medicareTax" name="medicareTax" class="form-input" placeholder="942.50" step="0.01" min="0" />
+            </div>
+          </div>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">7</span>
+                Social security tips
+              </label>
+              <input type="number" id="socialSecurityTips" name="socialSecurityTips" class="form-input" placeholder="0.00" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">8</span>
+                Allocated tips
+              </label>
+              <input type="number" id="allocatedTips" name="allocatedTips" class="form-input" placeholder="0.00" step="0.01" min="0" />
+            </div>
+          </div>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">10</span>
+                Dependent care benefits
+              </label>
+              <input type="number" id="dependentCareBenefits" name="dependentCareBenefits" class="form-input" placeholder="0.00" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">11</span>
+                Nonqualified plans
+              </label>
+              <input type="number" id="nonqualifiedPlans" name="nonqualifiedPlans" class="form-input" placeholder="0.00" step="0.01" min="0" />
+            </div>
+          </div>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">12a</span>
+                Code & Amount (Optional)
+              </label>
+              <input type="text" id="box12aCode" name="box12aCode" class="form-input" placeholder="Code" maxlength="2" style="text-transform:uppercase;" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="opacity:0;">Amount</label>
+              <input type="number" id="box12aAmount" name="box12aAmount" class="form-input" placeholder="Amount" step="0.01" min="0" />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="statutoryEmployee" name="statutoryEmployee" />
+              <label for="statutoryEmployee"><span class="box-number">13</span> Statutory employee</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="retirementPlan" name="retirementPlan" />
+              <label for="retirementPlan">Retirement plan</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="thirdPartySickPay" name="thirdPartySickPay" />
+              <label for="thirdPartySickPay">Third-party sick pay</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- State and Local Information -->
+        <div class="form-section">
+          <h2 class="section-title">State and Local Tax Information</h2>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">15</span>
+                State
+              </label>
+              <select id="stateForTax" name="stateForTax" class="form-select">
+                <option value="">Select State</option>
+                <option value="NY">New York</option>
+                <option value="CA">California</option>
+                <option value="TX">Texas</option>
+                <option value="FL">Florida</option>
+                <option value="IL">Illinois</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="OH">Ohio</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Employer's state ID number</label>
+              <input type="text" id="stateEmployerId" name="stateEmployerId" class="form-input" placeholder="Optional" />
+            </div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">16</span>
+                State wages, tips, etc.
+              </label>
+              <input type="number" id="stateWages" name="stateWages" class="form-input" placeholder="65000.00" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">17</span>
+                State income tax
+              </label>
+              <input type="number" id="stateIncomeTax" name="stateIncomeTax" class="form-input" placeholder="3250.00" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">18</span>
+                Local wages, tips, etc.
+              </label>
+              <input type="number" id="localWages" name="localWages" class="form-input" placeholder="0.00" step="0.01" min="0" />
+            </div>
+          </div>
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">19</span>
+                Local income tax
+              </label>
+              <input type="number" id="localIncomeTax" name="localIncomeTax" class="form-input" placeholder="0.00" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="box-number">20</span>
+                Locality name
+              </label>
+              <input type="text" id="localityName" name="localityName" class="form-input" placeholder="Optional" />
+            </div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="btn btn-primary">Continue to Summary →</button>
+          <button type="button" class="btn btn-secondary" id="resetBtn">Clear Form</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 TaxPro Online. For demonstration purposes only. Not for actual tax filing.</p>
+  </footer>
+
+  <script src="../theme.js" defer></script>
+  <script>
+    (function(){
+      const form = document.getElementById('w2Form');
+      const resetBtn = document.getElementById('resetBtn');
+
+      // Format EIN input
+      const einInput = document.getElementById('ein');
+      einInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 2) {
+          value = value.substring(0, 2) + '-' + value.substring(2, 9);
+        }
+        e.target.value = value;
+      });
+
+      // Format SSN input
+      const ssnInput = document.getElementById('ssn');
+      ssnInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 3 && value.length <= 5) {
+          value = value.substring(0, 3) + '-' + value.substring(3);
+        } else if (value.length > 5) {
+          value = value.substring(0, 3) + '-' + value.substring(3, 5) + '-' + value.substring(5, 9);
+        }
+        e.target.value = value;
+      });
+
+      // Auto-populate dependent fields
+      const wagesInput = document.getElementById('wages');
+      const ssWagesInput = document.getElementById('socialSecurityWages');
+      const medicareWagesInput = document.getElementById('medicareWages');
+      const stateWagesInput = document.getElementById('stateWages');
+
+      wagesInput.addEventListener('blur', function() {
+        const value = parseFloat(this.value) || 0;
+        if (!ssWagesInput.value) ssWagesInput.value = value.toFixed(2);
+        if (!medicareWagesInput.value) medicareWagesInput.value = value.toFixed(2);
+        if (!stateWagesInput.value) stateWagesInput.value = value.toFixed(2);
+      });
+
+      // Validation
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        const requiredFields = form.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+          const errorSpan = field.parentElement.querySelector('.field-error');
+          if (!field.value.trim()) {
+            field.classList.add('error');
+            if (errorSpan) errorSpan.classList.add('show');
+            isValid = false;
+          } else {
+            field.classList.remove('error');
+            if (errorSpan) errorSpan.classList.remove('show');
+          }
+        });
+
+        // Validate EIN format
+        const einValue = einInput.value;
+        if (einValue && !/^\d{2}-\d{7}$/.test(einValue)) {
+          einInput.classList.add('error');
+          einInput.parentElement.querySelector('.field-error').classList.add('show');
+          isValid = false;
+        }
+
+        // Validate SSN format
+        const ssnValue = ssnInput.value;
+        if (ssnValue && !/^\d{3}-\d{2}-\d{4}$/.test(ssnValue)) {
+          ssnInput.classList.add('error');
+          ssnInput.parentElement.querySelector('.field-error').classList.add('show');
+          isValid = false;
+        }
+
+        if (isValid) {
+          // Store form data in sessionStorage
+          const formData = new FormData(form);
+          const data = {};
+          formData.forEach((value, key) => {
+            data[key] = value;
+          });
+          sessionStorage.setItem('w2Data', JSON.stringify(data));
+          
+          // Redirect to summary
+          window.location.href = 'w2summary.html';
+        } else {
+          // Scroll to first error
+          const firstError = form.querySelector('.error');
+          if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstError.focus();
+          }
+        }
+      });
+
+      // Clear error on input
+      form.querySelectorAll('.form-input, .form-select').forEach(input => {
+        input.addEventListener('input', function() {
+          this.classList.remove('error');
+          const errorSpan = this.parentElement.querySelector('.field-error');
+          if (errorSpan) errorSpan.classList.remove('show');
+        });
+      });
+
+      // Reset form
+      resetBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear all fields?')) {
+          form.reset();
+          form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+          form.querySelectorAll('.field-error.show').forEach(el => el.classList.remove('show'));
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

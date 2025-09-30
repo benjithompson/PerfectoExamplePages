@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>W-2 Summary - TaxPro Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+/* Base Design Tokens */
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f1f5f9;
+  --color-border: #cbd5e1;
+  --color-border-strong: #94a3b8;
+  --color-text: #0f172a;
+  --color-text-light: #64748b;
+  --color-text-muted: #94a3b8;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-subtle: #dbeafe;
+  --color-success: #16a34a;
+  --color-success-bg: #dcfce7;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fee2e2;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+  --transition: .2s cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"] {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-surface-alt: #334155;
+  --color-border: #475569;
+  --color-border-strong: #64748b;
+  --color-text: #f1f5f9;
+  --color-text-light: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #60a5fa;
+  --color-accent-subtle: #1e3a8a;
+  --color-success: #22c55e;
+  --color-success-bg: #14532d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text); line-height:1.6; min-height:100vh; }
+
+.container { max-width:1000px; margin:0 auto; padding:2rem 1.5rem; }
+header { background:var(--color-surface); border-bottom:1px solid var(--color-border); padding:1.5rem 0; margin-bottom:2rem; box-shadow:var(--shadow-sm); }
+.header-content { max-width:1000px; margin:0 auto; padding:0 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+.logo { display:flex; align-items:center; gap:.75rem; }
+.logo-icon { width:42px; height:42px; background:linear-gradient(135deg, var(--color-accent), #1d4ed8); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:1.1rem; box-shadow:0 2px 8px rgba(37,99,235,.3); }
+.logo-text { display:flex; flex-direction:column; line-height:1.2; }
+.logo-text strong { font-size:1.15rem; font-weight:700; color:var(--color-text); }
+.logo-text span { font-size:.75rem; color:var(--color-text-light); letter-spacing:.3px; }
+
+.success-banner { background:linear-gradient(135deg, var(--color-success), #059669); color:#fff; padding:1.5rem; border-radius:var(--radius-lg); margin-bottom:2rem; display:flex; align-items:center; gap:1rem; box-shadow:var(--shadow-lg); }
+.success-icon { font-size:2.5rem; }
+.success-content h1 { font-size:1.5rem; font-weight:700; margin-bottom:.25rem; }
+.success-content p { font-size:.95rem; opacity:.95; }
+
+.summary-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:2rem; box-shadow:var(--shadow-md); margin-bottom:2rem; }
+.summary-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--color-border); flex-wrap:wrap; gap:1rem; }
+.summary-title { font-size:1.5rem; font-weight:700; color:var(--color-text); }
+.tax-year-badge { display:inline-flex; align-items:center; padding:.4rem .8rem; background:var(--color-accent-subtle); color:var(--color-accent); border-radius:var(--radius-md); font-size:.85rem; font-weight:600; }
+
+.info-section { margin-bottom:2rem; }
+.section-title { font-size:1.1rem; font-weight:600; color:var(--color-text); margin-bottom:1rem; padding:.5rem .75rem; background:var(--color-surface-alt); border-left:3px solid var(--color-accent); border-radius:var(--radius-sm); }
+.info-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1.25rem; }
+.info-item { display:flex; flex-direction:column; gap:.25rem; }
+.info-label { font-size:.8rem; font-weight:600; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:.5px; display:flex; align-items:center; gap:.35rem; }
+.box-number { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; background:var(--color-accent); color:#fff; border-radius:3px; font-size:.65rem; font-weight:700; }
+.info-value { font-size:1rem; font-weight:600; color:var(--color-text); }
+.info-value.currency::before { content:'$'; color:var(--color-text-muted); margin-right:.15rem; }
+.info-value.empty { color:var(--color-text-muted); font-weight:400; font-style:italic; }
+
+.totals-summary { background:linear-gradient(135deg, var(--color-surface-alt), var(--color-surface)); border:2px solid var(--color-accent); border-radius:var(--radius-lg); padding:1.5rem; margin-top:2rem; }
+.totals-title { font-size:1.2rem; font-weight:700; color:var(--color-text); margin-bottom:1rem; text-align:center; }
+.totals-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; }
+.total-item { text-align:center; padding:1rem; background:var(--color-surface); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); }
+.total-label { font-size:.75rem; color:var(--color-text-muted); margin-bottom:.5rem; text-transform:uppercase; letter-spacing:.5px; font-weight:600; }
+.total-value { font-size:1.5rem; font-weight:700; color:var(--color-accent); }
+.total-value::before { content:'$'; font-size:1rem; opacity:.7; margin-right:.15rem; }
+
+.button-group { display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap; }
+.btn { font-family:inherit; font-size:.9rem; font-weight:600; padding:.85rem 1.75rem; border-radius:var(--radius-md); border:none; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; justify-content:center; gap:.5rem; text-decoration:none; }
+.btn-primary { background:var(--color-accent); color:#fff; box-shadow:0 2px 6px rgba(37,99,235,.3); }
+.btn-primary:hover { background:var(--color-accent-hover); transform:translateY(-1px); box-shadow:0 4px 12px rgba(37,99,235,.4); }
+.btn-secondary { background:var(--color-surface-alt); color:var(--color-text); border:1px solid var(--color-border); }
+.btn-secondary:hover { background:var(--color-border); }
+.btn-outline { background:transparent; color:var(--color-accent); border:2px solid var(--color-accent); }
+.btn-outline:hover { background:var(--color-accent-subtle); }
+
+.alert { padding:1rem 1.25rem; border-radius:var(--radius-md); margin-bottom:1.5rem; display:flex; align-items:flex-start; gap:.75rem; background:var(--color-accent-subtle); border-left:4px solid var(--color-accent); }
+.alert-icon { font-size:1.25rem; }
+
+footer { text-align:center; padding:2rem 1rem; color:var(--color-text-muted); font-size:.85rem; border-top:1px solid var(--color-border); margin-top:3rem; }
+
+@media print {
+  body { background:#fff; }
+  header, .button-group, .alert, footer { display:none; }
+  .summary-card { box-shadow:none; border:1px solid #000; }
+}
+
+@media (max-width: 640px) {
+  .container { padding:1rem; }
+  .summary-card { padding:1.5rem 1rem; }
+  .info-grid { grid-template-columns:1fr; }
+  .totals-grid { grid-template-columns:1fr; }
+  .button-group { flex-direction:column; }
+  .btn { width:100%; }
+}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">W2</div>
+        <div class="logo-text">
+          <strong>TaxPro Online</strong>
+          <span>Tax Document Center</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="success-banner">
+      <div class="success-icon">✓</div>
+      <div class="success-content">
+        <h1>W-2 Form Submitted Successfully!</h1>
+        <p>Your W-2 information has been recorded. Review the details below and save or print for your records.</p>
+      </div>
+    </div>
+
+    <div class="alert">
+      <span class="alert-icon">ℹ️</span>
+      <div>
+        <strong>Next Steps:</strong> Review this summary carefully. You can print this page for your records or go back to make changes.
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-header">
+        <h2 class="summary-title">W-2 Summary</h2>
+        <div class="tax-year-badge">📅 Tax Year 2024</div>
+      </div>
+
+      <!-- Employer Information -->
+      <div class="info-section">
+        <h3 class="section-title">Employer Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">b</span> EIN</div>
+            <div class="info-value" id="display-ein">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">c</span> Employer Name</div>
+            <div class="info-value" id="display-employerName">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Address</div>
+            <div class="info-value" id="display-employerAddress">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">City, State ZIP</div>
+            <div class="info-value" id="display-employerLocation">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Control Number</div>
+            <div class="info-value" id="display-controlNumber">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employee Information -->
+      <div class="info-section">
+        <h3 class="section-title">Employee Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">a</span> SSN</div>
+            <div class="info-value" id="display-ssn">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">e</span> Employee Name</div>
+            <div class="info-value" id="display-employeeName">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">f</span> Address</div>
+            <div class="info-value" id="display-employeeAddress">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">City, State ZIP</div>
+            <div class="info-value" id="display-employeeLocation">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wages and Federal Tax -->
+      <div class="info-section">
+        <h3 class="section-title">Federal Wages and Tax Withholding</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">1</span> Wages, Tips, Other Compensation</div>
+            <div class="info-value currency" id="display-wages">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">2</span> Federal Income Tax Withheld</div>
+            <div class="info-value currency" id="display-federalTax">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">3</span> Social Security Wages</div>
+            <div class="info-value currency" id="display-socialSecurityWages">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">4</span> Social Security Tax Withheld</div>
+            <div class="info-value currency" id="display-socialSecurityTax">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">5</span> Medicare Wages and Tips</div>
+            <div class="info-value currency" id="display-medicareWages">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">6</span> Medicare Tax Withheld</div>
+            <div class="info-value currency" id="display-medicareTax">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">7</span> Social Security Tips</div>
+            <div class="info-value currency" id="display-socialSecurityTips">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">8</span> Allocated Tips</div>
+            <div class="info-value currency" id="display-allocatedTips">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">10</span> Dependent Care Benefits</div>
+            <div class="info-value currency" id="display-dependentCareBenefits">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">11</span> Nonqualified Plans</div>
+            <div class="info-value currency" id="display-nonqualifiedPlans">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">12a</span> Code & Amount</div>
+            <div class="info-value" id="display-box12a">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">13</span> Status Indicators</div>
+            <div class="info-value" id="display-statusIndicators">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- State and Local Tax -->
+      <div class="info-section">
+        <h3 class="section-title">State and Local Tax Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">15</span> State</div>
+            <div class="info-value" id="display-stateForTax">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Employer's State ID</div>
+            <div class="info-value" id="display-stateEmployerId">--</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">16</span> State Wages, Tips, etc.</div>
+            <div class="info-value currency" id="display-stateWages">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">17</span> State Income Tax</div>
+            <div class="info-value currency" id="display-stateIncomeTax">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">18</span> Local Wages, Tips, etc.</div>
+            <div class="info-value currency" id="display-localWages">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">19</span> Local Income Tax</div>
+            <div class="info-value currency" id="display-localIncomeTax">0.00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label"><span class="box-number">20</span> Locality Name</div>
+            <div class="info-value" id="display-localityName">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tax Totals Summary -->
+      <div class="totals-summary">
+        <h3 class="totals-title">Total Tax Withholding Summary</h3>
+        <div class="totals-grid">
+          <div class="total-item">
+            <div class="total-label">Federal Tax</div>
+            <div class="total-value" id="total-federal">0.00</div>
+          </div>
+          <div class="total-item">
+            <div class="total-label">Social Security Tax</div>
+            <div class="total-value" id="total-ss">0.00</div>
+          </div>
+          <div class="total-item">
+            <div class="total-label">Medicare Tax</div>
+            <div class="total-value" id="total-medicare">0.00</div>
+          </div>
+          <div class="total-item">
+            <div class="total-label">State Tax</div>
+            <div class="total-value" id="total-state">0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="window.print()">🖨️ Print Summary</button>
+        <a href="w2.html" class="btn btn-secondary">← Edit W-2 Form</a>
+        <a href="../index.html" class="btn btn-outline">Back to Examples</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 TaxPro Online. For demonstration purposes only. Not for actual tax filing.</p>
+  </footer>
+
+  <script src="../theme.js" defer></script>
+  <script>
+    (function(){
+      // Retrieve W-2 data from sessionStorage
+      const w2DataStr = sessionStorage.getItem('w2Data');
+      
+      if (!w2DataStr) {
+        // No data found, redirect back to form
+        alert('No W-2 data found. Please fill out the form first.');
+        window.location.href = 'w2.html';
+        return;
+      }
+
+      const data = JSON.parse(w2DataStr);
+
+      // Helper function to format currency
+      function formatCurrency(value) {
+        const num = parseFloat(value) || 0;
+        return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      // Helper function to display text or fallback
+      function displayText(value, fallback = 'Not provided') {
+        return value && value.trim() ? value : fallback;
+      }
+
+      // Populate employer information
+      document.getElementById('display-ein').textContent = displayText(data.ein);
+      document.getElementById('display-employerName').textContent = displayText(data.employerName);
+      document.getElementById('display-employerAddress').textContent = displayText(data.employerAddress);
+      
+      const employerLocation = [data.employerCity, data.employerState, data.employerZip]
+        .filter(v => v && v.trim())
+        .join(', ');
+      document.getElementById('display-employerLocation').textContent = displayText(employerLocation);
+      document.getElementById('display-controlNumber').textContent = displayText(data.controlNumber);
+
+      // Populate employee information
+      document.getElementById('display-ssn').textContent = displayText(data.ssn);
+      document.getElementById('display-employeeName').textContent = displayText(data.employeeName);
+      document.getElementById('display-employeeAddress').textContent = displayText(data.employeeAddress);
+      
+      const employeeLocation = [data.employeeCity, data.employeeState, data.employeeZip]
+        .filter(v => v && v.trim())
+        .join(', ');
+      document.getElementById('display-employeeLocation').textContent = displayText(employeeLocation);
+
+      // Populate wages and tax information
+      document.getElementById('display-wages').textContent = formatCurrency(data.wages);
+      document.getElementById('display-federalTax').textContent = formatCurrency(data.federalTax);
+      document.getElementById('display-socialSecurityWages').textContent = formatCurrency(data.socialSecurityWages);
+      document.getElementById('display-socialSecurityTax').textContent = formatCurrency(data.socialSecurityTax);
+      document.getElementById('display-medicareWages').textContent = formatCurrency(data.medicareWages);
+      document.getElementById('display-medicareTax').textContent = formatCurrency(data.medicareTax);
+      document.getElementById('display-socialSecurityTips').textContent = formatCurrency(data.socialSecurityTips);
+      document.getElementById('display-allocatedTips').textContent = formatCurrency(data.allocatedTips);
+      document.getElementById('display-dependentCareBenefits').textContent = formatCurrency(data.dependentCareBenefits);
+      document.getElementById('display-nonqualifiedPlans').textContent = formatCurrency(data.nonqualifiedPlans);
+
+      // Box 12a
+      const box12aText = data.box12aCode && data.box12aAmount 
+        ? `${data.box12aCode.toUpperCase()} - $${formatCurrency(data.box12aAmount)}`
+        : 'Not provided';
+      document.getElementById('display-box12a').textContent = box12aText;
+
+      // Status indicators (checkboxes)
+      const statusIndicators = [];
+      if (data.statutoryEmployee === 'on') statusIndicators.push('Statutory Employee');
+      if (data.retirementPlan === 'on') statusIndicators.push('Retirement Plan');
+      if (data.thirdPartySickPay === 'on') statusIndicators.push('Third-Party Sick Pay');
+      document.getElementById('display-statusIndicators').textContent = 
+        statusIndicators.length ? statusIndicators.join(', ') : 'None';
+
+      // Populate state and local information
+      document.getElementById('display-stateForTax').textContent = displayText(data.stateForTax);
+      document.getElementById('display-stateEmployerId').textContent = displayText(data.stateEmployerId);
+      document.getElementById('display-stateWages').textContent = formatCurrency(data.stateWages);
+      document.getElementById('display-stateIncomeTax').textContent = formatCurrency(data.stateIncomeTax);
+      document.getElementById('display-localWages').textContent = formatCurrency(data.localWages);
+      document.getElementById('display-localIncomeTax').textContent = formatCurrency(data.localIncomeTax);
+      document.getElementById('display-localityName').textContent = displayText(data.localityName);
+
+      // Populate totals summary
+      document.getElementById('total-federal').textContent = formatCurrency(data.federalTax);
+      document.getElementById('total-ss').textContent = formatCurrency(data.socialSecurityTax);
+      document.getElementById('total-medicare').textContent = formatCurrency(data.medicareTax);
+      document.getElementById('total-state').textContent = formatCurrency(data.stateIncomeTax);
+    })();
+  </script>
+</body>
+</html>
