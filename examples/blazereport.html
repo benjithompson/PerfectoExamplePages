@@ -611,8 +611,10 @@
         </div>
       </div>
       <p class="muted" style="font-size: 0.75rem; margin-top: 0.5rem;">
-        <strong>Note:</strong> Authentication uses curl-style format: --user 'api_key_id:api_key_secret'<br>
-        Direct API calls from browser may be blocked by CORS. Consider using a proxy server for production.
+        <strong>⚠️ Browser Limitation:</strong> BlazeMeter's API blocks browser-based requests with "403 Forbidden: Origin not allowed". 
+        Direct API calls from web pages are not supported by BlazeMeter.<br>
+        <strong>For demos:</strong> Use "Load Sample Data" button below.<br>
+        <strong>For production:</strong> Implement a backend server proxy to forward requests to BlazeMeter.
         <br><a href="https://help.blazemeter.com/apidocs/performance/masters_request_statistics.htm" target="_blank" style="color: var(--color-primary);">📖 API Documentation</a>
       </p>
       <div class="form-actions">
@@ -1407,7 +1409,11 @@
         } else if (error.message.includes('401')) {
           errorMessage += ' (Authentication required - check API key and secret)';
         } else if (error.message.includes('403')) {
-          errorMessage += ' (Access forbidden - verify credentials have proper permissions)';
+          if (error.message.includes('Origin not allowed') || error.message.includes('Forbidden')) {
+            errorMessage += ' (BlazeMeter API explicitly blocks browser-based requests. The API validates the Origin header and only allows requests from approved domains or server-to-server calls. Use "Load Sample Data" for demos or implement a backend proxy)';
+          } else {
+            errorMessage += ' (Access forbidden - verify credentials have proper permissions)';
+          }
         } else if (error.message.includes('404')) {
           errorMessage += ' (Resource not found - verify the API URL is correct)';
         } else if (error.message.includes('500') || error.message.includes('502') || error.message.includes('503')) {
