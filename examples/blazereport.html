@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blaze Report - BlazeMeter Test Results</title>
+  <link rel="stylesheet" href="../theme.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      padding: 2rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      background: var(--color-background);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: var(--color-text);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    h1::before {
+      content: '🔥';
+      font-size: 2.5rem;
+    }
+
+    .config-panel {
+      background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-alt) 100%);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .config-panel h2 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--color-text);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 0.875rem;
+      background: var(--color-background);
+      color: var(--color-text);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-alpha);
+      transform: translateY(-1px);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      padding: 0.625rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 2px solid var(--color-border);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-surface-hover);
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-message {
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+
+    .status-message.loading {
+      background: #e3f2fd;
+      color: #1565c0;
+      border: 1px solid #90caf9;
+    }
+
+    .status-message.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #81c784;
+    }
+
+    .status-message.error {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
+    }
+
+    .status-message.hidden {
+      display: none;
+    }
+
+    .results-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .results-panel h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      color: var(--color-text);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, var(--color-background) 0%, var(--color-surface-alt) 100%);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-color: var(--color-primary);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 1px;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 1;
+    }
+
+    .stat-unit {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-left: 0.25rem;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    thead {
+      background: linear-gradient(135deg, var(--color-surface-alt) 0%, var(--color-surface) 100%);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    th {
+      padding: 1rem 0.75rem;
+      text-align: left;
+      font-weight: 700;
+      color: var(--color-text);
+      border-bottom: 2px solid var(--color-border);
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 1rem 0.75rem;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: var(--color-surface-hover);
+      transform: scale(1.01);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .label-name {
+      font-weight: 500;
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .metric-good {
+      color: #2e7d32;
+      font-weight: 500;
+    }
+
+    .metric-warning {
+      color: #f57c00;
+      font-weight: 500;
+    }
+
+    .metric-error {
+      color: #c62828;
+      font-weight: 500;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-success {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      color: #2e7d32;
+      box-shadow: 0 2px 4px rgba(46, 125, 50, 0.2);
+    }
+
+    .badge-error {
+      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+      color: #c62828;
+      box-shadow: 0 2px 4px rgba(198, 40, 40, 0.2);
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 3rem;
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+
+    .chart-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-top: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .chart-panel h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      color: var(--color-text);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: var(--color-background);
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+    }
+
+    .chart-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.875rem;
+      font-weight: 500;
+      user-select: none;
+    }
+
+    .chart-legend-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-color: var(--color-primary);
+    }
+
+    .chart-legend-item.disabled {
+      opacity: 0.4;
+      background: var(--color-surface-alt);
+    }
+
+    .chart-legend-item.disabled:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .legend-color {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .chart-legend-item:hover .legend-color {
+      transform: scale(1.2);
+    }
+
+    .chart-legend-item.disabled .legend-color {
+      opacity: 0.3;
+    }
+
+    .chart-canvas-container {
+      position: relative;
+      background: var(--color-background);
+      border-radius: 8px;
+      padding: 1.5rem;
+      border: 1px solid var(--color-border);
+    }
+
+    #metricsChart {
+      display: block;
+      max-width: 100%;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      padding-right: 2.5rem;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+    }
+
+    .toggle-password:hover {
+      color: var(--color-text);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      .summary-stats {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 0.75rem;
+      }
+
+      th, td {
+        padding: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Blaze Report - BlazeMeter Test Results</h1>
+
+  <div class="config-panel">
+    <h2>Configuration</h2>
+    <form id="configForm">
+      <div class="form-group">
+        <label for="apiUrl">API URL</label>
+        <input 
+          type="text" 
+          id="apiUrl" 
+          placeholder="https://a.blazemeter.com/api/v4/masters/79641384/reports/aggregatereport/data"
+          value="https://a.blazemeter.com/api/v4/masters/79641384/reports/aggregatereport/data"
+        />
+      </div>
+      <div class="form-group">
+        <label for="apiKey">API Key</label>
+        <input 
+          type="text" 
+          id="apiKey" 
+          placeholder="Enter your API key"
+        />
+      </div>
+      <div class="form-group">
+        <label for="apiSecret">API Secret</label>
+        <div class="password-wrapper">
+          <input 
+            type="password" 
+            id="apiSecret" 
+            placeholder="Enter your API secret"
+          />
+          <button type="button" class="toggle-password" id="toggleSecret" aria-label="Toggle password visibility">👁️</button>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="fetchBtn">Fetch Results</button>
+        <button type="button" class="btn btn-secondary" id="loadSampleBtn">Load Sample Data</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="statusMessage" class="status-message hidden"></div>
+
+  <div class="results-panel" id="resultsPanel" style="display: none;">
+    <h2>Test Results</h2>
+    
+    <div class="summary-stats" id="summaryStats"></div>
+
+    <div class="table-container">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th>Label Name</th>
+            <th>Samples</th>
+            <th>Avg Response Time</th>
+            <th>90th Percentile</th>
+            <th>95th Percentile</th>
+            <th>99th Percentile</th>
+            <th>Min/Max</th>
+            <th>Throughput</th>
+            <th>Error Rate</th>
+            <th>Concurrency</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+        </tbody>
+      </table>
+    </div>
+
+    <div class="chart-panel">
+      <h2>📊 Performance Metrics Comparison</h2>
+      <div class="chart-controls" id="chartControls">
+        <!-- Legend items will be dynamically added here -->
+      </div>
+      <div class="chart-canvas-container">
+        <canvas id="metricsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="../theme.js"></script>
+  <script>
+    // Sample data for testing
+    const SAMPLE_DATA = {
+      "api_version": 4,
+      "error": null,
+      "result": [
+        {
+          "labelId": "d0527e4b3d658351dae74be7b10c7531a7ac98493c6b257ab62774853bcc74b2",
+          "labelName": "Logout",
+          "samples": 50,
+          "avgResponseTime": 84.739999999999995,
+          "90line": 93,
+          "95line": 103,
+          "99line": 104,
+          "minResponseTime": 77,
+          "maxResponseTime": 104,
+          "avgLatency": 55.82,
+          "stDev": 6.581215693167942,
+          "duration": 250,
+          "avgBytes": 1.165,
+          "avgThroughput": 0.20000000000000001,
+          "medianResponseTime": 82,
+          "errorsCount": 0,
+          "errorsRate": 0,
+          "hasLabelPassedThresholds": null,
+          "concurrency": 7
+        },
+        {
+          "labelId": "53b9eaf1108388b081e624b9498fb2dd04d577cd4931f6c61126bd83c3f8314e",
+          "labelName": "http://dbankdemo.com/bank/login",
+          "samples": 60,
+          "avgResponseTime": 421.46666666666664,
+          "90line": 470,
+          "95line": 496,
+          "99line": 591,
+          "minResponseTime": 374,
+          "maxResponseTime": 591,
+          "avgLatency": 138.80000000000001,
+          "stDev": 38.665862060594087,
+          "duration": 291,
+          "avgBytes": 5.516,
+          "avgThroughput": 0.20618556701030927,
+          "medianResponseTime": 413,
+          "errorsCount": 0,
+          "errorsRate": 0,
+          "hasLabelPassedThresholds": null,
+          "concurrency": 6
+        },
+        {
+          "labelId": "86d6c48e1e11d804afc335b9de65e16789b5260e941f61f09b6de6bd5063c734",
+          "labelName": "http://dbankdemo.com/bank/account/checking-view",
+          "samples": 60,
+          "avgResponseTime": 217.76666666666668,
+          "90line": 232,
+          "95line": 246,
+          "99line": 263,
+          "minResponseTime": 200,
+          "maxResponseTime": 263,
+          "avgLatency": 168.66666666666666,
+          "stDev": 12.594134437198223,
+          "duration": 290,
+          "avgBytes": 10.664,
+          "avgThroughput": 0.20689655172413793,
+          "medianResponseTime": 214,
+          "errorsCount": 0,
+          "errorsRate": 0,
+          "hasLabelPassedThresholds": null,
+          "concurrency": 6
+        },
+        {
+          "labelId": "d018c6c26d8bbff8199c681a7f1bffd7781fbf9cdf798f3cb6f66d7afbdc5ba6",
+          "labelName": "http://dbankdemo.com/bank/account/savings-view",
+          "samples": 57,
+          "avgResponseTime": 196.75438596491227,
+          "90line": 206,
+          "95line": 222,
+          "99line": 227,
+          "minResponseTime": 179,
+          "maxResponseTime": 227,
+          "avgLatency": 169.91228070175438,
+          "stDev": 9.2362381302345984,
+          "duration": 275,
+          "avgBytes": 6.8940000000000001,
+          "avgThroughput": 0.20727272727272728,
+          "medianResponseTime": 195,
+          "errorsCount": 0,
+          "errorsRate": 0,
+          "hasLabelPassedThresholds": null,
+          "concurrency": 6
+        },
+        {
+          "labelId": "9d6322c1f4d9d3f38aed8bfbe0b2bcadf66ad82c008476fa62541fa069138e94",
+          "labelName": "Login",
+          "samples": 60,
+          "avgResponseTime": 421.46666666666664,
+          "90line": 470,
+          "95line": 496,
+          "99line": 591,
+          "minResponseTime": 374,
+          "maxResponseTime": 591,
+          "avgLatency": 138.80000000000001,
+          "stDev": 38.665862060594087,
+          "duration": 291,
+          "avgBytes": 5.516,
+          "avgThroughput": 0.20618556701030927,
+          "medianResponseTime": 413,
+          "errorsCount": 0,
+          "errorsRate": 0,
+          "hasLabelPassedThresholds": null,
+          "concurrency": 6
+        },
+        {
+          "labelId": "b5c7aed7cd2a308523e7d2847b7815909e864b2fd9c4ea88b00d35adb2ecdfd7",
+          "labelName": "ALL",
+          "samples": 456,
+          "avgResponseTime": 235.31578947368422,
+          "90line": 420,
+          "95line": 443,
+          "99line": 506,
+          "minResponseTime": 77,
+          "maxResponseTime": 591,
+          "avgLatency": 134.93859649122808,
+          "stDev": 123.74014599303888,
+          "duration": 317,
+          "avgBytes": 42.954999999999998,
+          "avgThroughput": 1.4384858044164037,
+          "medianResponseTime": 208,
+          "errorsCount": 0,
+          "errorsRate": 0,
+          "hasLabelPassedThresholds": null,
+          "concurrency": 10
+        },
+        {
+          "labelId": "ed46218066a733ee14713d1e8662e3d90464a23cb7272f10b9fb1958bb13c58f",
+          "labelName": "Savings",
+          "samples": 56,
+          "avgResponseTime": 196.875,
+          "90line": 206,
+          "95line": 222,
+          "99line": 227,
+          "minResponseTime": 179,
+          "maxResponseTime": 227,
+          "avgLatency": 170.01785714285714,
+          "stDev": 9.2737388437920298,
+          "duration": 267,
+          "avgBytes": 6.976,
+          "avgThroughput": 0.20973782771535582,
+          "medianResponseTime": 195,
+          "errorsCount": 0,
+          "errorsRate": 0,
+          "hasLabelPassedThresholds": null,
+          "concurrency": 7
+        },
+        {
+          "labelId": "0dfe1d63c9d868967e5de8777847eeb8e53b08533f1736ddf596d37e9df1737c",
+          "labelName": "Checking",
+          "samples": 57,
+          "avgResponseTime": 218.12280701754386,
+          "90line": 238,
+          "95line": 246,
+          "99line": 263,
+          "minResponseTime": 200,
+          "maxResponseTime": 263,
+          "avgLatency": 169.01754385964912,
+          "stDev": 12.803604447869148,
+          "duration": 277,
+          "avgBytes": 10.606,
+          "avgThroughput": 0.20577617328519857,
+          "medianResponseTime": 215,
+          "errorsCount": 0,
+          "errorsRate": 0,
+          "hasLabelPassedThresholds": null,
+          "concurrency": 6
+        },
+        {
+          "labelId": "e30db161be989f528b520a6708f48ef5b3de394613fcc5ea3b21a694ed3aa3ae",
+          "labelName": "http://dbankdemo.com/bank/logout",
+          "samples": 56,
+          "avgResponseTime": 84.428571428571431,
+          "90line": 93,
+          "95line": 103,
+          "99line": 104,
+          "minResponseTime": 77,
+          "maxResponseTime": 104,
+          "avgLatency": 55.517857142857146,
+          "stDev": 6.3999362241720341,
+          "duration": 268,
+          "avgBytes": 1.2170000000000001,
+          "avgThroughput": 0.20895522388059701,
+          "medianResponseTime": 81,
+          "errorsCount": 0,
+          "errorsRate": 0,
+          "hasLabelPassedThresholds": null,
+          "concurrency": 6
+        }
+      ]
+    };
+
+    // DOM elements
+    const configForm = document.getElementById('configForm');
+    const apiUrlInput = document.getElementById('apiUrl');
+    const apiKeyInput = document.getElementById('apiKey');
+    const apiSecretInput = document.getElementById('apiSecret');
+    const toggleSecretBtn = document.getElementById('toggleSecret');
+    const fetchBtn = document.getElementById('fetchBtn');
+    const loadSampleBtn = document.getElementById('loadSampleBtn');
+    const statusMessage = document.getElementById('statusMessage');
+    const resultsPanel = document.getElementById('resultsPanel');
+    const summaryStats = document.getElementById('summaryStats');
+    const resultsBody = document.getElementById('resultsBody');
+
+    // Toggle password visibility
+    toggleSecretBtn.addEventListener('click', () => {
+      const type = apiSecretInput.type === 'password' ? 'text' : 'password';
+      apiSecretInput.type = type;
+      toggleSecretBtn.textContent = type === 'password' ? '👁️' : '🙈';
+    });
+
+    // Mask secret after losing focus
+    apiSecretInput.addEventListener('blur', () => {
+      if (apiSecretInput.value && apiSecretInput.type === 'text') {
+        apiSecretInput.type = 'password';
+        toggleSecretBtn.textContent = '👁️';
+      }
+    });
+
+    // Show status message
+    function showStatus(message, type) {
+      statusMessage.textContent = message;
+      statusMessage.className = `status-message ${type}`;
+    }
+
+    // Hide status message
+    function hideStatus() {
+      statusMessage.className = 'status-message hidden';
+    }
+
+    // Format number with decimals
+    function formatNumber(num, decimals = 2) {
+      return Number(num).toFixed(decimals);
+    }
+
+    // Get color class based on response time
+    function getResponseTimeClass(avgTime) {
+      if (avgTime < 200) return 'metric-good';
+      if (avgTime < 500) return 'metric-warning';
+      return 'metric-error';
+    }
+
+    // Render summary statistics
+    function renderSummary(data) {
+      const allData = data.result.find(item => item.labelName === 'ALL');
+      
+      if (!allData) {
+        summaryStats.innerHTML = '<p class="no-data">No summary data available</p>';
+        return;
+      }
+
+      const totalSamples = allData.samples;
+      const avgResponseTime = allData.avgResponseTime;
+      const totalErrors = allData.errorsCount;
+      const errorRate = allData.errorsRate;
+      const throughput = allData.avgThroughput;
+
+      summaryStats.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-label">Total Samples</div>
+          <div class="stat-value">${totalSamples.toLocaleString()}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Response Time</div>
+          <div class="stat-value ${getResponseTimeClass(avgResponseTime)}">
+            ${formatNumber(avgResponseTime)}<span class="stat-unit">ms</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Throughput</div>
+          <div class="stat-value">
+            ${formatNumber(throughput)}<span class="stat-unit">req/s</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Error Rate</div>
+          <div class="stat-value ${errorRate > 0 ? 'metric-error' : 'metric-good'}">
+            ${formatNumber(errorRate * 100, 2)}<span class="stat-unit">%</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Errors</div>
+          <div class="stat-value ${totalErrors > 0 ? 'metric-error' : 'metric-good'}">
+            ${totalErrors}
+          </div>
+        </div>
+      `;
+    }
+
+    // Render results table
+    function renderResults(data) {
+      if (!data.result || data.result.length === 0) {
+        resultsBody.innerHTML = '<tr><td colspan="10" class="no-data">No test results available</td></tr>';
+        return;
+      }
+
+      // Filter out the "ALL" row for the table, or show it last
+      const sortedResults = [...data.result].sort((a, b) => {
+        if (a.labelName === 'ALL') return 1;
+        if (b.labelName === 'ALL') return -1;
+        return a.labelName.localeCompare(b.labelName);
+      });
+
+      resultsBody.innerHTML = sortedResults.map(item => {
+        const errorBadge = item.errorsCount > 0 
+          ? `<span class="badge badge-error">${item.errorsCount} errors</span>`
+          : `<span class="badge badge-success">✓ Pass</span>`;
+
+        return `
+          <tr>
+            <td class="label-name" title="${item.labelName}">${item.labelName}</td>
+            <td>${item.samples.toLocaleString()}</td>
+            <td class="${getResponseTimeClass(item.avgResponseTime)}">${formatNumber(item.avgResponseTime)} ms</td>
+            <td>${formatNumber(item['90line'])} ms</td>
+            <td>${formatNumber(item['95line'])} ms</td>
+            <td>${formatNumber(item['99line'])} ms</td>
+            <td>${formatNumber(item.minResponseTime)} / ${formatNumber(item.maxResponseTime)} ms</td>
+            <td>${formatNumber(item.avgThroughput)} req/s</td>
+            <td>${errorBadge}</td>
+            <td>${item.concurrency}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Chart state
+    let disabledLabels = new Set();
+
+    // Color palette for chart lines
+    const chartColors = [
+      '#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a',
+      '#feca57', '#ff6348', '#5f27cd', '#00d2d3', '#ee5a6f',
+      '#a29bfe', '#fd79a8', '#fdcb6e', '#e17055', '#74b9ff'
+    ];
+
+    // Get color for label
+    function getChartColor(index) {
+      return chartColors[index % chartColors.length];
+    }
+
+    // Draw chart
+    function drawChart(data) {
+      const canvas = document.getElementById('metricsChart');
+      const ctx = canvas.getContext('2d');
+      
+      // Filter out "ALL" label and disabled labels, sort by avg response time
+      const chartItems = data.result
+        .filter(item => item.labelName !== 'ALL' && !disabledLabels.has(item.labelName))
+        .sort((a, b) => b.avgResponseTime - a.avgResponseTime);
+
+      if (chartItems.length === 0) {
+        // Clear canvas if no data
+        const container = canvas.parentElement;
+        const dpr = window.devicePixelRatio || 1;
+        const displayWidth = container.clientWidth;
+        const displayHeight = 500;
+        
+        canvas.width = displayWidth * dpr;
+        canvas.height = displayHeight * dpr;
+        canvas.style.width = displayWidth + 'px';
+        canvas.style.height = displayHeight + 'px';
+        
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, displayWidth, displayHeight);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--color-text-muted') || '#666';
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('No data to display. Enable labels from the legend above.', displayWidth / 2, displayHeight / 2);
+        return;
+      }
+
+      // Set canvas size with device pixel ratio for crisp rendering
+      const container = canvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      const displayWidth = container.clientWidth;
+      const displayHeight = 500;
+      
+      canvas.width = displayWidth * dpr;
+      canvas.height = displayHeight * dpr;
+      canvas.style.width = displayWidth + 'px';
+      canvas.style.height = displayHeight + 'px';
+      
+      ctx.scale(dpr, dpr);
+      
+      // Reset transform to fix offset issues
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const width = displayWidth;
+      const height = displayHeight;
+      const padding = { top: 50, right: 60, bottom: 120, left: 80 };
+      const chartWidth = width - padding.left - padding.right;
+      const chartHeight = height - padding.top - padding.bottom;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+
+      // Metrics to display
+      const metrics = [
+        { key: 'avgResponseTime', label: 'Avg', color: '#667eea' },
+        { key: '90line', label: '90th', color: '#4facfe' },
+        { key: '95line', label: '95th', color: '#43e97b' },
+        { key: '99line', label: '99th', color: '#fa709a' }
+      ];
+
+      // Calculate bar dimensions with better spacing
+      // Now groups are metrics, bars in group are labels
+      const totalGroups = metrics.length;
+      const barsPerGroup = chartItems.length;
+      const minGroupSpacing = 50; // Minimum pixels between groups
+      const totalSpacing = minGroupSpacing * (totalGroups + 1); // Include edges
+      const availableWidth = chartWidth - totalSpacing;
+      const groupWidth = availableWidth / totalGroups;
+      
+      // Calculate bar width - ensure bars don't overlap
+      const maxBarWidth = Math.floor((groupWidth * 0.9) / barsPerGroup);
+      const barWidth = Math.max(Math.min(maxBarWidth, 60), 10);
+      const barsWidth = barWidth * barsPerGroup;
+      const groupPadding = (groupWidth - barsWidth) / 2;
+
+      // Find max value for scaling
+      const allValues = chartItems.flatMap(item => 
+        metrics.map(m => item[m.key])
+      );
+      const maxValue = Math.max(...allValues);
+      const yScale = chartHeight / (maxValue * 1.15);
+
+      // Draw grid lines
+      ctx.strokeStyle = 'rgba(128, 128, 128, 0.15)';
+      ctx.lineWidth = 1;
+      const gridLines = 6;
+      for (let i = 0; i <= gridLines; i++) {
+        const y = padding.top + (chartHeight / gridLines) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(padding.left + chartWidth, y);
+        ctx.stroke();
+
+        // Y-axis labels
+        const value = maxValue * 1.15 * (1 - i / gridLines);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--color-text-muted') || '#666';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(Math.round(value) + ' ms', padding.left - 10, y);
+      }
+
+      // Draw bars grouped by metric (not by label)
+      metrics.forEach((metric, metricIndex) => {
+        const groupX = padding.left + minGroupSpacing + (metricIndex * (groupWidth + minGroupSpacing)) + groupPadding;
+
+        chartItems.forEach((item, labelIndex) => {
+          const color = getChartColor(labelIndex);
+          const value = item[metric.key];
+          const barHeight = value * yScale;
+          const barSpacing = 2; // Small gap between bars in same group
+          const x = groupX + (labelIndex * (barWidth + barSpacing));
+          const y = padding.top + chartHeight - barHeight;
+
+          // Draw bar with gradient
+          const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
+          gradient.addColorStop(0, color);
+          gradient.addColorStop(1, color + '99');
+          
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x, y, barWidth - barSpacing, barHeight);
+
+          // Draw bar border
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, barWidth - barSpacing, barHeight);
+
+          // Draw value on top of bar if there's space
+          if (barHeight > 25 && barWidth > 20) {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 10px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(Math.round(value), x + (barWidth - barSpacing) / 2, y + 12);
+          }
+        });
+
+        // Draw metric label below bars
+        const barSpacing = 2;
+        const totalBarsWidth = (barWidth * chartItems.length) + (barSpacing * (chartItems.length - 1));
+        ctx.save();
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--color-text') || '#000';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        
+        ctx.fillText(metric.label + ' Percentile', groupX + totalBarsWidth / 2, height - padding.bottom + 10);
+        ctx.restore();
+      });
+
+      // Draw Y-axis label
+      ctx.save();
+      ctx.translate(15, height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--color-text') || '#000';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Response Time (ms)', 0, 0);
+      ctx.restore();
+    }
+
+    // Render chart legend
+    function renderChartLegend(data) {
+      const chartControls = document.getElementById('chartControls');
+      
+      const chartItems = data.result
+        .filter(item => item.labelName !== 'ALL')
+        .sort((a, b) => b.avgResponseTime - a.avgResponseTime);
+
+      chartControls.innerHTML = chartItems.map((item, index) => {
+        const color = getChartColor(index);
+        const isDisabled = disabledLabels.has(item.labelName);
+        
+        return `
+          <div class="chart-legend-item ${isDisabled ? 'disabled' : ''}" 
+               data-label="${item.labelName}"
+               role="button"
+               tabindex="0"
+               aria-pressed="${!isDisabled}">
+            <div class="legend-color" style="background: ${color};"></div>
+            <span>${item.labelName}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Add click handlers
+      chartControls.querySelectorAll('.chart-legend-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const labelName = item.dataset.label;
+          
+          if (disabledLabels.has(labelName)) {
+            disabledLabels.delete(labelName);
+            item.classList.remove('disabled');
+            item.setAttribute('aria-pressed', 'true');
+          } else {
+            disabledLabels.add(labelName);
+            item.classList.add('disabled');
+            item.setAttribute('aria-pressed', 'false');
+          }
+          
+          if (fullData) {
+            drawChart(fullData);
+          }
+        });
+
+        // Keyboard support
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            item.click();
+          }
+        });
+      });
+    }
+
+    // Store the full data for redrawing
+    let fullData = null;
+
+    // Display results
+    function displayResults(data) {
+      fullData = data;
+      renderSummary(data);
+      renderResults(data);
+      renderChartLegend(data);
+      
+      // Show panel first, then draw chart (needs visible container for proper sizing)
+      resultsPanel.style.display = 'block';
+      
+      // Use requestAnimationFrame to ensure the panel is rendered before drawing
+      requestAnimationFrame(() => {
+        drawChart(data);
+      });
+    }
+
+    // Redraw chart on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (fullData) {
+          drawChart(fullData);
+        }
+      }, 250);
+    });
+
+    // Fetch results from API
+    async function fetchResults(url, apiKey, apiSecret) {
+      showStatus('Fetching test results...', 'loading');
+      fetchBtn.disabled = true;
+
+      try {
+        const headers = {};
+        
+        // Add authentication if provided
+        if (apiKey && apiSecret) {
+          const credentials = btoa(`${apiKey}:${apiSecret}`);
+          headers['Authorization'] = `Basic ${credentials}`;
+        }
+
+        const response = await fetch(url, { headers });
+
+        if (!response.ok) {
+          // Try to get error details from response body
+          let errorDetails = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const errorData = await response.json();
+            if (errorData.error) {
+              errorDetails += ` - ${errorData.error}`;
+            } else if (errorData.message) {
+              errorDetails += ` - ${errorData.message}`;
+            } else if (errorData.result && errorData.result.error) {
+              errorDetails += ` - ${errorData.result.error}`;
+            }
+          } catch (jsonError) {
+            // If response is not JSON, try to get text
+            try {
+              const errorText = await response.text();
+              if (errorText && errorText.length < 200) {
+                errorDetails += ` - ${errorText}`;
+              }
+            } catch (textError) {
+              // Ignore if we can't read the body
+            }
+          }
+          throw new Error(errorDetails);
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(`API Error: ${data.error}`);
+        }
+
+        showStatus('✓ Results loaded successfully', 'success');
+        setTimeout(hideStatus, 3000);
+        
+        displayResults(data);
+      } catch (error) {
+        // Enhanced error message with more context
+        let errorMessage = `Error: ${error.message}`;
+        
+        // Add additional context for common errors
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage += ' (Network error - check URL, CORS, or if the server is running)';
+        } else if (error.message.includes('401')) {
+          errorMessage += ' (Authentication required - check API key and secret)';
+        } else if (error.message.includes('403')) {
+          errorMessage += ' (Access forbidden - verify credentials have proper permissions)';
+        } else if (error.message.includes('404')) {
+          errorMessage += ' (Resource not found - verify the API URL is correct)';
+        } else if (error.message.includes('500') || error.message.includes('502') || error.message.includes('503')) {
+          errorMessage += ' (Server error - try again later)';
+        }
+        
+        showStatus(errorMessage, 'error');
+        console.error('Fetch error details:', error);
+      } finally {
+        fetchBtn.disabled = false;
+      }
+    }
+
+    // Form submission
+    configForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const url = apiUrlInput.value.trim();
+      const apiKey = apiKeyInput.value.trim();
+      const apiSecret = apiSecretInput.value.trim();
+
+      if (!url) {
+        showStatus('Please enter an API URL', 'error');
+        return;
+      }
+
+      fetchResults(url, apiKey, apiSecret);
+    });
+
+    // Load sample data
+    loadSampleBtn.addEventListener('click', () => {
+      showStatus('✓ Sample data loaded', 'success');
+      setTimeout(hideStatus, 3000);
+      displayResults(SAMPLE_DATA);
+    });
+
+    // Auto-load sample data on page load
+    window.addEventListener('load', () => {
+      displayResults(SAMPLE_DATA);
+    });
+  </script>
+</body>
+</html>
