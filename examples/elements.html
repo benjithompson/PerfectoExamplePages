@@ -246,6 +246,7 @@
     <div class="tabs" role="tablist" aria-label="Page Sections" id="pageTabs">
       <button role="tab" id="page-tab-1" aria-controls="page-panel-1" aria-selected="true" tabindex="0">Components</button>
       <button role="tab" id="page-tab-forms" aria-controls="page-panel-forms" aria-selected="false" tabindex="-1">Forms</button>
+      <button role="tab" id="page-tab-images" aria-controls="page-panel-images" aria-selected="false" tabindex="-1">Images</button>
       <button role="tab" id="page-tab-2" aria-controls="page-panel-2" aria-selected="false" tabindex="-1">Data & Files</button>
     </div>
     <section id="page-panel-1" class="tab-panel active" role="tabpanel" aria-labelledby="page-tab-1">
@@ -344,6 +345,54 @@
       </div>
     </div>
 
+    <h2 id="map">Map</h2>
+    <div class="panel" id="mapSection">
+      <p class="muted" style="margin-top:0;">Interactive Leaflet map with a marker and accessible fallback text.</p>
+      <div id="demoMap" role="region" aria-label="Map showing a sample location">
+        <p style="padding:1rem;">Loading map… (If this remains, the map library may be blocked.)</p>
+      </div>
+    </div>
+    </section>
+    <section id="page-panel-forms" class="tab-panel" role="tabpanel" aria-labelledby="page-tab-forms">
+      <h2 id="forms">Form Inputs & Validation</h2>
+      <div class="grid cols-3">
+        <div class="panel">
+          <h3>Text Fields</h3>
+          <label for="nameInput">Name <span class="badge">REQ</span></label>
+          <input id="nameInput" type="text" required placeholder="Ada Lovelace" />
+          <div id="nameMsg" class="field-msg">Enter at least 2 characters.</div>
+          <label for="emailInput">Email</label>
+          <input id="emailInput" type="email" placeholder="you@example.com" />
+          <div id="emailMsg" class="field-msg"></div>
+        </div>
+        <div class="panel">
+          <h3>Password Strength</h3>
+          <label for="pwInput">Password</label>
+          <input id="pwInput" type="password" aria-describedby="pwHelp" />
+          <div id="pwHelp" class="field-msg">Min 8 chars incl. number.</div>
+          <div id="pwStrength" class="field-msg"></div>
+          <label for="bioInput">Bio</label>
+          <textarea id="bioInput" maxlength="160" placeholder="Short bio..."></textarea>
+          <div class="field-msg" id="bioCount">0 / 160</div>
+        </div>
+        <div class="panel">
+          <h3>Selects & Combobox</h3>
+          <label for="petSelect">Favorite Pet</label>
+          <select id="petSelect">
+            <option value="">-- choose --</option>
+            <option>Dog</option><option>Cat</option><option>Bird</option><option>Fish</option>
+          </select>
+          <label for="comboInput">Searchable (Combobox)</label>
+          <div class="combo" role="combobox" aria-haspopup="listbox" aria-owns="comboList" aria-expanded="false">
+            <input id="comboInput" type="text" autocomplete="off" aria-autocomplete="list" aria-controls="comboList" placeholder="Type to filter..." />
+            <button type="button" class="toggle" tabindex="-1" aria-label="Toggle options">▾</button>
+            <ul id="comboList" class="combo-list" role="listbox" aria-label="Options"></ul>
+          </div>
+          <div class="field-msg" id="comboMsg">Pick an option.</div>
+        </div>
+      </div>
+    </section>
+    <section id="page-panel-images" class="tab-panel" role="tabpanel" aria-labelledby="page-tab-images">
     <h2 id="carousel">Carousel</h2>
     <div class="panel">
       <p style="margin-top:0;" class="muted">Accessible, keyboard-friendly carousel with auto-rotate (pauses on hover, focus or manual navigation).</p>
@@ -397,52 +446,6 @@
         </button>
       </div>
     </div>
-    <h2 id="map">Map</h2>
-    <div class="panel" id="mapSection">
-      <p class="muted" style="margin-top:0;">Interactive Leaflet map with a marker and accessible fallback text.</p>
-      <div id="demoMap" role="region" aria-label="Map showing a sample location">
-        <p style="padding:1rem;">Loading map… (If this remains, the map library may be blocked.)</p>
-      </div>
-    </div>
-    </section>
-    <section id="page-panel-forms" class="tab-panel" role="tabpanel" aria-labelledby="page-tab-forms">
-      <h2 id="forms">Form Inputs & Validation</h2>
-      <div class="grid cols-3">
-        <div class="panel">
-          <h3>Text Fields</h3>
-          <label for="nameInput">Name <span class="badge">REQ</span></label>
-          <input id="nameInput" type="text" required placeholder="Ada Lovelace" />
-          <div id="nameMsg" class="field-msg">Enter at least 2 characters.</div>
-          <label for="emailInput">Email</label>
-          <input id="emailInput" type="email" placeholder="you@example.com" />
-          <div id="emailMsg" class="field-msg"></div>
-        </div>
-        <div class="panel">
-          <h3>Password Strength</h3>
-          <label for="pwInput">Password</label>
-          <input id="pwInput" type="password" aria-describedby="pwHelp" />
-          <div id="pwHelp" class="field-msg">Min 8 chars incl. number.</div>
-          <div id="pwStrength" class="field-msg"></div>
-          <label for="bioInput">Bio</label>
-          <textarea id="bioInput" maxlength="160" placeholder="Short bio..."></textarea>
-          <div class="field-msg" id="bioCount">0 / 160</div>
-        </div>
-        <div class="panel">
-          <h3>Selects & Combobox</h3>
-          <label for="petSelect">Favorite Pet</label>
-          <select id="petSelect">
-            <option value="">-- choose --</option>
-            <option>Dog</option><option>Cat</option><option>Bird</option><option>Fish</option>
-          </select>
-          <label for="comboInput">Searchable (Combobox)</label>
-          <div class="combo" role="combobox" aria-haspopup="listbox" aria-owns="comboList" aria-expanded="false">
-            <input id="comboInput" type="text" autocomplete="off" aria-autocomplete="list" aria-controls="comboList" placeholder="Type to filter..." />
-            <button type="button" class="toggle" tabindex="-1" aria-label="Toggle options">▾</button>
-            <ul id="comboList" class="combo-list" role="listbox" aria-label="Options"></ul>
-          </div>
-          <div class="field-msg" id="comboMsg">Pick an option.</div>
-        </div>
-      </div>
     </section>
     <section id="page-panel-2" class="tab-panel" role="tabpanel" aria-labelledby="page-tab-2">
       <h2>Data Table</h2>
