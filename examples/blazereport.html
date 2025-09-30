@@ -59,19 +59,18 @@
 
     .form-group input {
       width: 100%;
-      padding: 0.5rem;
-      border: 1px solid var(--color-border);
+      padding: 0.75rem;
+      border: 2px solid #ccc;
       border-radius: 4px;
       font-size: 0.875rem;
-      background: var(--color-background);
+      background: #fff;
       color: var(--color-text);
+      box-sizing: border-box;
     }
 
     .form-group input:focus {
       outline: none;
       border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px var(--color-primary-alpha);
-      transform: translateY(-1px);
     }
 
     .form-actions {
@@ -132,6 +131,11 @@
       border-radius: 4px;
       margin-bottom: 1rem;
       font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
 
     .status-message.loading {
@@ -154,6 +158,35 @@
 
     .status-message.hidden {
       display: none;
+    }
+
+    .status-message .message-content {
+      flex: 1;
+    }
+
+    .btn-download {
+      background: linear-gradient(135deg, #2e7d32, #388e3c);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-download:hover {
+      background: linear-gradient(135deg, #388e3c, #43a047);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+    }
+
+    .btn-download:active {
+      transform: translateY(0);
     }
 
     .results-panel {
@@ -410,10 +443,12 @@
 
     .password-wrapper {
       position: relative;
+      width: 100%;
     }
 
     .password-wrapper input {
       padding-right: 2.5rem;
+      width: 100%;
     }
 
     .toggle-password {
@@ -449,10 +484,80 @@
       th, td {
         padding: 0.5rem;
       }
+
+      header {
+        padding: 0.5rem;
+      }
+    }
+
+    /* Header styles */
+    header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, var(--color-surface), var(--color-surface-alt));
+      border-bottom: 1px solid var(--color-border);
+      padding: 0.9rem clamp(1rem, 3vw, 2.2rem);
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      z-index: 40;
+      box-shadow: var(--shadow-sm);
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .back-link {
+      text-decoration: none;
+      color: var(--color-text-dim);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.65rem;
+      border-radius: var(--radius-sm);
+      background: var(--color-surface-alt);
+      border: 1px solid var(--color-border);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .back-link:hover {
+      background: var(--color-surface);
+      color: var(--color-text);
+      border-color: var(--color-accent);
+      transform: translateX(-2px);
+    }
+
+    .brand {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .brand-badge {
+      background: var(--color-accent);
+      padding: 0.35rem 0.6rem;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
+  <header>
+    <a href="../index.html" class="back-link">← Home</a>
+    <div class="brand">
+      Blaze Report
+      <span class="brand-badge">Example</span>
+    </div>
+  </header>
+
   <h1>Blaze Report - BlazeMeter Test Results</h1>
 
   <div class="config-panel">
@@ -463,29 +568,37 @@
         <input 
           type="text" 
           id="apiUrl" 
-          placeholder="https://a.blazemeter.com/api/v4/masters/79641384/reports/aggregatereport/data"
+          placeholder="https://a.blazemeter.com/api/v4/masters/12345678/reports/aggregatereport/data"
           value="https://a.blazemeter.com/api/v4/masters/79641384/reports/aggregatereport/data"
         />
+        <small class="muted" style="font-size: 0.7rem; display: block; margin-top: 0.25rem;">
+          Format: https://a.blazemeter.com/api/v4/masters/[MASTER_ID]/reports/aggregatereport/data
+        </small>
       </div>
       <div class="form-group">
-        <label for="apiKey">API Key</label>
+        <label for="apiKey">API Key ID</label>
         <input 
           type="text" 
           id="apiKey" 
-          placeholder="Enter your API key"
+          placeholder="api_key_id"
         />
       </div>
       <div class="form-group">
-        <label for="apiSecret">API Secret</label>
+        <label for="apiSecret">API Key Secret</label>
         <div class="password-wrapper">
           <input 
             type="password" 
             id="apiSecret" 
-            placeholder="Enter your API secret"
+            placeholder="api_key_secret"
           />
           <button type="button" class="toggle-password" id="toggleSecret" aria-label="Toggle password visibility">👁️</button>
         </div>
       </div>
+      <p class="muted" style="font-size: 0.75rem; margin-top: 0.5rem;">
+        <strong>Note:</strong> Authentication uses curl-style format: --user 'api_key_id:api_key_secret'<br>
+        Direct API calls from browser may be blocked by CORS. Consider using a proxy server for production.
+        <br><a href="https://help.blazemeter.com/apidocs/performance/masters_request_statistics.htm" target="_blank" style="color: var(--color-primary);">📖 API Documentation</a>
+      </p>
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" id="fetchBtn">Fetch Results</button>
         <button type="button" class="btn btn-secondary" id="loadSampleBtn">Load Sample Data</button>
@@ -534,6 +647,9 @@
 
   <script src="../theme.js"></script>
   <script>
+    // Global variable to store RR Pair data
+    let currentRRPair = null;
+
     // Sample data for testing
     const SAMPLE_DATA = {
       "api_version": 4,
@@ -760,15 +876,48 @@
     });
 
     // Show status message
-    function showStatus(message, type) {
-      statusMessage.textContent = message;
+    function showStatus(message, type, isHtml = false) {
+      if (isHtml) {
+        statusMessage.innerHTML = message;
+      } else {
+        statusMessage.textContent = message;
+      }
       statusMessage.className = `status-message ${type}`;
     }
 
     // Hide status message
     function hideStatus() {
       statusMessage.className = 'status-message hidden';
+      statusMessage.innerHTML = '';
     }
+
+    // Download RR Pair (WireMock format)
+    function downloadRRPair() {
+      if (!currentRRPair) {
+        console.error('No RR Pair data available');
+        return;
+      }
+
+      // Create WireMock stub mapping format
+      const wireMockStub = {
+        request: currentRRPair.request,
+        response: currentRRPair.response
+      };
+
+      const jsonString = JSON.stringify(wireMockStub, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `blazemeter-rr-pair-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Make downloadRRPair globally accessible
+    window.downloadRRPair = downloadRRPair;
 
     // Format number with decimals
     function formatNumber(num, decimals = 2) {
@@ -1135,15 +1284,27 @@
       fetchBtn.disabled = true;
 
       try {
-        const headers = {};
+        const headers = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        };
         
-        // Add authentication if provided
-        if (apiKey && apiSecret) {
-          const credentials = btoa(`${apiKey}:${apiSecret}`);
+        // Only add authentication if BOTH key and secret are provided
+        let authUsed = false;
+        if (apiKey && apiKey.trim() !== '' && apiSecret && apiSecret.trim() !== '') {
+          const credentials = btoa(`${apiKey.trim()}:${apiSecret.trim()}`);
           headers['Authorization'] = `Basic ${credentials}`;
+          authUsed = true;
         }
 
-        const response = await fetch(url, { headers });
+        const requestConfig = { 
+          method: 'GET',
+          headers: headers,
+          mode: 'cors',
+          credentials: 'omit'
+        };
+
+        const response = await fetch(url, requestConfig);
 
         if (!response.ok) {
           // Try to get error details from response body
@@ -1177,8 +1338,47 @@
           throw new Error(`API Error: ${data.error}`);
         }
 
-        showStatus('✓ Results loaded successfully', 'success');
-        setTimeout(hideStatus, 3000);
+        // Capture Request/Response for RR Pair
+        const requestData = {
+          method: 'GET',
+          url: url,
+          headers: Object.keys(headers).reduce((acc, key) => {
+            // Mask authorization header for security
+            if (key.toLowerCase() === 'authorization') {
+              acc[key] = authUsed ? 'Basic [REDACTED]' : undefined;
+            } else {
+              acc[key] = headers[key];
+            }
+            return acc;
+          }, {})
+        };
+
+        const responseData = {
+          status: response.status,
+          statusText: response.statusText,
+          headers: {},
+          body: data
+        };
+
+        // Capture response headers
+        response.headers.forEach((value, key) => {
+          responseData.headers[key] = value;
+        });
+
+        // Store RR Pair globally for download
+        currentRRPair = {
+          request: requestData,
+          response: responseData
+        };
+
+        // Show success message with download button
+        const successHtml = `
+          <span class="message-content">✓ Results loaded successfully</span>
+          <button class="btn-download" onclick="window.downloadRRPair()">
+            📥 Download RR Pair
+          </button>
+        `;
+        showStatus(successHtml, 'success', true);
         
         displayResults(data);
       } catch (error) {
@@ -1186,8 +1386,8 @@
         let errorMessage = `Error: ${error.message}`;
         
         // Add additional context for common errors
-        if (error.message.includes('Failed to fetch')) {
-          errorMessage += ' (Network error - check URL, CORS, or if the server is running)';
+        if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+          errorMessage += ' (CORS blocked or network error - BlazeMeter API may not allow direct browser access. Try using the "Load Sample Data" button or set up a proxy server)';
         } else if (error.message.includes('401')) {
           errorMessage += ' (Authentication required - check API key and secret)';
         } else if (error.message.includes('403')) {
