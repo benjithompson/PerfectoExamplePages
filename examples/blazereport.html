@@ -494,21 +494,23 @@
     header {
       position: sticky;
       top: 0;
-      background: linear-gradient(135deg, var(--color-surface), var(--color-surface-alt));
-      border-bottom: 1px solid var(--color-border);
+      background: #ffffff;
+      background: linear-gradient(135deg, var(--color-surface, #ffffff), var(--color-surface-alt, #f8f9fa));
+      border-bottom: 2px solid #666666;
       padding: 0.9rem clamp(1rem, 3vw, 2.2rem);
       display: flex;
       gap: 1rem;
       align-items: center;
       z-index: 40;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       justify-content: space-between;
       flex-wrap: wrap;
+      backdrop-filter: blur(8px);
     }
 
     .back-link {
       text-decoration: none;
-      color: var(--color-text-dim);
+      color: #1a1a1a;
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.6px;
@@ -517,16 +519,24 @@
       gap: 0.35rem;
       padding: 0.4rem 0.65rem;
       border-radius: var(--radius-sm);
-      background: var(--color-surface-alt);
-      border: 1px solid var(--color-border);
+      background: #f0f0f0;
+      border: 1px solid #666666;
       transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .back-link:hover {
-      background: var(--color-surface);
-      color: var(--color-text);
-      border-color: var(--color-accent);
+    .back-link:hover,
+    .back-link:focus {
+      background: #e0e0e0;
+      color: #000000;
+      border-color: #0056b3;
       transform: translateX(-2px);
+      outline: 2px solid #0056b3;
+      outline-offset: 2px;
+    }
+
+    .back-link:focus {
+      outline: 2px solid #0056b3;
+      outline-offset: 2px;
     }
 
     .brand {
@@ -535,30 +545,36 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
+      color: #1a1a1a;
     }
 
     .brand-badge {
-      background: var(--color-accent);
+      background: #0056b3;
       padding: 0.35rem 0.6rem;
       font-size: 0.6rem;
       text-transform: uppercase;
       letter-spacing: 1px;
       border-radius: var(--radius-sm);
-      color: #fff;
-      font-weight: 600;
+      color: #ffffff;
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
-  <header>
-    <a href="../index.html" class="back-link">← Home</a>
-    <div class="brand">
+  <header role="banner">
+    <nav aria-label="Main navigation">
+      <a href="../index.html" class="back-link" aria-label="Go back to home page">
+        <span aria-hidden="true">←</span> Home
+      </a>
+    </nav>
+    <div class="brand" role="heading" aria-level="1">
       Blaze Report
-      <span class="brand-badge">Example</span>
+      <span class="brand-badge" role="status">Example</span>
     </div>
   </header>
 
-  <h1>Blaze Report - BlazeMeter Test Results</h1>
+  <main role="main">
+    <h1>Blaze Report - BlazeMeter Test Results</h1>
 
   <div class="config-panel">
     <h2>Configuration</h2>
@@ -1284,24 +1300,22 @@
       fetchBtn.disabled = true;
 
       try {
-        const headers = {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        };
+        // Create headers matching Postman's working format
+        const myHeaders = new Headers();
         
         // Only add authentication if BOTH key and secret are provided
         let authUsed = false;
         if (apiKey && apiKey.trim() !== '' && apiSecret && apiSecret.trim() !== '') {
           const credentials = btoa(`${apiKey.trim()}:${apiSecret.trim()}`);
-          headers['Authorization'] = `Basic ${credentials}`;
+          myHeaders.append('Authorization', `Basic ${credentials}`);
           authUsed = true;
         }
 
+        // Match Postman's exact request configuration
         const requestConfig = { 
           method: 'GET',
-          headers: headers,
-          mode: 'cors',
-          credentials: 'omit'
+          headers: myHeaders,
+          redirect: 'follow'
         };
 
         const response = await fetch(url, requestConfig);
@@ -1339,18 +1353,20 @@
         }
 
         // Capture Request/Response for RR Pair
+        const requestHeaders = {};
+        myHeaders.forEach((value, key) => {
+          // Mask authorization header for security
+          if (key.toLowerCase() === 'authorization') {
+            requestHeaders[key] = 'Basic [REDACTED]';
+          } else {
+            requestHeaders[key] = value;
+          }
+        });
+        
         const requestData = {
           method: 'GET',
           url: url,
-          headers: Object.keys(headers).reduce((acc, key) => {
-            // Mask authorization header for security
-            if (key.toLowerCase() === 'authorization') {
-              acc[key] = authUsed ? 'Basic [REDACTED]' : undefined;
-            } else {
-              acc[key] = headers[key];
-            }
-            return acc;
-          }, {})
+          headers: requestHeaders
         };
 
         const responseData = {
@@ -1387,7 +1403,7 @@
         
         // Add additional context for common errors
         if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
-          errorMessage += ' (CORS blocked or network error - BlazeMeter API may not allow direct browser access. Try using the "Load Sample Data" button or set up a proxy server)';
+          errorMessage += ' (Network error or CORS blocked - BlazeMeter API blocks browser requests from different origins. Use "Load Sample Data" for testing or implement a server-side proxy for production)';
         } else if (error.message.includes('401')) {
           errorMessage += ' (Authentication required - check API key and secret)';
         } else if (error.message.includes('403')) {
@@ -1433,5 +1449,6 @@
       displayResults(SAMPLE_DATA);
     });
   </script>
+  </main>
 </body>
 </html>
