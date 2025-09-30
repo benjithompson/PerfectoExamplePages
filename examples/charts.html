@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Charts - Market Data</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    .back-link {
+      color: #3498db;
+      text-decoration: none;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    .back-link:hover {
+      background: #ebf5fb;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: box-shadow 0.3s;
+    }
+
+    .chart-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    .stock-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .stock-symbol {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .stock-name {
+      font-size: 13px;
+      color: #7f8c8d;
+    }
+
+    .price-info {
+      text-align: right;
+    }
+
+    .current-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .price-change {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-top: 5px;
+      display: inline-block;
+    }
+
+    .price-change.positive {
+      color: #27ae60;
+      background: #d5f4e6;
+    }
+
+    .price-change.negative {
+      color: #e74c3c;
+      background: #fadbd8;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 15px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .chart-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #95a5a6;
+      padding-top: 15px;
+      border-top: 1px solid #ecf0f1;
+    }
+
+    .time-period {
+      font-weight: 500;
+    }
+
+    .data-points {
+      font-style: italic;
+    }
+
+    .data-table-section {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    .data-table-section h2 {
+      font-size: 22px;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    thead th {
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #2c3e50;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #ecf0f1;
+      transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    tbody td {
+      padding: 12px 15px;
+      color: #2c3e50;
+    }
+
+    .stock-cell {
+      font-weight: 600;
+    }
+
+    .company-cell {
+      color: #7f8c8d;
+      font-size: 13px;
+    }
+
+    .price-cell {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .change-cell {
+      font-weight: 600;
+    }
+
+    .change-cell.positive {
+      color: #27ae60;
+    }
+
+    .change-cell.negative {
+      color: #e74c3c;
+    }
+
+    .trend-cell {
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .trend-cell.bullish {
+      background: #d5f4e6;
+      color: #27ae60;
+    }
+
+    .trend-cell.bearish {
+      background: #fadbd8;
+      color: #e74c3c;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #7f8c8d;
+      font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .chart-container {
+        height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <h1>📈 Stock Market Charts</h1>
+        <a href="../index.html" class="back-link">← Back to Examples</a>
+      </div>
+    </header>
+
+    <div class="charts-grid">
+      <!-- Chart 1: Bullish Stock (Increasing) -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="stock-info">
+            <div class="stock-symbol">TECH</div>
+            <div class="stock-name">TechCorp Industries</div>
+          </div>
+          <div class="price-info">
+            <div class="current-price">$152.45</div>
+            <div class="price-change positive">+12.8% ▲</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart1"></canvas>
+        </div>
+        <div class="chart-footer">
+          <span class="time-period">Past 30 Days</span>
+          <span class="data-points">Daily Close Prices</span>
+        </div>
+      </div>
+
+      <!-- Chart 2: Bearish Stock (Decreasing) -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="stock-info">
+            <div class="stock-symbol">RETL</div>
+            <div class="stock-name">RetailCo Group</div>
+          </div>
+          <div class="price-info">
+            <div class="current-price">$67.23</div>
+            <div class="price-change negative">-8.5% ▼</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart2"></canvas>
+        </div>
+        <div class="chart-footer">
+          <span class="time-period">Past 30 Days</span>
+          <span class="data-points">Daily Close Prices</span>
+        </div>
+      </div>
+
+      <!-- Chart 3: Another Bullish Stock -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="stock-info">
+            <div class="stock-symbol">ENRG</div>
+            <div class="stock-name">Energy Solutions Ltd</div>
+          </div>
+          <div class="price-info">
+            <div class="current-price">$89.67</div>
+            <div class="price-change positive">+15.2% ▲</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart3"></canvas>
+        </div>
+        <div class="chart-footer">
+          <span class="time-period">Past 30 Days</span>
+          <span class="data-points">Daily Close Prices</span>
+        </div>
+      </div>
+
+      <!-- Chart 4: Another Bearish Stock -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="stock-info">
+            <div class="stock-symbol">BANK</div>
+            <div class="stock-name">BankCorp Financial</div>
+          </div>
+          <div class="price-info">
+            <div class="current-price">$43.12</div>
+            <div class="price-change negative">-11.3% ▼</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart4"></canvas>
+        </div>
+        <div class="chart-footer">
+          <span class="time-period">Past 30 Days</span>
+          <span class="data-points">Daily Close Prices</span>
+        </div>
+      </div>
+
+      <!-- Chart 5: Volatile Bullish Stock -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="stock-info">
+            <div class="stock-symbol">PHARM</div>
+            <div class="stock-name">PharmaTech Inc</div>
+          </div>
+          <div class="price-info">
+            <div class="current-price">$234.89</div>
+            <div class="price-change positive">+22.4% ▲</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart5"></canvas>
+        </div>
+        <div class="chart-footer">
+          <span class="time-period">Past 30 Days</span>
+          <span class="data-points">Daily Close Prices</span>
+        </div>
+      </div>
+
+      <!-- Chart 6: Volatile Bearish Stock -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="stock-info">
+            <div class="stock-symbol">AUTO</div>
+            <div class="stock-name">AutoMakers Global</div>
+          </div>
+          <div class="price-info">
+            <div class="current-price">$56.78</div>
+            <div class="price-change negative">-14.7% ▼</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart6"></canvas>
+        </div>
+        <div class="chart-footer">
+          <span class="time-period">Past 30 Days</span>
+          <span class="data-points">Daily Close Prices</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="data-table-section">
+      <h2>📊 Stock Data Summary</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Company Name</th>
+              <th>Current Price</th>
+              <th>Opening Price (30d ago)</th>
+              <th>Change ($)</th>
+              <th>Change (%)</th>
+              <th>Trend</th>
+              <th>Period</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="stock-cell">TECH</td>
+              <td class="company-cell">TechCorp Industries</td>
+              <td class="price-cell">$152.45</td>
+              <td>$135.20</td>
+              <td class="change-cell positive">+$17.25</td>
+              <td class="change-cell positive">+12.8%</td>
+              <td><span class="trend-cell bullish">Bullish ▲</span></td>
+              <td>30 Days</td>
+            </tr>
+            <tr>
+              <td class="stock-cell">RETL</td>
+              <td class="company-cell">RetailCo Group</td>
+              <td class="price-cell">$67.23</td>
+              <td>$73.45</td>
+              <td class="change-cell negative">-$6.22</td>
+              <td class="change-cell negative">-8.5%</td>
+              <td><span class="trend-cell bearish">Bearish ▼</span></td>
+              <td>30 Days</td>
+            </tr>
+            <tr>
+              <td class="stock-cell">ENRG</td>
+              <td class="company-cell">Energy Solutions Ltd</td>
+              <td class="price-cell">$89.67</td>
+              <td>$77.82</td>
+              <td class="change-cell positive">+$11.85</td>
+              <td class="change-cell positive">+15.2%</td>
+              <td><span class="trend-cell bullish">Bullish ▲</span></td>
+              <td>30 Days</td>
+            </tr>
+            <tr>
+              <td class="stock-cell">BANK</td>
+              <td class="company-cell">BankCorp Financial</td>
+              <td class="price-cell">$43.12</td>
+              <td>$48.64</td>
+              <td class="change-cell negative">-$5.52</td>
+              <td class="change-cell negative">-11.3%</td>
+              <td><span class="trend-cell bearish">Bearish ▼</span></td>
+              <td>30 Days</td>
+            </tr>
+            <tr>
+              <td class="stock-cell">PHARM</td>
+              <td class="company-cell">PharmaTech Inc</td>
+              <td class="price-cell">$234.89</td>
+              <td>$191.92</td>
+              <td class="change-cell positive">+$42.97</td>
+              <td class="change-cell positive">+22.4%</td>
+              <td><span class="trend-cell bullish">Bullish ▲</span></td>
+              <td>30 Days</td>
+            </tr>
+            <tr>
+              <td class="stock-cell">AUTO</td>
+              <td class="company-cell">AutoMakers Global</td>
+              <td class="price-cell">$56.78</td>
+              <td>$66.54</td>
+              <td class="change-cell negative">-$9.76</td>
+              <td class="change-cell negative">-14.7%</td>
+              <td><span class="trend-cell bearish">Bearish ▼</span></td>
+              <td>30 Days</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2024 Stock Market Charts - For demonstration purposes only. Not real market data.</p>
+    </footer>
+  </div>
+
+  <script src="../theme.js" defer></script>
+  <script>
+    // Utility function to generate realistic stock price data
+    function generateStockData(startPrice, trend, volatility, days = 30) {
+      const data = [];
+      let price = startPrice;
+      const trendPerDay = (trend / 100) / days; // Convert percentage to daily change
+      
+      for (let i = 0; i < days; i++) {
+        // Add trend
+        price = price * (1 + trendPerDay);
+        
+        // Add some random volatility
+        const randomChange = (Math.random() - 0.5) * volatility * price;
+        price += randomChange;
+        
+        // Ensure price doesn't go negative
+        price = Math.max(price, startPrice * 0.5);
+        
+        data.push(price);
+      }
+      
+      return data;
+    }
+
+    // Function to draw a line chart
+    function drawLineChart(canvasId, data, color, fillColor) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // Set canvas size based on container
+      const container = canvas.parentElement;
+      canvas.width = container.offsetWidth;
+      canvas.height = container.offsetHeight;
+      
+      const width = canvas.width;
+      const height = canvas.height;
+      const padding = 40;
+      const chartWidth = width - padding * 2;
+      const chartHeight = height - padding * 2;
+      
+      // Find min and max values
+      const minValue = Math.min(...data);
+      const maxValue = Math.max(...data);
+      const valueRange = maxValue - minValue;
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+      
+      // Draw grid lines
+      ctx.strokeStyle = '#ecf0f1';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = padding + (chartHeight / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(width - padding, y);
+        ctx.stroke();
+      }
+      
+      // Draw gradient fill
+      const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+      gradient.addColorStop(0, fillColor.replace(')', ', 0.3)').replace('rgb', 'rgba'));
+      gradient.addColorStop(1, fillColor.replace(')', ', 0.05)').replace('rgb', 'rgba'));
+      
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.moveTo(padding, height - padding);
+      
+      data.forEach((value, index) => {
+        const x = padding + (chartWidth / (data.length - 1)) * index;
+        const y = height - padding - ((value - minValue) / valueRange) * chartHeight;
+        
+        if (index === 0) {
+          ctx.lineTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      
+      ctx.lineTo(width - padding, height - padding);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Draw line
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      
+      data.forEach((value, index) => {
+        const x = padding + (chartWidth / (data.length - 1)) * index;
+        const y = height - padding - ((value - minValue) / valueRange) * chartHeight;
+        
+        if (index === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      
+      ctx.stroke();
+      
+      // Draw points
+      ctx.fillStyle = color;
+      data.forEach((value, index) => {
+        const x = padding + (chartWidth / (data.length - 1)) * index;
+        const y = height - padding - ((value - minValue) / valueRange) * chartHeight;
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      
+      // Draw Y-axis labels
+      ctx.fillStyle = '#95a5a6';
+      ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
+      ctx.textAlign = 'right';
+      
+      for (let i = 0; i <= 5; i++) {
+        const value = minValue + (valueRange / 5) * (5 - i);
+        const y = padding + (chartHeight / 5) * i;
+        ctx.fillText('$' + value.toFixed(2), padding - 10, y + 4);
+      }
+    }
+
+    // Generate data and draw charts when page loads
+    window.addEventListener('load', () => {
+      // Chart 1: Bullish (green)
+      const data1 = generateStockData(135.20, 12.8, 0.02);
+      drawLineChart('chart1', data1, '#27ae60', 'rgb(39, 174, 96)');
+      
+      // Chart 2: Bearish (red)
+      const data2 = generateStockData(73.45, -8.5, 0.015);
+      drawLineChart('chart2', data2, '#e74c3c', 'rgb(231, 76, 60)');
+      
+      // Chart 3: Bullish (green)
+      const data3 = generateStockData(77.82, 15.2, 0.025);
+      drawLineChart('chart3', data3, '#27ae60', 'rgb(39, 174, 96)');
+      
+      // Chart 4: Bearish (red)
+      const data4 = generateStockData(48.64, -11.3, 0.018);
+      drawLineChart('chart4', data4, '#e74c3c', 'rgb(231, 76, 60)');
+      
+      // Chart 5: Volatile Bullish (green)
+      const data5 = generateStockData(191.92, 22.4, 0.035);
+      drawLineChart('chart5', data5, '#27ae60', 'rgb(39, 174, 96)');
+      
+      // Chart 6: Volatile Bearish (red)
+      const data6 = generateStockData(66.54, -14.7, 0.028);
+      drawLineChart('chart6', data6, '#e74c3c', 'rgb(231, 76, 60)');
+    });
+
+    // Redraw charts on window resize
+    window.addEventListener('resize', () => {
+      const data1 = generateStockData(135.20, 12.8, 0.02);
+      drawLineChart('chart1', data1, '#27ae60', 'rgb(39, 174, 96)');
+      
+      const data2 = generateStockData(73.45, -8.5, 0.015);
+      drawLineChart('chart2', data2, '#e74c3c', 'rgb(231, 76, 60)');
+      
+      const data3 = generateStockData(77.82, 15.2, 0.025);
+      drawLineChart('chart3', data3, '#27ae60', 'rgb(39, 174, 96)');
+      
+      const data4 = generateStockData(48.64, -11.3, 0.018);
+      drawLineChart('chart4', data4, '#e74c3c', 'rgb(231, 76, 60)');
+      
+      const data5 = generateStockData(191.92, 22.4, 0.035);
+      drawLineChart('chart5', data5, '#27ae60', 'rgb(39, 174, 96)');
+      
+      const data6 = generateStockData(66.54, -14.7, 0.028);
+      drawLineChart('chart6', data6, '#e74c3c', 'rgb(231, 76, 60)');
+    });
+  </script>
+</body>
+</html>

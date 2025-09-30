@@ -588,19 +588,26 @@
 
     /* Tabs */
     const tabs = document.querySelectorAll('[role=tab]');
-    const panels = document.querySelectorAll('.tab-panel');
     tabs.forEach(tab => {
       tab.addEventListener('click', () => activateTab(tab));
       tab.addEventListener('keydown', e => {
-        const idx = [...tabs].indexOf(tab);
-        if(e.key==='ArrowRight'){ const next = tabs[(idx+1)%tabs.length]; next.focus(); activateTab(next); }
-        else if(e.key==='ArrowLeft'){ const prev = tabs[(idx-1+tabs.length)%tabs.length]; prev.focus(); activateTab(prev); }
+        const tablist = tab.closest('[role=tablist]');
+        const siblingTabs = [...tablist.querySelectorAll('[role=tab]')];
+        const idx = siblingTabs.indexOf(tab);
+        if(e.key==='ArrowRight'){ const next = siblingTabs[(idx+1)%siblingTabs.length]; next.focus(); activateTab(next); }
+        else if(e.key==='ArrowLeft'){ const prev = siblingTabs[(idx-1+siblingTabs.length)%siblingTabs.length]; prev.focus(); activateTab(prev); }
       });
     });
     function activateTab(tab){
-      tabs.forEach(t => { t.setAttribute('aria-selected','false'); t.tabIndex=-1; });
+      const tablist = tab.closest('[role=tablist]');
+      const siblingTabs = tablist.querySelectorAll('[role=tab]');
+      const panelContainer = tablist.parentElement;
+      const panels = panelContainer.querySelectorAll('.tab-panel');
+      
+      siblingTabs.forEach(t => { t.setAttribute('aria-selected','false'); t.tabIndex=-1; });
       panels.forEach(p => p.classList.remove('active'));
-      tab.setAttribute('aria-selected','true'); tab.tabIndex=0; document.getElementById(tab.getAttribute('aria-controls')).classList.add('active');
+      tab.setAttribute('aria-selected','true'); tab.tabIndex=0; 
+      document.getElementById(tab.getAttribute('aria-controls')).classList.add('active');
     }
 
     /* Accordion */

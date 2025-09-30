@@ -8,117 +8,234 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-/* Base Design Tokens */
-:root {
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --color-bg: #f8fafc;
-  --color-surface: #ffffff;
-  --color-surface-alt: #f1f5f9;
-  --color-border: #cbd5e1;
-  --color-border-strong: #94a3b8;
-  --color-text: #0f172a;
-  --color-text-light: #64748b;
-  --color-text-muted: #94a3b8;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-accent-subtle: #dbeafe;
-  --color-success: #16a34a;
-  --color-success-bg: #dcfce7;
-  --color-danger: #dc2626;
-  --color-danger-bg: #fee2e2;
-  --color-warning: #ea580c;
-  --color-warning-bg: #fed7aa;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
-  --focus-ring: 0 0 0 3px rgba(37,99,235,.25);
-  --transition: .2s cubic-bezier(.4,0,.2,1);
-}
-
-[data-theme="dark"] {
-  --color-bg: #0f172a;
-  --color-surface: #1e293b;
-  --color-surface-alt: #334155;
-  --color-border: #475569;
-  --color-border-strong: #64748b;
-  --color-text: #f1f5f9;
-  --color-text-light: #cbd5e1;
-  --color-text-muted: #94a3b8;
-  --color-accent: #3b82f6;
-  --color-accent-hover: #60a5fa;
-  --color-accent-subtle: #1e3a8a;
-  --color-success: #22c55e;
-  --color-success-bg: #14532d;
-  --color-danger: #ef4444;
-  --color-danger-bg: #7f1d1d;
-  --color-warning: #f97316;
-  --color-warning-bg: #7c2d12;
-}
-
+/* Legacy 1990s-style design */
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text); line-height:1.6; min-height:100vh; }
+body { 
+  font-family: 'Courier New', Courier, monospace; 
+  background: #c0c0c0; 
+  color: #000000; 
+  line-height:1.4; 
+  min-height:100vh; 
+}
 
-.container { max-width:1000px; margin:0 auto; padding:2rem 1.5rem; }
-header { background:var(--color-surface); border-bottom:1px solid var(--color-border); padding:1.5rem 0; margin-bottom:2rem; box-shadow:var(--shadow-sm); }
-.header-content { max-width:1000px; margin:0 auto; padding:0 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
-.logo { display:flex; align-items:center; gap:.75rem; }
-.logo-icon { width:42px; height:42px; background:linear-gradient(135deg, var(--color-accent), #1d4ed8); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:1.1rem; box-shadow:0 2px 8px rgba(37,99,235,.3); }
-.logo-text { display:flex; flex-direction:column; line-height:1.2; }
-.logo-text strong { font-size:1.15rem; font-weight:700; color:var(--color-text); }
-.logo-text span { font-size:.75rem; color:var(--color-text-light); letter-spacing:.3px; }
-.back-link { display:inline-flex; align-items:center; gap:.4rem; font-size:.85rem; color:var(--color-text-light); text-decoration:none; padding:.5rem .75rem; border-radius:var(--radius-sm); transition:var(--transition); }
-.back-link:hover { background:var(--color-surface-alt); color:var(--color-text); }
+.container { max-width:900px; margin:0 auto; padding:20px; }
+header { 
+  background: #ffffff; 
+  border: 3px solid #000000; 
+  padding:12px; 
+  margin-bottom:15px; 
+  box-shadow: 4px 4px 0px #808080;
+}
+.header-content { 
+  max-width:900px; 
+  margin:0 auto; 
+  display:flex; 
+  align-items:center; 
+  justify-content:space-between; 
+  flex-wrap:wrap; 
+  gap:10px; 
+}
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-icon { 
+  width:40px; 
+  height:40px; 
+  background: #000000; 
+  border: 2px solid #000000; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center; 
+  color:#ffffff; 
+  font-weight:bold; 
+  font-size:16px;
+}
+.logo-text { display:flex; flex-direction:column; line-height:1.1; }
+.logo-text strong { font-size:14px; font-weight:bold; color:#000000; }
+.logo-text span { font-size:10px; color:#333333; }
+.back-link { 
+  font-size:11px; 
+  color:#0000ee; 
+  text-decoration:underline; 
+}
+.back-link:hover { color:#551a8b; }
 
-.form-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:2rem; box-shadow:var(--shadow-md); }
-.form-header { margin-bottom:2rem; padding-bottom:1.5rem; border-bottom:2px solid var(--color-border); }
-.form-title { font-size:1.75rem; font-weight:700; color:var(--color-text); margin-bottom:.5rem; }
-.form-subtitle { font-size:.95rem; color:var(--color-text-light); }
-.tax-year-badge { display:inline-flex; align-items:center; padding:.35rem .7rem; background:var(--color-accent-subtle); color:var(--color-accent); border-radius:var(--radius-md); font-size:.8rem; font-weight:600; margin-top:.75rem; }
+.form-card { 
+  background: #ffffff; 
+  border: 3px double #000000; 
+  padding:25px; 
+  box-shadow: 5px 5px 0px #808080;
+}
+.form-header { 
+  margin-bottom:20px; 
+  padding-bottom:12px; 
+  border-bottom:3px solid #000000; 
+}
+.form-title { 
+  font-size:20px; 
+  font-weight:bold; 
+  color:#000000; 
+  margin-bottom:5px; 
+  text-transform:uppercase;
+}
+.form-subtitle { font-size:11px; color:#333333; }
+.tax-year-badge { 
+  display:inline-block; 
+  padding:4px 10px; 
+  background: #000000; 
+  color:#ffffff; 
+  font-size:11px; 
+  font-weight:bold; 
+  margin-top:8px; 
+  border: 2px solid #000000;
+}
 
-.form-section { margin-bottom:2rem; }
-.section-title { font-size:1.05rem; font-weight:600; color:var(--color-text); margin-bottom:1rem; padding:.5rem .75rem; background:var(--color-surface-alt); border-left:3px solid var(--color-accent); border-radius:var(--radius-sm); }
-.section-help { font-size:.8rem; color:var(--color-text-muted); margin-bottom:1rem; padding:.5rem .75rem; background:var(--color-accent-subtle); border-radius:var(--radius-sm); }
+.autofill-btn {
+  font-family: 'Courier New', Courier, monospace;
+  font-size:11px;
+  font-weight:bold;
+  padding:4px 10px;
+  border: 2px outset #808080;
+  background: #ffff00;
+  color:#000000;
+  cursor:pointer;
+  text-transform:uppercase;
+  margin-left:10px;
+  margin-top:8px;
+  display:inline-block;
+}
+.autofill-btn:hover { background: #ffff99; }
+.autofill-btn:active { border-style: inset; }
 
-.form-grid { display:grid; gap:1.25rem; }
-.form-grid.cols-2 { grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); }
-.form-grid.cols-3 { grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); }
+.form-section { margin-bottom:20px; }
+.section-title { 
+  font-size:13px; 
+  font-weight:bold; 
+  color:#000000; 
+  margin-bottom:12px; 
+  padding:5px 10px; 
+  background: #c0c0c0; 
+  border: 1px solid #000000; 
+  text-transform:uppercase;
+}
+.section-help { 
+  font-size:11px; 
+  color:#000000; 
+  margin-bottom:12px; 
+  padding:8px; 
+  background: #e0e0e0; 
+  border: 2px solid #000000;
+}
 
-.form-group { display:flex; flex-direction:column; gap:.4rem; }
-.form-label { font-size:.85rem; font-weight:600; color:var(--color-text-light); display:flex; align-items:center; gap:.35rem; }
-.form-label .required { color:var(--color-danger); }
-.form-label .box-number { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; background:var(--color-accent); color:#fff; border-radius:4px; font-size:.7rem; font-weight:700; }
-.form-input, .form-select { font-family:inherit; font-size:.9rem; padding:.7rem .85rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-surface); color:var(--color-text); transition:var(--transition); width:100%; }
-.form-input:focus, .form-select:focus { outline:none; border-color:var(--color-accent); box-shadow:var(--focus-ring); }
-.form-input.error { border-color:var(--color-danger); background:var(--color-danger-bg); }
-.form-input::placeholder { color:var(--color-text-muted); }
-.field-error { font-size:.75rem; color:var(--color-danger); display:none; }
+.form-grid { display:grid; gap:12px; }
+.form-grid.cols-2 { grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); }
+.form-grid.cols-3 { grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); }
+
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-label { 
+  font-size:11px; 
+  font-weight:bold; 
+  color:#000000; 
+  display:flex; 
+  align-items:center; 
+  gap:4px; 
+}
+.form-label .required { color:#ff0000; }
+.form-label .box-number { 
+  display:inline-flex; 
+  align-items:center; 
+  justify-content:center; 
+  width:18px; 
+  height:18px; 
+  background: #ffffff; 
+  color:#000000; 
+  border: 2px solid #000000; 
+  font-size:10px; 
+  font-weight:bold;
+}
+.form-input, .form-select { 
+  font-family: 'Courier New', Courier, monospace; 
+  font-size:12px; 
+  padding:6px 8px; 
+  border: 2px solid #000000; 
+  background: #ffffff; 
+  color:#000000; 
+  width:100%; 
+}
+.form-input:focus, .form-select:focus { 
+  outline:none; 
+  background: #ffffcc; 
+}
+.form-input.error { 
+  border-color: #ff0000; 
+  background: #ffcccc; 
+}
+.form-input::placeholder { color:#808080; }
+.field-error { font-size:10px; color:#ff0000; display:none; }
 .field-error.show { display:block; }
-.field-hint { font-size:.75rem; color:var(--color-text-muted); }
+.field-hint { font-size:10px; color:#666666; }
 
-.checkbox-group { display:flex; align-items:center; gap:.5rem; margin-top:.5rem; }
-.checkbox-group input[type="checkbox"] { width:18px; height:18px; cursor:pointer; accent-color:var(--color-accent); }
-.checkbox-group label { font-size:.85rem; color:var(--color-text-light); cursor:pointer; }
+.checkbox-group { display:flex; align-items:center; gap:6px; margin-top:6px; }
+.checkbox-group input[type="checkbox"] { width:16px; height:16px; cursor:pointer; }
+.checkbox-group label { font-size:11px; color:#000000; cursor:pointer; }
 
-.button-group { display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap; }
-.btn { font-family:inherit; font-size:.9rem; font-weight:600; padding:.85rem 1.75rem; border-radius:var(--radius-md); border:none; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; justify-content:center; gap:.5rem; text-decoration:none; }
-.btn-primary { background:var(--color-accent); color:#fff; box-shadow:0 2px 6px rgba(37,99,235,.3); }
-.btn-primary:hover { background:var(--color-accent-hover); transform:translateY(-1px); box-shadow:0 4px 12px rgba(37,99,235,.4); }
-.btn-secondary { background:var(--color-surface-alt); color:var(--color-text); border:1px solid var(--color-border); }
-.btn-secondary:hover { background:var(--color-border); }
+.button-group { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; justify-content:center; }
+.btn { 
+  font-family: 'Courier New', Courier, monospace; 
+  font-size:13px; 
+  font-weight:bold; 
+  padding:10px 20px; 
+  border: 3px outset #808080; 
+  cursor:pointer; 
+  display:inline-flex; 
+  align-items:center; 
+  justify-content:center; 
+  gap:6px; 
+  text-decoration:none; 
+  text-transform:uppercase;
+}
+.btn-primary { 
+  background: #c0c0c0; 
+  color:#000000; 
+}
+.btn-primary:hover { background: #a0a0a0; }
+.btn-primary:active { border-style: inset; }
+.btn-secondary { 
+  background: #e0e0e0; 
+  color:#000000; 
+}
+.btn-secondary:hover { background: #d0d0d0; }
+.btn-secondary:active { border-style: inset; }
 .btn:disabled { opacity:.5; cursor:not-allowed; }
 
-.alert { padding:1rem 1.25rem; border-radius:var(--radius-md); margin-bottom:1.5rem; display:flex; align-items:flex-start; gap:.75rem; }
-.alert-warning { background:var(--color-warning-bg); border-left:4px solid var(--color-warning); color:var(--color-text); }
-.alert-icon { font-size:1.25rem; }
+.alert { 
+  padding:10px 12px; 
+  margin-bottom:15px; 
+  display:flex; 
+  align-items:flex-start; 
+  gap:8px; 
+  border: 2px solid #000000;
+}
+.alert-warning { 
+  background: #ffffe0; 
+  color:#000000; 
+}
+.alert-icon { font-size:14px; }
 
-footer { text-align:center; padding:2rem 1rem; color:var(--color-text-muted); font-size:.85rem; border-top:1px solid var(--color-border); margin-top:3rem; }
+footer { 
+  text-align:center; 
+  padding:15px; 
+  color:#000000; 
+  font-size:10px; 
+  border: 2px solid #000000; 
+  background: #ffffff;
+  margin-top:20px; 
+  max-width:900px;
+  margin-left:auto;
+  margin-right:auto;
+}
 
 @media (max-width: 640px) {
-  .container { padding:1rem; }
-  .form-card { padding:1.5rem 1rem; }
+  .container { padding:10px; }
+  .form-card { padding:15px; }
   .form-grid.cols-2, .form-grid.cols-3 { grid-template-columns:1fr; }
   .button-group { flex-direction:column; }
   .btn { width:100%; }
@@ -144,7 +261,10 @@ footer { text-align:center; padding:2rem 1rem; color:var(--color-text-muted); fo
       <div class="form-header">
         <h1 class="form-title">W-2 Wage and Tax Statement</h1>
         <p class="form-subtitle">Enter your W-2 information exactly as it appears on your form</p>
-        <div class="tax-year-badge">📅 Tax Year 2024</div>
+        <div>
+          <div class="tax-year-badge">📅 Tax Year 2024</div>
+          <button type="button" class="autofill-btn" id="autofillBtn">🔧 Autofill Sample Data</button>
+        </div>
       </div>
 
       <div class="alert alert-warning">
@@ -553,6 +673,64 @@ footer { text-align:center; padding:2rem 1rem; color:var(--color-text-muted); fo
     (function(){
       const form = document.getElementById('w2Form');
       const resetBtn = document.getElementById('resetBtn');
+      const autofillBtn = document.getElementById('autofillBtn');
+
+      // Autofill sample data
+      autofillBtn.addEventListener('click', function() {
+        // Employer Information
+        document.getElementById('ein').value = '12-3456789';
+        document.getElementById('employerName').value = 'Tech Corporation Inc.';
+        document.getElementById('employerAddress').value = '1234 Silicon Valley Blvd';
+        document.getElementById('employerCity').value = 'San Francisco';
+        document.getElementById('employerState').value = 'CA';
+        document.getElementById('employerZip').value = '94102';
+        document.getElementById('controlNumber').value = 'W2-2024-001234';
+        
+        // Employee Information
+        document.getElementById('ssn').value = '123-45-6789';
+        document.getElementById('employeeName').value = 'Jane Smith';
+        document.getElementById('employeeAddress').value = '456 Main Street, Apt 5B';
+        document.getElementById('employeeCity').value = 'Oakland';
+        document.getElementById('employeeState').value = 'CA';
+        document.getElementById('employeeZip').value = '94601';
+        
+        // Wages and Tax Information
+        document.getElementById('wages').value = '85000.00';
+        document.getElementById('federalTax').value = '12750.00';
+        document.getElementById('socialSecurityWages').value = '85000.00';
+        document.getElementById('socialSecurityTax').value = '5270.00';
+        document.getElementById('medicareWages').value = '85000.00';
+        document.getElementById('medicareTax').value = '1232.50';
+        document.getElementById('socialSecurityTips').value = '0.00';
+        document.getElementById('allocatedTips').value = '0.00';
+        document.getElementById('dependentCare').value = '0.00';
+        document.getElementById('nonqualifiedPlans').value = '0.00';
+        document.getElementById('box12aCode').value = 'D';
+        document.getElementById('box12aAmount').value = '3000.00';
+        
+        // Checkboxes
+        document.getElementById('statutoryEmployee').checked = false;
+        document.getElementById('retirementPlan').checked = true;
+        document.getElementById('thirdPartySickPay').checked = false;
+        
+        // State and Local Tax Information
+        document.getElementById('state').value = 'CA';
+        document.getElementById('stateEmployerId').value = '999-9999-9';
+        document.getElementById('stateWages').value = '85000.00';
+        document.getElementById('stateIncomeTax').value = '4250.00';
+        document.getElementById('localWages').value = '85000.00';
+        document.getElementById('localIncomeTax').value = '850.00';
+        document.getElementById('localityName').value = 'Oakland';
+        
+        // Show a brief confirmation
+        const originalText = autofillBtn.textContent;
+        autofillBtn.textContent = '✓ FILLED!';
+        autofillBtn.style.background = '#90ee90';
+        setTimeout(() => {
+          autofillBtn.textContent = originalText;
+          autofillBtn.style.background = '#ffff00';
+        }, 1500);
+      });
 
       // Format EIN input
       const einInput = document.getElementById('ein');
