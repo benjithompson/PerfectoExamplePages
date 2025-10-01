@@ -664,6 +664,7 @@
   </div>
 
   <script src="../theme.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script>
     // Global variable to store RR Pair data
     let currentRRPair = null;
@@ -909,29 +910,68 @@
       statusMessage.innerHTML = '';
     }
 
-    // Download RR Pair (WireMock format)
-    function downloadRRPair() {
+    // Download RR Pair as zip with req.txt and resp.txt
+    async function downloadRRPair() {
       if (!currentRRPair) {
         console.error('No RR Pair data available');
         return;
       }
 
-      // Create WireMock stub mapping format
-      const wireMockStub = {
-        request: currentRRPair.request,
-        response: currentRRPair.response
-      };
+      const request = currentRRPair.request;
+      const response = currentRRPair.response;
 
-      const jsonString = JSON.stringify(wireMockStub, null, 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `blazemeter-rr-pair-${Date.now()}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // Format request as: METHOD URL HTTP/1.1 + headers + body
+      let requestText = `${request.method} ${request.url} HTTP/1.1\n`;
+      
+      // Add headers
+      if (request.headers) {
+        for (const [key, value] of Object.entries(request.headers)) {
+          if (value) {
+            requestText += `${key}: ${value}\n`;
+          }
+        }
+      }
+      
+      // Add body if present (for GET requests, typically no body)
+      if (request.body) {
+        requestText += '\n' + JSON.stringify(request.body, null, 2);
+      }
+
+      // Format response as: HTTP/1.1 STATUS + headers + body
+      let responseText = `HTTP/1.1 ${response.status} ${response.statusText}\n`;
+      
+      // Add headers
+      if (response.headers) {
+        for (const [key, value] of Object.entries(response.headers)) {
+          if (value) {
+            responseText += `${key}: ${value}\n`;
+          }
+        }
+      }
+      
+      // Add body
+      responseText += '\n' + JSON.stringify(response.body, null, 2);
+
+      // Create zip file
+      const zip = new JSZip();
+      zip.file('req.txt', requestText);
+      zip.file('resp.txt', responseText);
+
+      // Generate and download zip
+      try {
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `blazemeter-rr-pair-${Date.now()}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error creating zip file:', error);
+        showStatus('Error creating download file', 'error');
+      }
     }
 
     // Make downloadRRPair globally accessible
@@ -1445,8 +1485,38 @@
 
     // Load sample data
     loadSampleBtn.addEventListener('click', () => {
-      showStatus('✓ Sample data loaded', 'success');
-      setTimeout(hideStatus, 3000);
+      // Create mock Request/Response for RR Pair
+      const requestData = {
+        method: 'GET',
+        url: 'https://a.blazemeter.com/api/v4/masters/79641384/reports/aggregatereport/data',
+        headers: {}
+      };
+
+      const responseData = {
+        status: 200,
+        statusText: 'OK',
+        headers: {
+          'content-type': 'application/json',
+          'access-control-allow-origin': '*'
+        },
+        body: SAMPLE_DATA
+      };
+
+      // Store RR Pair globally for download
+      currentRRPair = {
+        request: requestData,
+        response: responseData
+      };
+
+      // Show success message with download button
+      const successHtml = `
+        <span class="message-content">✓ Sample data loaded</span>
+        <button class="btn-download" onclick="window.downloadRRPair()">
+          📥 Download RR Pair
+        </button>
+      `;
+      showStatus(successHtml, 'success', true);
+      
       displayResults(SAMPLE_DATA);
     });
 
