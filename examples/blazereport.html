@@ -584,7 +584,6 @@
         <input 
           type="text" 
           id="apiUrl" 
-          placeholder="https://a.blazemeter.com/api/v4/masters/12345678/reports/aggregatereport/data"
           value="https://a.blazemeter.com/api/v4/masters/79641384/reports/aggregatereport/data"
         />
         <small class="muted" style="font-size: 0.7rem; display: block; margin-top: 0.25rem;">
@@ -595,8 +594,7 @@
         <label for="apiKey">API Key ID</label>
         <input 
           type="text" 
-          id="apiKey" 
-          placeholder="api_key_id"
+          id="apiKey"
         />
       </div>
       <div class="form-group">
@@ -604,8 +602,7 @@
         <div class="password-wrapper">
           <input 
             type="password" 
-            id="apiSecret" 
-            placeholder="api_key_secret"
+            id="apiSecret"
           />
           <button type="button" class="toggle-password" id="toggleSecret" aria-label="Toggle password visibility">👁️</button>
         </div>
@@ -991,18 +988,31 @@
 
     // Render summary statistics
     function renderSummary(data) {
-      const allData = data.result.find(item => item.labelName === 'ALL');
-      
-      if (!allData) {
+      if (!data.result || data.result.length === 0) {
         summaryStats.innerHTML = '<p class="no-data">No summary data available</p>';
         return;
       }
 
-      const totalSamples = allData.samples;
-      const avgResponseTime = allData.avgResponseTime;
-      const totalErrors = allData.errorsCount;
-      const errorRate = allData.errorsRate;
-      const throughput = allData.avgThroughput;
+      // Filter out 'ALL' label to avoid double counting, aggregate across individual labels
+      const labels = data.result.filter(item => item.labelName !== 'ALL');
+      
+      if (labels.length === 0) {
+        summaryStats.innerHTML = '<p class="no-data">No summary data available</p>';
+        return;
+      }
+
+      // Aggregate metrics across all labels
+      const totalSamples = labels.reduce((sum, item) => sum + item.samples, 0);
+      const totalErrors = labels.reduce((sum, item) => sum + item.errorsCount, 0);
+      
+      // Calculate weighted average response time (weighted by samples)
+      const avgResponseTime = labels.reduce((sum, item) => sum + (item.avgResponseTime * item.samples), 0) / totalSamples;
+      
+      // Sum throughput across all labels
+      const throughput = labels.reduce((sum, item) => sum + item.avgThroughput, 0);
+      
+      // Calculate overall error rate
+      const errorRate = totalSamples > 0 ? totalErrors / totalSamples : 0;
 
       summaryStats.innerHTML = `
         <div class="stat-card">
@@ -1338,6 +1348,7 @@
 
     // Fetch results from API
     async function fetchResults(url, apiKey, apiSecret) {
+      console.log('Fetching URL:', url);
       showStatus('Fetching test results...', 'loading');
       fetchBtn.disabled = true;
 
@@ -1360,7 +1371,9 @@
           redirect: 'follow'
         };
 
+        console.log('Making fetch request to:', url);
         const response = await fetch(url, requestConfig);
+        console.log('Response status:', response.status, response.statusText);
 
         if (!response.ok) {
           // Try to get error details from response body
