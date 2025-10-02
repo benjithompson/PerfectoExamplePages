@@ -5,10 +5,13 @@ This directory contains global theme styling for the PerfectoExamplePages projec
 ## Structure
 
 - `default.css` - The default theme with light and dark mode support
+- `nord.css` - Nord theme based on the popular Nord color palette (https://www.nordtheme.com/)
 
 ## Usage
 
-To apply the default theme to an HTML page, include this link in the `<head>` section:
+### Static Theme Loading
+
+To apply a specific theme to an HTML page, include this link in the `<head>` section:
 
 ```html
 <link rel="stylesheet" href="themes/default.css">
@@ -18,6 +21,31 @@ Or for pages in subdirectories (like `examples/`):
 
 ```html
 <link rel="stylesheet" href="../themes/default.css">
+```
+
+### Dynamic Theme Switching
+
+The project supports dynamic theme switching through the `theme.js` utility. When included in a page, users can switch between available themes using a theme picker dropdown.
+
+**For the index page:**
+1. Include `theme.js` in your HTML: `<script src="./theme.js" defer></script>`
+2. Add a theme picker select element with id `themePicker`:
+```html
+<select id="themePicker" aria-label="Select theme">
+  <option value="default">Default</option>
+  <option value="nord">Nord</option>
+</select>
+```
+3. The theme.js utility will automatically:
+   - Load the selected theme CSS file
+   - Remember the user's theme preference in localStorage
+   - Sync theme selection across multiple tabs
+   - Support both light and dark modes for each theme
+
+**For example pages:**
+Include `theme.js` from the parent directory:
+```html
+<script src="../theme.js" defer></script>
 ```
 
 ## Theme Variables
@@ -70,10 +98,28 @@ Dark mode is automatically applied when the `data-theme="dark"` attribute is set
 
 To create a new theme:
 
-1. Create a new CSS file in this directory (e.g., `custom.css`)
-2. Define the same CSS custom properties with different values
-3. Include your theme file instead of `default.css` in your HTML pages
-4. Optionally override specific variables for page-specific customization
+1. **Create a new CSS file** in this directory (e.g., `custom.css`)
+2. **Define the same CSS custom properties** with different values for both `:root` (light mode) and `[data-theme="dark"]` (dark mode)
+3. **Update theme.js** to include your theme in the `AVAILABLE_THEMES` array:
+   ```javascript
+   const AVAILABLE_THEMES = ['default', 'nord', 'custom'];
+   ```
+4. **Add the option** to the theme picker in `index.html`:
+   ```html
+   <select id="themePicker" aria-label="Select theme">
+     <option value="default">Default</option>
+     <option value="nord">Nord</option>
+     <option value="custom">Custom</option>
+   </select>
+   ```
+
+### Theme Best Practices
+
+- **Use CSS custom properties (variables)** for all color values to enable easy theming
+- **Support both light and dark modes** in your theme file
+- **Keep the same variable names** as defined in `default.css` for consistency
+- **Test your theme** with all example pages to ensure compatibility
+- **Document your color palette** in comments at the top of your theme file
 
 Example page-specific override:
 

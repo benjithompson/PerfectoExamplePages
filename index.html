@@ -38,6 +38,10 @@
     button:hover, .btn:hover { color:var(--color-text); border-color:var(--color-accent); }
     button[aria-pressed="true"], .toggle-active { background:var(--color-accent); color:#fff; border-color:var(--color-accent); }
     button[aria-pressed="true"]:hover { background:var(--color-accent-hover); }
+    
+    select { font:inherit; cursor:pointer; border:1px solid var(--color-border); background:var(--color-surface-alt); color:var(--color-text-dim); padding:.55rem .85rem; border-radius:var(--radius-sm); font-size:.75rem; font-weight:600; letter-spacing:.8px; text-transform:uppercase; transition:var(--transition); }
+    select:hover { color:var(--color-text); border-color:var(--color-accent); }
+    select:focus { outline:none; border-color:var(--color-accent); box-shadow:0 0 0 3px rgba(37,99,235,.25); }
 
     input[type="search"] { font:inherit; padding:.6rem .85rem; border:1px solid var(--color-border); background:var(--color-bg-alt); color:var(--color-text); border-radius:var(--radius-sm); width:260px; transition:var(--transition); }
     input[type="search"]:focus { outline:none; border-color:var(--color-accent); box-shadow:0 0 0 3px rgba(37,99,235,.25); }
@@ -111,6 +115,10 @@
         <button id="gridBtn" type="button" aria-pressed="true" title="Grid view">🔳 <span class="sr-only">Grid view</span></button>
         <button id="listBtn" type="button" aria-pressed="false" title="List view">📄 <span class="sr-only">List view</span></button>
       </div>
+      <select id="themePicker" aria-label="Select theme" title="Select theme" style="font:inherit; cursor:pointer; border:1px solid var(--color-border); background:var(--color-surface-alt); color:var(--color-text-dim); padding:.55rem .85rem; border-radius:var(--radius-sm); font-size:.75rem; font-weight:600; letter-spacing:.8px; text-transform:uppercase;">
+        <option value="default">Default</option>
+        <option value="nord">Nord</option>
+      </select>
       <button id="themeToggle" type="button" aria-pressed="false" title="Toggle theme">🌗 Theme</button>
   <!-- Rescan removed for static mode -->
     </div>
