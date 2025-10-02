@@ -1,0 +1,70 @@
+/* ------------------ DEFAULT THEME TOKENS ------------------ */
+/* This file contains the global theme styling for light and dark modes.
+ * Import this file in HTML pages to apply consistent theming across the site.
+ */
+
+:root {
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  
+  /* Light Theme Colors */
+  --color-bg: #f5f7fb;
+  --color-bg-alt: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f0f3f9;
+  --color-border: #d7dde7;
+  --color-border-strong: #b5c0cf;
+  --color-text: #1e2935;
+  --color-text-dim: #5a6b80;
+  --color-text-light: #5a6b82;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-subtle: #eff6ff;
+  --color-warn: #d97706;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fee2e2;
+  --color-success: #15803d;
+  
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.03);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 6px 18px -4px rgba(0,0,0,.12), 0 3px 6px -2px rgba(0,0,0,.08);
+  
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  
+  /* Transitions */
+  --transition: .18s cubic-bezier(.4,0,.2,1);
+  
+  /* Focus Ring */
+  --focus-ring: 0 0 0 3px rgba(37,99,235,.35);
+  
+  color-scheme: light;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --color-bg: #0c1626;
+  --color-bg-alt: #101d31;
+  --color-surface: #162335;
+  --color-surface-alt: #1d2e45;
+  --color-border: #27384d;
+  --color-border-strong: #37516d;
+  --color-text: #f1f5fa;
+  --color-text-dim: #95a6bd;
+  --color-text-light: #94a3b8;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-accent-subtle: #1e3a8a;
+  --color-danger: #f87171;
+  --color-danger-bg: #7f1d1d;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03);
+  --shadow-sm: 0 2px 6px -1px rgba(0,0,0,.55), 0 1px 3px -1px rgba(0,0,0,.4);
+  --shadow-md: 0 8px 26px -6px rgba(0,0,0,.65), 0 4px 10px -2px rgba(0,0,0,.55);
+  color-scheme: dark;
+}
