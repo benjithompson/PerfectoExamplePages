@@ -1,0 +1,72 @@
+/* ------------------ NORD THEME ------------------ */
+/* Nord color palette: https://www.nordtheme.com/
+ * This theme uses the Nord color scheme for both light and dark modes.
+ * Import this file in HTML pages to apply the Nord theme.
+ */
+
+:root {
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  
+  /* Nord Polar Night (dark backgrounds) and Snow Storm (light text) for light mode */
+  /* Using inverted approach: Snow Storm for backgrounds, Polar Night for text */
+  --color-bg: #ECEFF4;          /* Snow Storm 3 */
+  --color-bg-alt: #E5E9F0;      /* Snow Storm 2 */
+  --color-surface: #E5E9F0;     /* Snow Storm 2 */
+  --color-surface-alt: #D8DEE9; /* Snow Storm 1 */
+  --color-border: #D8DEE9;      /* Snow Storm 1 */
+  --color-border-strong: #C4CBD6;
+  --color-text: #2E3440;        /* Polar Night 0 */
+  --color-text-dim: #4C566A;    /* Polar Night 3 */
+  --color-text-light: #4C566A;  /* Polar Night 3 */
+  --color-accent: #5E81AC;      /* Frost 3 - Nord blue */
+  --color-accent-hover: #81A1C1; /* Frost 4 - lighter blue */
+  --color-accent-subtle: #D8DEE9;
+  --color-warn: #EBCB8B;        /* Aurora yellow */
+  --color-danger: #BF616A;      /* Aurora red */
+  --color-danger-bg: #f4dfe1;
+  --color-success: #A3BE8C;     /* Aurora green */
+  
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(46,52,64,.06), 0 0 0 1px rgba(46,52,64,.03);
+  --shadow-sm: 0 2px 4px rgba(46,52,64,.08), 0 1px 2px rgba(46,52,64,.04);
+  --shadow-md: 0 6px 18px -4px rgba(46,52,64,.12), 0 3px 6px -2px rgba(46,52,64,.08);
+  
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  
+  /* Transitions */
+  --transition: .18s cubic-bezier(.4,0,.2,1);
+  
+  /* Focus Ring */
+  --focus-ring: 0 0 0 3px rgba(94,129,172,.35);
+  
+  color-scheme: light;
+}
+
+/* Dark Theme - Nord Polar Night backgrounds with Snow Storm text */
+[data-theme="dark"] {
+  --color-bg: #2E3440;          /* Polar Night 0 */
+  --color-bg-alt: #3B4252;      /* Polar Night 1 */
+  --color-surface: #3B4252;     /* Polar Night 1 */
+  --color-surface-alt: #434C5E; /* Polar Night 2 */
+  --color-border: #434C5E;      /* Polar Night 2 */
+  --color-border-strong: #4C566A; /* Polar Night 3 */
+  --color-text: #ECEFF4;        /* Snow Storm 3 */
+  --color-text-dim: #D8DEE9;    /* Snow Storm 1 */
+  --color-text-light: #E5E9F0;  /* Snow Storm 2 */
+  --color-accent: #88C0D0;      /* Frost 2 - cyan */
+  --color-accent-hover: #8FBCBB; /* Frost 1 - aqua */
+  --color-accent-subtle: #434C5E;
+  --color-danger: #BF616A;      /* Aurora red */
+  --color-danger-bg: #5d3237;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.6), 0 0 0 1px rgba(236,239,244,.03);
+  --shadow-sm: 0 2px 6px -1px rgba(0,0,0,.55), 0 1px 3px -1px rgba(0,0,0,.4);
+  --shadow-md: 0 8px 26px -6px rgba(0,0,0,.65), 0 4px 10px -2px rgba(0,0,0,.55);
+  color-scheme: dark;
+}
