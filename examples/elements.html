@@ -8,40 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../themes/default.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <style>
-    :root {
-      --font-sans: 'Inter', system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-      --color-bg: #f5f7fb;
-      --color-surface: #ffffff;
-      --color-surface-alt:#f0f3f9;
-      --color-border:#d5dbe4;
-      --color-border-strong:#b1bccb;
-      --color-text:#182230;
-      --color-text-dim:#5a6b80;
-      --color-accent:#2563eb;
-      --color-accent-hover:#1d4ed8;
-      --color-danger:#dc2626;
-      --color-warn:#d97706;
-      --color-success:#15803d;
-      --radius-xs:4px; --radius-sm:6px; --radius:12px; --radius-pill:999px;
-      --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-      --shadow-md:0 4px 12px -2px rgba(0,0,0,.15),0 2px 6px -1px rgba(0,0,0,.08);
-      --transition:.18s cubic-bezier(.4,0,.2,1);
-    }
-    [data-theme="dark"] {
-      --color-bg:#0d1828;
-      --color-surface:#162335;
-      --color-surface-alt:#1e2f45;
-      --color-border:#2b415b;
-      --color-border-strong:#3d5875;
-      --color-text:#f2f7fb;
-      --color-text-dim:#92a6bd;
-      --color-accent:#3b82f6;
-      --color-accent-hover:#2563eb;
-      --shadow-sm:0 1px 3px rgba(0,0,0,.65),0 1px 2px rgba(0,0,0,.5);
-      --shadow-md:0 6px 20px -4px rgba(0,0,0,.7),0 3px 8px -2px rgba(0,0,0,.55);
-    }
     * { box-sizing:border-box; }
     body { margin:0; font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text); line-height:1.45; }
     h1,h2,h3 { line-height:1.15; letter-spacing:.4px; }
