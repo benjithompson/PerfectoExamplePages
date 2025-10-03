@@ -48,6 +48,10 @@
 
     /* ------------------ EXAMPLES LIST ------------------ */
     .examples-wrapper { margin-top:1.2rem; }
+    .example-group { margin-bottom:2.5rem; }
+    .example-group:last-child { margin-bottom:0; }
+    .group-header { font-size:1.25rem; font-weight:600; margin:0 0 1rem 0; color:var(--color-text); letter-spacing:.5px; display:flex; align-items:center; gap:.6rem; }
+    .group-header:before { content:""; display:inline-block; width:4px; height:1.25rem; background:var(--color-accent); border-radius:2px; }
     #examplesList { list-style:none; padding:0; margin:0; display:grid; gap:1rem; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); }
     #examplesList.list-view { display:block; }
     #examplesList.list-view > li { display:flex; align-items:center; gap:1.1rem; padding:.85rem 1rem; }
@@ -131,7 +135,7 @@
 
     <section class="examples-wrapper">
       <h2 class="sr-only" id="examples-heading">Examples</h2>
-      <ul id="examplesList" aria-labelledby="examples-heading" class="fade-in" aria-live="polite"></ul>
+      <div id="examplesContainer" aria-labelledby="examples-heading" class="fade-in" aria-live="polite"></div>
       <div id="emptyState" class="empty-state" role="status" aria-live="polite">No matching examples. Try a different search.</div>
     </section>
   </main>
@@ -141,7 +145,7 @@
   <script src="./theme.js" defer></script>
   <script>
     (function(){
-      const listEl = document.getElementById('examplesList');
+      const containerEl = document.getElementById('examplesContainer');
       const emptyEl = document.getElementById('emptyState');
       const searchInput = document.getElementById('search');
       const gridBtn = document.getElementById('gridBtn');
@@ -151,13 +155,16 @@
       yearEl.textContent = new Date().getFullYear();
 
       // ================= STATIC EXAMPLES LIST (External Source) =================
-      // The array window.EXAMPLES is defined in examples/examples-list.js
-      // Each entry: { file: 'page.html', name: 'Display Name' }
-      const examples = (window.EXAMPLES || []).map(x => {
-        const isExternal = /^(https?:)?\/\//i.test(x.file);
-        return { ...x, href: isExternal ? x.file : ('examples/' + x.file), external:isExternal };
-      });
-      let filtered = examples.slice();
+      // The array window.EXAMPLE_GROUPS is defined in examples/examples-list.js
+      // Each group: { groupName: 'Name', examples: [{ file: 'page.html', name: 'Display Name' }] }
+      const groups = (window.EXAMPLE_GROUPS || []).map(group => ({
+        ...group,
+        examples: group.examples.map(x => {
+          const isExternal = /^(https?:)?\/\//i.test(x.file);
+          return { ...x, href: isExternal ? x.file : ('examples/' + x.file), external:isExternal };
+        })
+      }));
+      let filteredGroups = JSON.parse(JSON.stringify(groups));
 
       // Theme handled globally (theme.js)
 
@@ -165,7 +172,7 @@
       const viewPrefKey = 'examples-view-mode';
       function setViewMode(mode){
         const isList = mode === 'list';
-        listEl.classList.toggle('list-view', isList);
+        containerEl.querySelectorAll('ul').forEach(ul => ul.classList.toggle('list-view', isList));
         gridBtn.setAttribute('aria-pressed', String(!isList));
         listBtn.setAttribute('aria-pressed', String(isList));
         localStorage.setItem(viewPrefKey, mode);
@@ -186,20 +193,47 @@
       /* ------------------ RENDERING ------------------ */
       function filterAndRender(){
         const q = searchInput.value.trim().toLowerCase();
-        filtered = !q ? examples : examples.filter(e => e.name.toLowerCase().includes(q) || e.file.toLowerCase().includes(q));
+        if(!q){
+          filteredGroups = JSON.parse(JSON.stringify(groups));
+        } else {
+          filteredGroups = groups.map(group => ({
+            ...group,
+            examples: group.examples.filter(e => 
+              e.name.toLowerCase().includes(q) || e.file.toLowerCase().includes(q)
+            )
+          })).filter(group => group.examples.length > 0);
+        }
         render();
       }
 
       function render(){
-        listEl.innerHTML = '';
-        if(!filtered.length){
+        containerEl.innerHTML = '';
+        const totalExamples = filteredGroups.reduce((sum, g) => sum + g.examples.length, 0);
+        if(!totalExamples){
           emptyEl.classList.add('show');
           return;
         }
         emptyEl.classList.remove('show');
         const frag = document.createDocumentFragment();
-        filtered.forEach(ex => frag.appendChild(exampleItem(ex)));
-        listEl.appendChild(frag);
+        filteredGroups.forEach(group => {
+          const groupDiv = document.createElement('div');
+          groupDiv.className = 'example-group';
+          const header = document.createElement('h3');
+          header.className = 'group-header';
+          header.textContent = group.groupName;
+          groupDiv.appendChild(header);
+          
+          const ul = document.createElement('ul');
+          ul.id = 'examplesList';
+          group.examples.forEach(ex => ul.appendChild(exampleItem(ex)));
+          groupDiv.appendChild(ul);
+          frag.appendChild(groupDiv);
+        });
+        containerEl.appendChild(frag);
+        
+        // Apply view mode to all lists
+        const isList = localStorage.getItem(viewPrefKey) === 'list';
+        containerEl.querySelectorAll('ul').forEach(ul => ul.classList.toggle('list-view', isList));
       }
 
       function exampleItem(ex){
@@ -226,7 +260,7 @@
       // Enter key focusing first result
       searchInput.addEventListener('keydown', e => {
         if(e.key === 'Enter'){
-          const first = listEl.querySelector('a.example-card');
+          const first = containerEl.querySelector('a.example-card');
           if(first) first.focus();
         }
       });
