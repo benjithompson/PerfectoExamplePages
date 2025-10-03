@@ -10,7 +10,8 @@ window.EXAMPLE_GROUPS = [
       { file: 'elements.html', name: 'UI Elements' },
       { file: 'store.html', name: 'Store Showcase' },
       { file: 'w2.html', name: 'W-2 Tax Form' },
-      { file: 'charts.html', name: 'Charts' }
+      { file: 'charts.html', name: 'Charts' },
+      { file: 'chess.html', name: 'Chess Game' }
     ]
   },
   {
