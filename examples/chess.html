@@ -39,6 +39,8 @@
     .square.capture::after { content:''; position:absolute; inset:0; border:3px solid rgba(200,0,0,0.6); border-radius:2px; }
     .square:hover { filter:brightness(1.1); }
     .piece { pointer-events:none; line-height:1; }
+    .piece.white { color:#ffffff; text-shadow:0 0 2px #000, 0 0 2px #000, 0 0 2px #000, 1px 1px 2px rgba(0,0,0,0.8); }
+    .piece.black { color:#000000; text-shadow:0 0 1px #fff, 0 0 1px #fff; }
 
     /* GAME INFO PANEL */
     .game-info { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:1rem; box-shadow:var(--shadow-md); min-width:280px; }
@@ -358,9 +360,10 @@
             const piece = this.game.board[row][col];
             if (piece) {
               const pieceSpan = document.createElement('span');
-              pieceSpan.className = 'piece';
+              const pieceColor = this.game.getPieceColor(piece);
+              pieceSpan.className = `piece ${pieceColor}`;
               pieceSpan.textContent = piece;
-              pieceSpan.setAttribute('aria-label', `${this.game.getPieceColor(piece)} ${this.game.getPieceType(piece)}`);
+              pieceSpan.setAttribute('aria-label', `${pieceColor} ${this.game.getPieceType(piece)}`);
               square.appendChild(pieceSpan);
             }
             
