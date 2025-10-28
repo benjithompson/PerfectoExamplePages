@@ -15,7 +15,7 @@
     body { margin:0; font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text); line-height:1.4; min-height:100vh; display:flex; flex-direction:column; }
 
     /* HEADER */
-    header { background:var(--color-surface); color:var(--color-text); padding:1rem 1.5rem; box-shadow:var(--shadow-md); border-bottom:1px solid var(--color-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+    header { background:var(--color-surface); color:var(--color-text); padding:1rem 1.5rem; box-shadow:var(--shadow-md); border-bottom:1px solid var(--color-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; position:relative; z-index:200; }
     .brand { font-size:1.5rem; font-weight:700; letter-spacing:.5px; display:flex; align-items:center; gap:.75rem; }
     .brand-icon { font-size:2rem; }
     header a, header button { font:inherit; cursor:pointer; border:1px solid var(--color-border); background:var(--color-surface-alt); color:var(--color-text-dim); padding:.6rem 1rem; border-radius:6px; display:inline-flex; align-items:center; gap:.5rem; font-size:.85rem; font-weight:600; text-decoration:none; transition:all 0.2s; }
