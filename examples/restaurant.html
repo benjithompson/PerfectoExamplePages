@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Restaurant Ordering System | POS Example</title>
+  <meta name="description" content="Restaurant point-of-sale ordering system with menu items and cart" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../themes/default.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin:0; font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text); line-height:1.4; min-height:100vh; display:flex; flex-direction:column; }
+
+    /* HEADER */
+    header { background:var(--color-surface); color:var(--color-text); padding:1rem 1.5rem; box-shadow:var(--shadow-md); border-bottom:1px solid var(--color-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+    .brand { font-size:1.5rem; font-weight:700; letter-spacing:.5px; display:flex; align-items:center; gap:.75rem; }
+    .brand-icon { font-size:2rem; }
+    header a, header button { font:inherit; cursor:pointer; border:1px solid var(--color-border); background:var(--color-surface-alt); color:var(--color-text-dim); padding:.6rem 1rem; border-radius:6px; display:inline-flex; align-items:center; gap:.5rem; font-size:.85rem; font-weight:600; text-decoration:none; transition:all 0.2s; }
+    header a:hover, header button:hover { color:var(--color-text); border-color:var(--color-accent); }
+    .server-info { font-size:.85rem; opacity:0.8; }
+
+    /* MAIN LAYOUT */
+    main { flex:1; display:flex; max-width:100%; width:100%; margin:0; position:relative; }
+    
+    /* MENU SECTION */
+    .menu-section { flex:1; padding:1.5rem; padding-right:440px; overflow-y:auto; }
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+    .section-title { margin:0; font-size:1.5rem; font-weight:700; color:var(--color-text); }
+    .category-tabs { display:flex; gap:.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+    .category-tab { padding:.75rem 1.5rem; background:var(--color-surface); border:2px solid var(--color-border); border-radius:8px; font-weight:600; font-size:.9rem; cursor:pointer; transition:all 0.2s; text-transform:uppercase; letter-spacing:.5px; color:var(--color-text-dim); }
+    .category-tab:hover { border-color:var(--color-accent); color:var(--color-accent); }
+    .category-tab.active { background:var(--color-accent); color:#fff; border-color:var(--color-accent); }
+
+    /* FOOD TYPE GROUPS */
+    .food-group { margin-bottom:2rem; }
+    .food-group:last-child { margin-bottom:0; }
+    .group-header { font-size:1.1rem; font-weight:700; color:var(--color-text); margin-bottom:.75rem; padding-bottom:.5rem; border-bottom:2px solid var(--color-border); display:flex; align-items:center; gap:.5rem; }
+    .group-header::before { content:''; display:inline-block; width:4px; height:1.1rem; background:var(--color-accent); border-radius:2px; }
+
+    /* MENU GRID */
+    #menuGrid { display:block; }
+    .menu-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:.75rem; }
+    .menu-item { background:var(--color-surface); border:2px solid var(--color-border); border-radius:8px; padding:.75rem; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; box-shadow:var(--shadow-sm); }
+    .menu-item:hover { border-color:var(--color-accent); transform:translateY(-3px); box-shadow:var(--shadow-md); }
+    .menu-item:active { transform:translateY(-1px); }
+    .item-icon { font-size:2.2rem; margin-bottom:.55rem; }
+    .item-name { font-weight:600; font-size:.75rem; margin-bottom:.4rem; color:var(--color-text); }
+    .item-description { font-size:.55rem; color:var(--color-text-dim); margin-bottom:.55rem; line-height:1.3; }
+    .item-price { font-size:.9rem; font-weight:700; color:var(--color-accent); }
+
+    /* ORDER PANEL */
+    .order-panel { width:420px; background:var(--color-surface); border-left:3px solid var(--color-border); display:flex; flex-direction:column; box-shadow:var(--shadow-lg); position:fixed; right:0; top:0; bottom:0; z-index:100; }
+    .order-header { background:var(--color-surface-alt); color:var(--color-text); padding:1.25rem 1.5rem; border-bottom:3px solid var(--color-border); flex-shrink:0; margin-top:env(safe-area-inset-top); }
+    .order-title { margin:0; font-size:1.3rem; font-weight:700; }
+    .order-subtitle { margin:.25rem 0 0 0; font-size:.85rem; opacity:0.85; }
+    
+    .order-items { flex:1; overflow-y:auto; padding:1rem; min-height:0; }
+    .order-item { display:flex; align-items:center; gap:1rem; padding:1rem; background:var(--color-bg-alt); border:2px solid var(--color-border); border-radius:8px; margin-bottom:.75rem; transition:all 0.2s; }
+    .order-item:hover { border-color:var(--color-accent); }
+    .item-quantity { display:flex; align-items:center; gap:.5rem; }
+    .qty-btn { width:32px; height:32px; border:2px solid var(--color-accent); background:var(--color-surface); color:var(--color-accent); border-radius:6px; cursor:pointer; font-weight:700; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+    .qty-btn:hover { background:var(--color-accent); color:#fff; }
+    .qty-btn:disabled { opacity:0.3; cursor:not-allowed; }
+    .qty-value { min-width:30px; text-align:center; font-weight:700; font-size:1.1rem; }
+    .item-details { flex:1; min-width:0; }
+    .item-details-name { font-weight:600; font-size:.95rem; margin-bottom:.25rem; color:var(--color-text); }
+    .item-details-price { font-size:.85rem; color:var(--color-text-dim); }
+    .item-total { font-weight:700; font-size:1.1rem; color:var(--color-accent); white-space:nowrap; }
+    .remove-btn { width:32px; height:32px; border:2px solid #e74c3c; background:var(--color-surface); color:#e74c3c; border-radius:6px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+    .remove-btn:hover { background:#e74c3c; color:#fff; }
+
+    .empty-order { text-align:center; padding:3rem 2rem; color:var(--color-text-dim); }
+    .empty-order-icon { font-size:4rem; margin-bottom:1rem; opacity:0.5; }
+    .empty-order-text { font-size:1.1rem; font-weight:600; }
+
+    /* ORDER SUMMARY */
+    .order-summary { border-top:3px solid var(--color-border); padding:1.5rem; background:var(--color-bg-alt); flex-shrink:0; }
+    .summary-row { display:flex; justify-content:space-between; margin-bottom:.75rem; font-size:1rem; }
+    .summary-label { color:var(--color-text-dim); font-weight:500; }
+    .summary-value { font-weight:600; color:var(--color-text); }
+    .summary-row.total { margin-top:1rem; padding-top:1rem; border-top:2px solid var(--color-border); font-size:1.3rem; }
+    .summary-row.total .summary-label { color:var(--color-text); font-weight:700; }
+    .summary-row.total .summary-value { color:var(--color-accent); font-weight:700; }
+
+    /* ACTION BUTTONS */
+    .order-actions { padding:1rem 1.5rem; background:var(--color-surface-alt); border-top:2px solid var(--color-border); display:flex; flex-direction:column; gap:.75rem; flex-shrink:0; }
+    .action-btn { padding:1rem; border:none; border-radius:8px; font-size:1rem; font-weight:700; cursor:pointer; transition:all 0.2s; text-transform:uppercase; letter-spacing:.5px; }
+    .action-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn-submit { background:var(--color-accent); color:#fff; }
+    .btn-submit:hover:not(:disabled) { background:var(--color-accent-hover); transform:translateY(-2px); box-shadow:0 4px 12px rgba(39,174,96,0.3); }
+    .btn-clear { background:#e74c3c; color:#fff; }
+    .btn-clear:hover:not(:disabled) { background:#c0392b; }
+
+    /* RESPONSIVE */
+    @media (max-width:1024px) {
+      .menu-section { padding-right:380px; }
+      .order-panel { width:360px; }
+      .menu-grid { grid-template-columns:repeat(auto-fill, minmax(115px, 1fr)); }
+    }
+
+    @media (max-width:768px) {
+      main { flex-direction:column; }
+      .menu-section { padding:1rem; padding-right:1rem; }
+      .order-panel { position:relative; width:100%; border-left:none; border-top:3px solid var(--color-border); max-height:50vh; top:auto; bottom:auto; right:auto; }
+      .menu-grid { grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:.6rem; }
+      .item-icon { font-size:1.8rem; }
+    }
+
+    @media (max-width:480px) {
+      header { padding:.75rem 1rem; }
+      .brand { font-size:1.2rem; }
+      .menu-grid { grid-template-columns:repeat(2, 1fr); }
+      .category-tabs { gap:.35rem; }
+      .category-tab { padding:.6rem 1rem; font-size:.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <header role="banner">
+    <div class="brand">
+      <span class="brand-icon">🍽️</span>
+      <div>
+        <div>Restaurant POS Example</div>
+        <div class="server-info">Server: #1234</div>
+      </div>
+    </div>
+    <div>
+      <a href="../index.html">← Back to Examples</a>
+      <button id="themeToggle" type="button" title="Toggle theme">🌗 Theme</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- MENU SECTION -->
+    <section class="menu-section">
+      <div class="section-header">
+        <h1 class="section-title">Menu</h1>
+      </div>
+
+      <!-- CATEGORY TABS -->
+      <div class="category-tabs" role="tablist">
+        <button class="category-tab active" data-category="all" role="tab" aria-selected="true">All Items</button>
+        <button class="category-tab" data-category="appetizers" role="tab" aria-selected="false">Appetizers</button>
+        <button class="category-tab" data-category="entrees" role="tab" aria-selected="false">Entrees</button>
+        <button class="category-tab" data-category="sides" role="tab" aria-selected="false">Sides</button>
+        <button class="category-tab" data-category="desserts" role="tab" aria-selected="false">Desserts</button>
+        <button class="category-tab" data-category="beverages" role="tab" aria-selected="false">Beverages</button>
+      </div>
+
+      <!-- MENU GRID -->
+      <div id="menuGrid" class="menu-grid" role="list"></div>
+    </section>
+
+    <!-- ORDER PANEL -->
+    <aside class="order-panel">
+      <div class="order-header">
+        <h2 class="order-title">Current Order</h2>
+        <p class="order-subtitle">Table #<span id="tableNumber">12</span></p>
+      </div>
+
+      <div id="orderItems" class="order-items">
+        <div class="empty-order">
+          <div class="empty-order-icon">🛒</div>
+          <div class="empty-order-text">No items in order</div>
+        </div>
+      </div>
+
+      <div class="order-summary">
+        <div class="summary-row">
+          <span class="summary-label">Subtotal:</span>
+          <span class="summary-value" id="subtotal">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Tax (8.5%):</span>
+          <span class="summary-value" id="tax">$0.00</span>
+        </div>
+        <div class="summary-row total">
+          <span class="summary-label">Total:</span>
+          <span class="summary-value" id="total">$0.00</span>
+        </div>
+      </div>
+
+      <div class="order-actions">
+        <button class="action-btn btn-submit" id="submitOrder" disabled>Submit Order</button>
+        <button class="action-btn btn-clear" id="clearOrder" disabled>Clear Order</button>
+      </div>
+    </aside>
+  </main>
+
+  <script src="../theme.js"></script>
+  <script>
+    // Menu Items Database
+    const menuItems = [
+      // Appetizers - Fried
+      { id: 1, name: 'Mozzarella Sticks', price: 8.99, category: 'appetizers', foodType: 'Fried', icon: '🧀', description: 'Crispy breaded mozzarella' },
+      { id: 2, name: 'Buffalo Wings', price: 12.99, category: 'appetizers', foodType: 'Wings', icon: '🍗', description: 'Spicy chicken wings' },
+      { id: 3, name: 'Onion Rings', price: 6.99, category: 'appetizers', foodType: 'Fried', icon: '🧅', description: 'Golden fried onion rings' },
+      { id: 4, name: 'Nachos Supreme', price: 10.99, category: 'appetizers', foodType: 'Shareable', icon: '🌮', description: 'Loaded tortilla chips' },
+      { id: 5, name: 'Spinach Artichoke Dip', price: 9.99, category: 'appetizers', foodType: 'Dips', icon: '🥗', description: 'Creamy dip with chips' },
+      { id: 30, name: 'Jalapeño Poppers', price: 7.99, category: 'appetizers', foodType: 'Fried', icon: '🌶️', description: 'Cream cheese filled peppers' },
+      { id: 31, name: 'Loaded Potato Skins', price: 9.99, category: 'appetizers', foodType: 'Shareable', icon: '🥔', description: 'Bacon, cheese, sour cream' },
+      
+      // Entrees - Burgers
+      { id: 6, name: 'Classic Burger', price: 14.99, category: 'entrees', foodType: 'Burgers', icon: '🍔', description: 'Angus beef patty with fries' },
+      { id: 32, name: 'Bacon Cheeseburger', price: 16.99, category: 'entrees', foodType: 'Burgers', icon: '🍔', description: 'Bacon, cheddar, lettuce, tomato' },
+      { id: 33, name: 'Mushroom Swiss Burger', price: 15.99, category: 'entrees', foodType: 'Burgers', icon: '🍔', description: 'Sautéed mushrooms, Swiss cheese' },
+      { id: 34, name: 'BBQ Burger', price: 16.49, category: 'entrees', foodType: 'Burgers', icon: '🍔', description: 'BBQ sauce, onion rings, cheddar' },
+      
+      // Entrees - Sandwiches & Wraps
+      { id: 35, name: 'Club Sandwich', price: 12.99, category: 'entrees', foodType: 'Sandwiches', icon: '🥪', description: 'Turkey, bacon, lettuce, tomato' },
+      { id: 36, name: 'Philly Cheesesteak', price: 14.99, category: 'entrees', foodType: 'Subs', icon: '🥖', description: 'Steak, peppers, onions, cheese' },
+      { id: 37, name: 'Italian Sub', price: 13.99, category: 'entrees', foodType: 'Subs', icon: '🥖', description: 'Salami, ham, provolone, veggies' },
+      { id: 38, name: 'Chicken Caesar Wrap', price: 11.99, category: 'entrees', foodType: 'Wraps', icon: '🌯', description: 'Grilled chicken, romaine, parmesan' },
+      { id: 39, name: 'Buffalo Chicken Wrap', price: 12.49, category: 'entrees', foodType: 'Wraps', icon: '🌯', description: 'Spicy chicken, ranch, lettuce' },
+      
+      // Entrees - Grilled & Seafood
+      { id: 7, name: 'Grilled Chicken', price: 16.99, category: 'entrees', foodType: 'Grilled', icon: '🍗', description: 'Herb-seasoned chicken breast' },
+      { id: 8, name: 'Ribeye Steak', price: 28.99, category: 'entrees', foodType: 'Grilled', icon: '🥩', description: '12oz prime ribeye' },
+      { id: 9, name: 'Salmon Fillet', price: 22.99, category: 'entrees', foodType: 'Seafood', icon: '🐟', description: 'Atlantic salmon, grilled' },
+      { id: 40, name: 'Fish & Chips', price: 15.99, category: 'entrees', foodType: 'Seafood', icon: '🐟', description: 'Beer-battered cod, fries' },
+      { id: 41, name: 'Shrimp Scampi', price: 19.99, category: 'entrees', foodType: 'Seafood', icon: '🍤', description: 'Garlic butter shrimp over pasta' },
+      
+      // Entrees - Pasta & Salads
+      { id: 10, name: 'Pasta Primavera', price: 15.99, category: 'entrees', foodType: 'Pasta', icon: '🍝', description: 'Fresh vegetables & pasta' },
+      { id: 42, name: 'Fettuccine Alfredo', price: 14.99, category: 'entrees', foodType: 'Pasta', icon: '🍝', description: 'Creamy parmesan sauce' },
+      { id: 43, name: 'Spaghetti & Meatballs', price: 16.99, category: 'entrees', foodType: 'Pasta', icon: '🍝', description: 'Marinara sauce, homemade meatballs' },
+      { id: 11, name: 'BBQ Ribs', price: 24.99, category: 'entrees', foodType: 'BBQ', icon: '🍖', description: 'Fall-off-the-bone ribs' },
+      { id: 12, name: 'Caesar Salad', price: 11.99, category: 'entrees', foodType: 'Salads', icon: '🥗', description: 'Romaine, croutons, parmesan' },
+      { id: 44, name: 'Garden Salad', price: 9.99, category: 'entrees', foodType: 'Salads', icon: '🥗', description: 'Mixed greens, vegetables' },
+      
+      // Sides
+      { id: 13, name: 'French Fries', price: 4.99, category: 'sides', foodType: 'Potatoes', icon: '🍟', description: 'Crispy golden fries' },
+      { id: 14, name: 'Mashed Potatoes', price: 5.99, category: 'sides', foodType: 'Potatoes', icon: '🥔', description: 'Creamy mashed potatoes' },
+      { id: 45, name: 'Sweet Potato Fries', price: 5.99, category: 'sides', foodType: 'Potatoes', icon: '🍠', description: 'Crispy sweet potato fries' },
+      { id: 15, name: 'Coleslaw', price: 3.99, category: 'sides', foodType: 'Fresh', icon: '🥗', description: 'Fresh cabbage slaw' },
+      { id: 16, name: 'Mac & Cheese', price: 6.99, category: 'sides', foodType: 'Comfort', icon: '🧀', description: 'Creamy macaroni & cheese' },
+      { id: 17, name: 'Steamed Vegetables', price: 5.99, category: 'sides', foodType: 'Fresh', icon: '🥦', description: 'Seasonal vegetables' },
+      { id: 46, name: 'Onion Rings', price: 5.49, category: 'sides', foodType: 'Fried', icon: '🧅', description: 'Beer-battered onion rings' },
+      
+      // Desserts
+      { id: 18, name: 'Chocolate Cake', price: 7.99, category: 'desserts', foodType: 'Cakes', icon: '🍰', description: 'Rich chocolate layer cake' },
+      { id: 19, name: 'Apple Pie', price: 6.99, category: 'desserts', foodType: 'Pies', icon: '🥧', description: 'Classic apple pie' },
+      { id: 20, name: 'Ice Cream Sundae', price: 5.99, category: 'desserts', foodType: 'Ice Cream', icon: '🍨', description: 'Vanilla ice cream with toppings' },
+      { id: 21, name: 'Cheesecake', price: 8.99, category: 'desserts', foodType: 'Cakes', icon: '🍰', description: 'New York style cheesecake' },
+      { id: 47, name: 'Brownie Sundae', price: 7.49, category: 'desserts', foodType: 'Ice Cream', icon: '🍨', description: 'Warm brownie with ice cream' },
+      { id: 48, name: 'Key Lime Pie', price: 6.99, category: 'desserts', foodType: 'Pies', icon: '🥧', description: 'Tangy and sweet' },
+      
+      // Beverages
+      { id: 22, name: 'Soft Drink', price: 2.99, category: 'beverages', foodType: 'Sodas', icon: '🥤', description: 'Coke, Sprite, or Pepsi' },
+      { id: 23, name: 'Iced Tea', price: 2.99, category: 'beverages', foodType: 'Tea & Coffee', icon: '🧃', description: 'Sweet or unsweet' },
+      { id: 24, name: 'Coffee', price: 2.49, category: 'beverages', foodType: 'Tea & Coffee', icon: '☕', description: 'Fresh brewed coffee' },
+      { id: 25, name: 'Lemonade', price: 3.49, category: 'beverages', foodType: 'Specialty Drinks', icon: '🍋', description: 'Fresh squeezed lemonade' },
+      { id: 26, name: 'Milkshake', price: 5.99, category: 'beverages', foodType: 'Specialty Drinks', icon: '🥛', description: 'Chocolate, vanilla, or strawberry' },
+      { id: 49, name: 'Fruit Smoothie', price: 6.49, category: 'beverages', foodType: 'Specialty Drinks', icon: '🥤', description: 'Mixed berry or tropical' }
+    ];
+
+    // Application State
+    let orderItems = [];
+    let currentCategory = 'all';
+
+    // DOM Elements
+    const menuGrid = document.getElementById('menuGrid');
+    const orderItemsContainer = document.getElementById('orderItems');
+    const subtotalEl = document.getElementById('subtotal');
+    const taxEl = document.getElementById('tax');
+    const totalEl = document.getElementById('total');
+    const submitBtn = document.getElementById('submitOrder');
+    const clearBtn = document.getElementById('clearOrder');
+
+    // Initialize
+    function init() {
+      renderMenu();
+      setupCategoryTabs();
+      setupOrderActions();
+      updateOrderDisplay();
+    }
+
+    // Render Menu Items
+    function renderMenu() {
+      const filteredItems = currentCategory === 'all' 
+        ? menuItems 
+        : menuItems.filter(item => item.category === currentCategory);
+
+      // Group items by food type
+      const groupedItems = {};
+      filteredItems.forEach(item => {
+        const foodType = item.foodType || 'Other';
+        if (!groupedItems[foodType]) {
+          groupedItems[foodType] = [];
+        }
+        groupedItems[foodType].push(item);
+      });
+
+      // Render groups
+      menuGrid.innerHTML = Object.entries(groupedItems).map(([foodType, items]) => `
+        <div class="food-group" style="grid-column: 1 / -1;">
+          <h3 class="group-header">${foodType}</h3>
+          <div class="menu-grid">
+            ${items.map(item => `
+              <div class="menu-item" data-id="${item.id}" role="button" tabindex="0" aria-label="Add ${item.name} to order">
+                <div class="item-icon">${item.icon}</div>
+                <div class="item-name">${item.name}</div>
+                <div class="item-description">${item.description}</div>
+                <div class="item-price">$${item.price.toFixed(2)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      // Add click handlers
+      document.querySelectorAll('.menu-item').forEach(el => {
+        el.addEventListener('click', () => addToOrder(parseInt(el.dataset.id)));
+        el.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            addToOrder(parseInt(el.dataset.id));
+          }
+        });
+      });
+    }
+
+    // Setup Category Tabs
+    function setupCategoryTabs() {
+      document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.category-tab').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+          currentCategory = tab.dataset.category;
+          renderMenu();
+        });
+      });
+    }
+
+    // Add Item to Order
+    function addToOrder(itemId) {
+      const menuItem = menuItems.find(item => item.id === itemId);
+      if (!menuItem) return;
+
+      const existingItem = orderItems.find(item => item.id === itemId);
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        orderItems.push({
+          id: menuItem.id,
+          name: menuItem.name,
+          price: menuItem.price,
+          icon: menuItem.icon,
+          quantity: 1
+        });
+      }
+
+      updateOrderDisplay();
+    }
+
+    // Update Order Display
+    function updateOrderDisplay() {
+      if (orderItems.length === 0) {
+        orderItemsContainer.innerHTML = `
+          <div class="empty-order">
+            <div class="empty-order-icon">🛒</div>
+            <div class="empty-order-text">No items in order</div>
+          </div>
+        `;
+        submitBtn.disabled = true;
+        clearBtn.disabled = true;
+      } else {
+        orderItemsContainer.innerHTML = orderItems.map(item => `
+          <div class="order-item" data-id="${item.id}">
+            <div class="item-quantity">
+              <button class="qty-btn qty-decrease" data-id="${item.id}" aria-label="Decrease quantity">−</button>
+              <span class="qty-value">${item.quantity}</span>
+              <button class="qty-btn qty-increase" data-id="${item.id}" aria-label="Increase quantity">+</button>
+            </div>
+            <div class="item-details">
+              <div class="item-details-name">${item.icon} ${item.name}</div>
+              <div class="item-details-price">$${item.price.toFixed(2)} each</div>
+            </div>
+            <div class="item-total">$${(item.price * item.quantity).toFixed(2)}</div>
+            <button class="remove-btn" data-id="${item.id}" aria-label="Remove item">×</button>
+          </div>
+        `).join('');
+
+        // Add event listeners
+        document.querySelectorAll('.qty-increase').forEach(btn => {
+          btn.addEventListener('click', () => changeQuantity(parseInt(btn.dataset.id), 1));
+        });
+        document.querySelectorAll('.qty-decrease').forEach(btn => {
+          btn.addEventListener('click', () => changeQuantity(parseInt(btn.dataset.id), -1));
+        });
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+          btn.addEventListener('click', () => removeItem(parseInt(btn.dataset.id)));
+        });
+
+        submitBtn.disabled = false;
+        clearBtn.disabled = false;
+      }
+
+      updateOrderSummary();
+    }
+
+    // Change Item Quantity
+    function changeQuantity(itemId, delta) {
+      const item = orderItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      item.quantity += delta;
+      if (item.quantity <= 0) {
+        removeItem(itemId);
+      } else {
+        updateOrderDisplay();
+      }
+    }
+
+    // Remove Item from Order
+    function removeItem(itemId) {
+      orderItems = orderItems.filter(item => item.id !== itemId);
+      updateOrderDisplay();
+    }
+
+    // Update Order Summary
+    function updateOrderSummary() {
+      const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const tax = subtotal * 0.085;
+      const total = subtotal + tax;
+
+      subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+      taxEl.textContent = `$${tax.toFixed(2)}`;
+      totalEl.textContent = `$${total.toFixed(2)}`;
+    }
+
+    // Setup Order Actions
+    function setupOrderActions() {
+      submitBtn.addEventListener('click', submitOrder);
+      clearBtn.addEventListener('click', clearOrder);
+    }
+
+    // Submit Order
+    function submitOrder() {
+      if (orderItems.length === 0) return;
+
+      const total = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const tax = total * 0.085;
+      const grandTotal = total + tax;
+
+      alert(`Order Submitted!\n\nItems: ${orderItems.length}\nSubtotal: $${total.toFixed(2)}\nTax: $${tax.toFixed(2)}\nTotal: $${grandTotal.toFixed(2)}\n\nThank you!`);
+      
+      clearOrder();
+    }
+
+    // Clear Order
+    function clearOrder() {
+      if (orderItems.length === 0) return;
+      
+      if (confirm('Are you sure you want to clear the order?')) {
+        orderItems = [];
+        updateOrderDisplay();
+      }
+    }
+
+    // Initialize app
+    init();
+  </script>
+</body>
+</html>
