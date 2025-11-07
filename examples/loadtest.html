@@ -8,9 +8,8 @@
   <script>
     // Check if request is from a non-browser client (JMeter, curl, etc.)
     // If so, return JSON response instead of HTML
-    (function() {
+    (async function() {
       const userAgent = navigator.userAgent.toLowerCase();
-      const acceptHeader = 'text/html'; // Browsers typically send Accept: text/html
       
       // Check for common non-browser user agents or if explicitly requesting JSON
       const isNonBrowser = userAgent.includes('jmeter') || 
@@ -22,81 +21,201 @@
                           window.location.search.includes('format=json');
       
       if (isNonBrowser) {
-        // Stop HTML rendering
-        document.open();
+        // Load Supabase config
+        let supabaseConfig = null;
+        try {
+          // We need to wait for supabase-config.js to load
+          // For now, we'll use a simple approach - inline the config check
+          const configScript = document.createElement('script');
+          configScript.src = './supabase-config.js';
+          document.head.appendChild(configScript);
+          
+          await new Promise((resolve) => {
+            configScript.onload = resolve;
+            configScript.onerror = resolve; // Continue even if config fails to load
+          });
+          
+          if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.enabled) {
+            supabaseConfig = window.SUPABASE_CONFIG;
+          }
+        } catch (e) {
+          console.error('Failed to load Supabase config:', e);
+        }
         
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const STORAGE_KEY = 'loadtest-data';
-        
-        // Load existing data
-        let requestData = {
+        const now = new Date().toISOString();
+        let responseData = {
+          success: true,
+          timestamp: now,
+          requestProcessed: urlParams.toString() !== '',
+          supabaseEnabled: !!supabaseConfig,
           totalRequests: 0,
           sessionStart: null,
+          uniqueParameters: 0,
           parameters: {}
         };
         
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
+        // Process and save to Supabase if enabled
+        if (supabaseConfig && urlParams.toString()) {
           try {
-            requestData = JSON.parse(stored);
-          } catch (e) {
-            console.error('Failed to load stored data:', e);
+            // Load Supabase client library
+            const supabaseScript = document.createElement('script');
+            supabaseScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+            document.head.appendChild(supabaseScript);
+            
+            await new Promise((resolve) => {
+              supabaseScript.onload = resolve;
+              supabaseScript.onerror = resolve;
+            });
+            
+            if (window.supabase && window.supabase.createClient) {
+              const supabase = window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey);
+              
+              // Update session total requests
+              await supabase.rpc('increment_total_requests');
+              
+              // Process each parameter
+              for (const [key, value] of urlParams.entries()) {
+                if (key === 'format') continue;
+                
+                // Check if exists
+                const { data: existing } = await supabase
+                  .from('request_counts')
+                  .select('count, first_seen')
+                  .eq('parameter_name', key)
+                  .eq('parameter_value', value)
+                  .single();
+                
+                if (existing) {
+                  // Update existing
+                  await supabase
+                    .from('request_counts')
+                    .update({
+                      count: existing.count + 1,
+                      last_seen: now
+                    })
+                    .eq('parameter_name', key)
+                    .eq('parameter_value', value);
+                } else {
+                  // Insert new
+                  await supabase
+                    .from('request_counts')
+                    .insert({
+                      parameter_name: key,
+                      parameter_value: value,
+                      count: 1,
+                      first_seen: now,
+                      last_seen: now
+                    });
+                }
+              }
+              
+              // Get updated stats
+              const { data: session } = await supabase
+                .from('session')
+                .select('*')
+                .eq('id', 1)
+                .single();
+              
+              const { data: counts } = await supabase
+                .from('request_counts')
+                .select('*');
+              
+              if (session) {
+                responseData.totalRequests = session.total_requests;
+                responseData.sessionStart = session.start_time;
+              }
+              
+              if (counts) {
+                responseData.uniqueParameters = new Set(counts.map(c => c.parameter_name)).size;
+                responseData.parameters = counts.reduce((acc, row) => {
+                  if (!acc[row.parameter_name]) {
+                    acc[row.parameter_name] = { values: {}, totalCount: 0 };
+                  }
+                  acc[row.parameter_name].values[row.parameter_value] = {
+                    count: row.count,
+                    firstSeen: row.first_seen,
+                    lastSeen: row.last_seen
+                  };
+                  acc[row.parameter_name].totalCount += row.count;
+                  return acc;
+                }, {});
+              }
+              
+              responseData.supabaseSaved = true;
+            }
+          } catch (error) {
+            console.error('Supabase error:', error);
+            responseData.supabaseError = error.message;
           }
         }
         
-        if (!requestData.sessionStart) {
-          requestData.sessionStart = new Date().toISOString();
-        }
-        
-        // Process current request
-        if (urlParams.toString()) {
-          requestData.totalRequests++;
-          const now = new Date().toISOString();
+        // Fallback to localStorage if Supabase is not enabled or failed
+        if (!supabaseConfig || !responseData.supabaseSaved) {
+          const STORAGE_KEY = 'loadtest-data';
+          let requestData = {
+            totalRequests: 0,
+            sessionStart: null,
+            parameters: {}
+          };
           
-          for (const [key, value] of urlParams.entries()) {
-            if (key === 'format') continue; // Skip format parameter
-            
-            if (!requestData.parameters[key]) {
-              requestData.parameters[key] = {
-                values: {},
-                totalCount: 0
-              };
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            try {
+              requestData = JSON.parse(stored);
+            } catch (e) {
+              console.error('Failed to load stored data:', e);
             }
-            
-            if (!requestData.parameters[key].values[value]) {
-              requestData.parameters[key].values[value] = {
-                count: 0,
-                firstSeen: now,
-                lastSeen: now
-              };
-            } else {
-              requestData.parameters[key].values[value].lastSeen = now;
-            }
-            
-            requestData.parameters[key].values[value].count++;
-            requestData.parameters[key].totalCount++;
           }
           
-          // Save data
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(requestData));
-          } catch (e) {
-            console.error('Failed to save data:', e);
+          if (!requestData.sessionStart) {
+            requestData.sessionStart = now;
           }
+          
+          if (urlParams.toString()) {
+            requestData.totalRequests++;
+            
+            for (const [key, value] of urlParams.entries()) {
+              if (key === 'format') continue;
+              
+              if (!requestData.parameters[key]) {
+                requestData.parameters[key] = {
+                  values: {},
+                  totalCount: 0
+                };
+              }
+              
+              if (!requestData.parameters[key].values[value]) {
+                requestData.parameters[key].values[value] = {
+                  count: 0,
+                  firstSeen: now,
+                  lastSeen: now
+                };
+              } else {
+                requestData.parameters[key].values[value].lastSeen = now;
+              }
+              
+              requestData.parameters[key].values[value].count++;
+              requestData.parameters[key].totalCount++;
+            }
+            
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(requestData));
+            } catch (e) {
+              console.error('Failed to save data:', e);
+            }
+          }
+          
+          responseData.totalRequests = requestData.totalRequests;
+          responseData.sessionStart = requestData.sessionStart;
+          responseData.uniqueParameters = Object.keys(requestData.parameters).length;
+          responseData.parameters = requestData.parameters;
         }
         
         // Return JSON response
-        document.write(JSON.stringify({
-          success: true,
-          timestamp: new Date().toISOString(),
-          requestProcessed: urlParams.toString() !== '',
-          totalRequests: requestData.totalRequests,
-          sessionStart: requestData.sessionStart,
-          uniqueParameters: Object.keys(requestData.parameters).length,
-          parameters: requestData.parameters
-        }, null, 2));
-        
+        document.open();
+        document.write(JSON.stringify(responseData, null, 2));
         document.close();
         throw new Error('JSON_RESPONSE_SENT'); // Stop further execution
       }
