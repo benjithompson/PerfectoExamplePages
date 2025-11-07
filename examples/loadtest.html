@@ -122,7 +122,7 @@
           <div class="stat-value" id="uniqueValues">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Duplicate Values</div>
+          <div class="stat-label">Duplicate Requests</div>
           <div class="stat-value" id="duplicateValues">0</div>
         </div>
         <div class="stat-card">
@@ -608,13 +608,19 @@
       let totalUniqueValues = 0;
       let duplicateValuesCount = 0;
       
+      // Count unique values and duplicates
       Object.values(requestData.parameters).forEach(param => {
         if (param && param.values) {
           const valueCount = Object.keys(param.values).length;
           totalUniqueValues += valueCount;
-          if (valueCount > 1) {
-            duplicateValuesCount++;
-          }
+          
+          // Count how many parameter-value combinations have been seen more than once
+          Object.values(param.values).forEach(valueData => {
+            const count = typeof valueData === 'number' ? valueData : valueData.count;
+            if (count > 1) {
+              duplicateValuesCount++;
+            }
+          });
         }
       });
       
