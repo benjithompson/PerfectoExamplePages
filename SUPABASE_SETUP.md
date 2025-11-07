@@ -117,53 +117,16 @@ CREATE POLICY "Allow all access to sessions" ON sessions
 
 ## 6. For JMeter Integration
 
-### Method 1: Direct Page Access (Simplest)
+⚠️ **Important**: JMeter does **not** execute JavaScript. Hitting the HTML page directly won't work because the data insertion happens via JavaScript.
 
-JMeter can hit the GitHub Pages URL directly with parameters:
+For JMeter load testing, you must use **direct Supabase API calls**.
 
-**URL**: `https://YOUR_USERNAME.github.io/PerfectoExamplePages/examples/loadtest.html?user=test1&session=abc&action=view`
+📖 **See [JMETER_SETUP.md](JMETER_SETUP.md) for complete JMeter integration instructions.**
 
-- The page will auto-detect JMeter (via User-Agent)
-- Returns JSON response with request data
-- Automatically saves to Supabase
-- No authentication needed (uses config from supabase-config.js)
-
-**JMeter HTTP Request Setup:**
-```
-Method: GET
-URL: https://YOUR_USERNAME.github.io/PerfectoExamplePages/examples/loadtest.html
-Parameters:
-  - user: ${USER_ID}
-  - session: ${SESSION_ID}
-  - action: ${ACTION}
-```
-
-### Method 2: Direct Supabase API (Advanced)
-
-For direct database access without the HTML page:
-
-**URL**: `https://YOUR_PROJECT.supabase.co/rest/v1/request_counts`
-
-**Headers**:
-```
-apikey: YOUR_ANON_KEY
-Authorization: Bearer YOUR_ANON_KEY
-Content-Type: application/json
-Prefer: resolution=merge-duplicates
-```
-
-**Body** (for updating counts):
-```json
-{
-  "parameter_name": "user",
-  "parameter_value": "${USER_ID}",
-  "count": 1,
-  "first_seen": "${__time(yyyy-MM-dd'T'HH:mm:ss'Z',)}",
-  "last_seen": "${__time(yyyy-MM-dd'T'HH:mm:ss'Z',)}"
-}
-```
-
-**Recommended**: Use Method 1 for simplicity - just hit the GitHub Pages URL with query parameters.
+Quick summary:
+1. Create PostgreSQL functions in Supabase for incrementing counts
+2. Call these functions via Supabase REST API from JMeter
+3. Use the `loadtest.html` page in a browser to view the results
 
 ## Features
 
