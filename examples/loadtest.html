@@ -111,6 +111,10 @@
           <div class="stat-value" id="uniqueValues">0</div>
         </div>
         <div class="stat-card">
+          <div class="stat-label">Duplicate Values</div>
+          <div class="stat-value" id="duplicateValues">0</div>
+        </div>
+        <div class="stat-card">
           <div class="stat-label">Session Start</div>
           <div class="stat-value" id="sessionStart" style="font-size:1rem;">--</div>
         </div>
@@ -304,10 +308,16 @@
       document.getElementById('uniqueParams').textContent = Object.keys(requestData.parameters).length;
       
       let totalUniqueValues = 0;
+      let duplicateValuesCount = 0;
       Object.values(requestData.parameters).forEach(param => {
-        totalUniqueValues += Object.keys(param.values).length;
+        const valueCount = Object.keys(param.values).length;
+        totalUniqueValues += valueCount;
+        if (valueCount > 1) {
+          duplicateValuesCount++;
+        }
       });
       document.getElementById('uniqueValues').textContent = totalUniqueValues;
+      document.getElementById('duplicateValues').textContent = duplicateValuesCount;
       
       if (requestData.sessionStart) {
         const startDate = new Date(requestData.sessionStart);
