@@ -54,29 +54,9 @@
     .btn-danger { background:#e74c3c; color:#fff; border-color:#e74c3c; }
     .btn-danger:hover { background:#c0392b; border-color:#c0392b; }
 
-    /* PARAMETER GROUPS */
-    .param-section { margin-top:1.5rem; }
-    .param-group { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:1.5rem; box-shadow:var(--shadow-md); margin-bottom:1.5rem; }
-    .param-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; padding-bottom:.75rem; border-bottom:2px solid var(--color-border); }
-    .param-name { font-size:1.2rem; font-weight:700; color:var(--color-text); display:flex; align-items:center; gap:.5rem; }
-    .param-count { font-size:.85rem; font-weight:600; background:var(--color-accent); color:#fff; padding:.35rem .75rem; border-radius:20px; }
-    
-    .value-list { display:flex; flex-direction:column; gap:.75rem; }
-    .value-item { display:flex; align-items:center; justify-content:space-between; padding:1rem; background:var(--color-bg-alt); border:1px solid var(--color-border); border-radius:var(--radius); transition:var(--transition); }
-    .value-item:hover { border-color:var(--color-accent); box-shadow:var(--shadow-sm); }
-    .value-text { font-family:monospace; font-size:.9rem; font-weight:500; color:var(--color-text); flex:1; word-break:break-all; }
-    .value-count { display:flex; align-items:center; gap:.5rem; }
-    .count-badge { font-size:.9rem; font-weight:700; background:var(--color-surface); border:2px solid var(--color-accent); color:var(--color-accent); padding:.4rem .85rem; border-radius:var(--radius-sm); min-width:60px; text-align:center; }
-
-    .empty-state { text-align:center; padding:3rem 2rem; color:var(--color-text-dim); }
-    .empty-icon { font-size:4rem; margin-bottom:1rem; opacity:0.5; }
-    .empty-text { font-size:1.1rem; font-weight:600; margin-bottom:.5rem; }
-    .empty-hint { font-size:.9rem; opacity:0.8; }
-
     @media (max-width:768px) {
       .stats-grid { grid-template-columns:1fr; }
       .controls { flex-direction:column; align-items:stretch; }
-      .param-header { flex-direction:column; align-items:flex-start; gap:.5rem; }
       .request-table { font-size:.8rem; }
       .request-table th, .request-table td { padding:.5rem; }
     }
@@ -115,12 +95,6 @@
       <div style="margin-bottom:1rem;">
         <label style="display:block;margin-bottom:.5rem;font-weight:600;">Supabase Anon Key</label>
         <input type="password" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="width:100%;padding:.5rem;border:1px solid var(--color-border);border-radius:4px;background:var(--color-bg);color:var(--color-text);">
-      </div>
-      <div style="margin-bottom:1rem;">
-        <label style="display:flex;align-items:center;gap:.5rem;">
-          <input type="checkbox" id="useSupabase">
-          <span>Enable Supabase (fallback to localStorage if disabled)</span>
-        </label>
       </div>
       <div style="display:flex;gap:.5rem;justify-content:flex-end;">
         <button id="cancelConfig" style="padding:.5rem 1rem;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);border-radius:4px;cursor:pointer;">Cancel</button>
@@ -197,13 +171,10 @@
       </table>
     </div>
 
-    <!-- PARAMETER GROUPS -->
-    <div class="param-section">
-      <div id="paramContainer"></div>
-      <div id="emptyState" class="empty-state">
-        <div class="empty-icon">📋</div>
-        <div class="empty-text">No URL Parameters Detected</div>
-        <div class="empty-hint">Add parameters to the URL to start tracking (e.g., ?user=test&session=123)</div>
+    <!-- CONTROLS -->
+    <div class="stats-panel">
+      <div class="controls">
+        <button class="btn btn-danger" id="resetBtn">🔄 Reset Data</button>
       </div>
     </div>
   </main>
@@ -211,8 +182,8 @@
   <script src="../theme.js"></script>
   <script>
     // Supabase and Data Store
-    const STORAGE_KEY = 'loadtest-data';
     const REFRESH_INTERVAL_KEY = 'loadtest-refresh-interval';
+    const SESSION_ID_KEY = 'loadtest-session-id';
     
     let supabase = null;
     let supabaseConfig = {
@@ -224,11 +195,32 @@
     let requestData = {
       totalRequests: 0,
       sessionStart: null,
-      parameters: {}
-      // Structure: { paramName: { values: { value1: { count: N, firstSeen: timestamp, lastSeen: timestamp } }, totalCount: N } }
+      parameters: {},
+      sessions: {}
+      // Structure for parameters: { paramName: { values: { value1: { count: N, firstSeen: timestamp, lastSeen: timestamp } }, totalCount: N } }
+      // Structure for sessions: { sessionId: { count: N, firstSeen: timestamp, lastSeen: timestamp, userAgent: string } }
     };
     let refreshIntervalId = null;
     let realtimeChannel = null;
+    let currentSessionId = null;
+
+    // Get or create session ID
+    function getSessionId() {
+      // Check URL params first
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('sessionId')) {
+        return urlParams.get('sessionId');
+      }
+      
+      // Check localStorage
+      let sessionId = localStorage.getItem(SESSION_ID_KEY);
+      if (!sessionId) {
+        // Generate new session ID
+        sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem(SESSION_ID_KEY, sessionId);
+      }
+      return sessionId;
+    }
 
     // Initialize Supabase from config file
     function initSupabase() {
@@ -285,6 +277,7 @@
 
     // Initialize
     async function init() {
+      currentSessionId = getSessionId();
       initSupabase();
       loadConfigUI();
       await loadData();
@@ -299,8 +292,6 @@
     async function loadData() {
       if (supabase && supabaseConfig.enabled) {
         await loadDataFromSupabase();
-      } else {
-        loadDataFromLocalStorage();
       }
     }
 
@@ -319,7 +310,18 @@
           return;
         }
         
+        // Load sessions
+        const { data: sessions, error: sessionsError } = await supabase
+          .from('sessions')
+          .select('*')
+          .order('count', { ascending: false });
+        
+        if (sessionsError) {
+          console.error('Sessions error:', sessionsError);
+        }
+        
         requestData.parameters = {};
+        requestData.sessions = {};
         requestData.totalRequests = 0;
         
         if (counts && counts.length) {
@@ -356,34 +358,20 @@
         } else {
           requestData.sessionStart = new Date().toISOString();
         }
+        
+        // Load session data
+        if (sessions && sessions.length) {
+          sessions.forEach(row => {
+            requestData.sessions[row.session_id] = {
+              count: row.count,
+              firstSeen: row.first_seen,
+              lastSeen: row.last_seen,
+              userAgent: row.user_agent
+            };
+          });
+        }
       } catch (error) {
         console.error('Failed to load data from Supabase:', error);
-        // Fallback to localStorage
-        loadDataFromLocalStorage();
-      }
-    }
-
-    // Load from localStorage
-    function loadDataFromLocalStorage() {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        try {
-          requestData = JSON.parse(stored);
-        } catch (e) {
-          console.error('Failed to load stored data:', e);
-        }
-      }
-      if (!requestData.sessionStart) {
-        requestData.sessionStart = new Date().toISOString();
-      }
-    }
-
-    // Save data to localStorage
-    function saveData() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(requestData));
-      } catch (e) {
-        console.error('Failed to save data:', e);
       }
     }
 
@@ -391,20 +379,51 @@
     async function processCurrentRequest() {
       const urlParams = new URLSearchParams(window.location.search);
       
-      if (urlParams.toString()) {
+      if (urlParams.toString() && supabase && supabaseConfig.enabled) {
         const now = new Date().toISOString();
-        
-        if (supabase && supabaseConfig.enabled) {
-          await processRequestToSupabase(urlParams, now);
-        } else {
-          processRequestToLocalStorage(urlParams, now);
-        }
+        await processRequestToSupabase(urlParams, now);
       }
     }
 
     // Process request to Supabase
     async function processRequestToSupabase(urlParams, now) {
       try {
+        // Track session
+        const sessionId = currentSessionId;
+        const userAgent = navigator.userAgent;
+        
+        // Update session count
+        const { data: existingSession, error: sessionSelectError } = await supabase
+          .from('sessions')
+          .select('count, first_seen')
+          .eq('session_id', sessionId)
+          .maybeSingle();
+        
+        if (sessionSelectError) {
+          console.error('Session select error:', sessionSelectError);
+        }
+        
+        if (existingSession) {
+          await supabase
+            .from('sessions')
+            .update({
+              count: existingSession.count + 1,
+              last_seen: now
+            })
+            .eq('session_id', sessionId);
+        } else {
+          await supabase
+            .from('sessions')
+            .insert({
+              session_id: sessionId,
+              count: 1,
+              first_seen: now,
+              last_seen: now,
+              user_agent: userAgent
+            });
+        }
+        
+        // Track parameters
         for (const [key, value] of urlParams.entries()) {
           // Check if this parameter-value combination exists
           const { data: existing, error: selectError } = await supabase
@@ -454,40 +473,7 @@
         await loadData();
       } catch (error) {
         console.error('Failed to process request to Supabase:', error);
-        // Fallback to localStorage
-        processRequestToLocalStorage(urlParams, now);
       }
-    }
-
-    // Process request to localStorage
-    function processRequestToLocalStorage(urlParams, now) {
-      requestData.totalRequests++;
-      
-      for (const [key, value] of urlParams.entries()) {
-        if (key === 'format') continue; // Skip format parameter
-        
-        if (!requestData.parameters[key]) {
-          requestData.parameters[key] = {
-            values: {},
-            totalCount: 0
-          };
-        }
-        
-        if (!requestData.parameters[key].values[value]) {
-          requestData.parameters[key].values[value] = {
-            count: 0,
-            firstSeen: now,
-            lastSeen: now
-          };
-        } else {
-          requestData.parameters[key].values[value].lastSeen = now;
-        }
-        
-        requestData.parameters[key].values[value].count++;
-        requestData.parameters[key].totalCount++;
-      }
-      
-      saveData();
     }
 
     // Render all data
@@ -495,7 +481,6 @@
       updateStats();
       renderRequestTable();
       renderSessionTable();
-      renderParameters();
     }
 
     // Render request table
@@ -583,83 +568,26 @@
       const tbody = document.getElementById('sessionTableBody');
       
       // Check if we have session data
-      const sessionParam = requestData.parameters['session'];
-      
-      if (!sessionParam || !sessionParam.values || Object.keys(sessionParam.values).length === 0) {
+      if (!requestData.sessions || Object.keys(requestData.sessions).length === 0) {
         tbody.innerHTML = '<tr><td colspan="2" class="table-empty">No session data yet</td></tr>';
         return;
       }
       
-      // Get all session values and sort by count (descending)
-      const sessions = Object.entries(sessionParam.values)
+      // Get all sessions and sort by count (descending)
+      const sessions = Object.entries(requestData.sessions)
         .map(([sessionId, data]) => ({
           id: sessionId,
-          count: data.count
+          count: data.count,
+          userAgent: data.userAgent || 'Unknown'
         }))
         .sort((a, b) => b.count - a.count);
       
       tbody.innerHTML = sessions.map(session => `
         <tr>
-          <td>${escapeHtml(session.id)}</td>
+          <td title="${escapeHtml(session.userAgent)}">${escapeHtml(session.id)}</td>
           <td>${session.count.toLocaleString()}</td>
         </tr>
       `).join('');
-    }
-
-    // Render parameter groups
-    function renderParameters() {
-      const container = document.getElementById('paramContainer');
-      const emptyState = document.getElementById('emptyState');
-      
-      const paramKeys = Object.keys(requestData.parameters);
-      
-      if (paramKeys.length === 0) {
-        container.innerHTML = '';
-        emptyState.style.display = 'block';
-        return;
-      }
-      
-      emptyState.style.display = 'none';
-      
-      // Sort parameters by name
-      paramKeys.sort();
-      
-      container.innerHTML = paramKeys.map(paramName => {
-        const param = requestData.parameters[paramName];
-        const values = param.values;
-        
-        // Handle both old format (number) and new format (object with count/firstSeen)
-        const valueKeys = Object.keys(values).sort((a, b) => {
-          const countA = typeof values[a] === 'number' ? values[a] : values[a].count;
-          const countB = typeof values[b] === 'number' ? values[b] : values[b].count;
-          return countB - countA;
-        });
-        
-        return `
-          <div class="param-group">
-            <div class="param-header">
-              <div class="param-name">
-                <span>🔑</span>
-                <code>${escapeHtml(paramName)}</code>
-              </div>
-              <div class="param-count">${param.totalCount} request${param.totalCount !== 1 ? 's' : ''}</div>
-            </div>
-            <div class="value-list">
-              ${valueKeys.map(value => {
-                const valueData = values[value];
-                const count = typeof valueData === 'number' ? valueData : valueData.count;
-                return `
-                <div class="value-item">
-                  <div class="value-text">${escapeHtml(value)}</div>
-                  <div class="value-count">
-                    <div class="count-badge">${count}</div>
-                  </div>
-                </div>
-              `;}).join('')}
-            </div>
-          </div>
-        `;
-      }).join('');
     }
 
     // Escape HTML
@@ -677,49 +605,21 @@
             // Delete all request counts
             await supabase.from('request_counts').delete().neq('parameter_name', '___NONE___');
             
-            // Reset session
-            await supabase
-              .from('session')
-              .update({
-                total_requests: 0,
-                start_time: new Date().toISOString()
-              })
-              .eq('id', 1);
+            // Delete all sessions
+            await supabase.from('sessions').delete().neq('session_id', '___NONE___');
             
             await loadData();
+            renderData();
           } catch (error) {
             console.error('Failed to reset Supabase data:', error);
           }
-        } else {
-          requestData = {
-            totalRequests: 0,
-            sessionStart: new Date().toISOString(),
-            parameters: {}
-          };
-          saveData();
         }
-        renderData();
       }
-    }
-
-    // Export data as JSON
-    function exportData() {
-      const dataStr = JSON.stringify(requestData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `loadtest-data-${Date.now()}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
     }
 
     // Event listeners
     function setupEventListeners() {
       document.getElementById('resetBtn').addEventListener('click', resetData);
-      document.getElementById('exportBtn').addEventListener('click', exportData);
       document.getElementById('autoRefresh').addEventListener('change', handleRefreshChange);
       document.getElementById('configBtn').addEventListener('click', openConfigModal);
       document.getElementById('saveConfig').addEventListener('click', saveConfigModal);
@@ -735,7 +635,6 @@
     function loadConfigUI() {
       document.getElementById('supabaseUrl').value = supabaseConfig.url || '';
       document.getElementById('supabaseKey').value = supabaseConfig.key || '';
-      document.getElementById('useSupabase').checked = supabaseConfig.enabled || false;
     }
 
     function openConfigModal() {
@@ -751,7 +650,7 @@
       const newConfig = {
         url: document.getElementById('supabaseUrl').value.trim(),
         key: document.getElementById('supabaseKey').value.trim(),
-        enabled: document.getElementById('useSupabase').checked
+        enabled: true
       };
       
       // Save as override in localStorage (takes precedence over config file)
@@ -772,7 +671,7 @@
       // Reload data
       loadData().then(() => renderData());
       
-      alert('Configuration saved! Page will now use ' + (supabaseConfig.enabled ? 'Supabase' : 'localStorage') + '\n\nNote: To make this permanent across deployments, update supabase-config.js in the repository.');
+      alert('Configuration saved!\n\nNote: To make this permanent across deployments, update supabase-config.js in the repository.');
     }
 
     // Auto-refresh functionality

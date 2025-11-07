@@ -40,11 +40,24 @@ CREATE TABLE request_counts (
   PRIMARY KEY (parameter_name, parameter_value)
 );
 
+-- Create sessions table
+CREATE TABLE sessions (
+  session_id TEXT PRIMARY KEY,
+  count INTEGER DEFAULT 0,
+  first_seen TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  last_seen TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  user_agent TEXT
+);
+
 -- Enable Row Level Security (RLS)
 ALTER TABLE request_counts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 
--- Create policy to allow all operations (for public access)
+-- Create policies to allow all operations (for public access)
 CREATE POLICY "Allow all access to request_counts" ON request_counts
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow all access to sessions" ON sessions
   FOR ALL USING (true) WITH CHECK (true);
 ```
 
@@ -86,10 +99,9 @@ CREATE POLICY "Allow all access to request_counts" ON request_counts
 3. Paste:
    - **Supabase URL**: Your project URL
    - **Supabase Anon Key**: Your anon public key
-4. Check **"Enable Supabase"**
-5. Click **Save**
+4. Click **Save**
 
-**Note:** This saves to localStorage and won't affect other users or JMeter.
+**Note:** This configuration is saved in the browser and only affects your local testing. For production, use Option A.
 
 ## 5. Test It Out
 
@@ -155,24 +167,25 @@ Prefer: resolution=merge-duplicates
 
 ## Features
 
-✅ **Real-time Updates**: Dashboard auto-updates when data changes
-✅ **Cross-browser Sync**: Data shared across all sessions
-✅ **JMeter Compatible**: Direct API access for load testing
-✅ **Free Tier**: 500MB storage, unlimited API requests
-✅ **Automatic Fallback**: Uses localStorage if Supabase is disabled
+✅ **Real-time Updates**: Dashboard auto-updates when data changes  
+✅ **Cross-session Sync**: Data shared across all clients and browsers  
+✅ **JMeter Compatible**: Direct API access for load testing  
+✅ **Free Tier**: 500MB storage, unlimited API requests  
+✅ **Session Tracking**: Unique session IDs track individual clients/threads
 
 ## Troubleshooting
 
 **"Failed to load data"**:
-- Check your API credentials are correct
-- Verify tables were created successfully
+- Check your API credentials are correct in `supabase-config.js`
+- Verify tables were created successfully (both `request_counts` and `sessions`)
 - Check browser console for errors
 
 **"Permission denied"**:
-- Make sure RLS policies were created
-- Verify the policies allow public access
+- Make sure RLS policies were created for both tables
+- Verify the policies allow public access (`FOR ALL USING (true)`)
 
 **Data not updating**:
-- Check Supabase is enabled in config
-- Verify your API key is correct
+- Verify Supabase config is enabled (`enabled: true`)
+- Check your API URL and anon key are correct
 - Look for errors in browser console
+- Ensure the page URL includes query parameters
