@@ -433,10 +433,11 @@
             .select('count, first_seen')
             .eq('parameter_name', key)
             .eq('parameter_value', value)
-            .single();
+            .maybeSingle();
           
-          if (selectError && selectError.code !== 'PGRST116') {
+          if (selectError) {
             console.error('Select error:', selectError);
+            continue;
           }
           
           if (existing) {
