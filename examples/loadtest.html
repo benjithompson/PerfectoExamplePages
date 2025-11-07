@@ -86,7 +86,16 @@
       <span>📊</span>
       <strong>Loadtest Data</strong>
     </div>
-    <div style="display:flex;gap:.5rem;">
+    <div style="display:flex;gap:.5rem;align-items:center;">
+      <label for="autoRefresh" style="font-size:.9rem;">Auto Refresh:</label>
+      <select id="autoRefresh" style="padding:.25rem .5rem;border-radius:4px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);">
+        <option value="0">Off</option>
+        <option value="1000">1s</option>
+        <option value="5000">5s</option>
+        <option value="10000">10s</option>
+        <option value="30000">30s</option>
+        <option value="60000">1m</option>
+      </select>
       <a href="../index.html">← Back to Examples</a>
       <button id="themeToggle" type="button" title="Toggle theme">🌗 Theme</button>
     </div>
@@ -196,6 +205,7 @@
   <script>
     // Data Store (persisted in localStorage)
     const STORAGE_KEY = 'loadtest-data';
+    const REFRESH_INTERVAL_KEY = 'loadtest-refresh-interval';
     
     let requestData = {
       totalRequests: 0,
@@ -204,12 +214,16 @@
       // Structure: { paramName: { values: { value1: { count: N, firstSeen: timestamp, lastSeen: timestamp } }, totalCount: N } }
     };
 
+    let refreshIntervalId = null;
+
     // Initialize
     function init() {
       loadData();
+      loadRefreshInterval();
       processCurrentRequest();
       renderData();
       setupEventListeners();
+      setupAutoRefresh();
     }
 
     // Load persisted data
@@ -441,6 +455,45 @@
     function setupEventListeners() {
       document.getElementById('resetBtn').addEventListener('click', resetData);
       document.getElementById('exportBtn').addEventListener('click', exportData);
+      document.getElementById('autoRefresh').addEventListener('change', handleRefreshChange);
+    }
+
+    // Auto-refresh functionality
+    function loadRefreshInterval() {
+      const saved = localStorage.getItem(REFRESH_INTERVAL_KEY);
+      if (saved) {
+        document.getElementById('autoRefresh').value = saved;
+      }
+    }
+
+    function setupAutoRefresh() {
+      const interval = parseInt(document.getElementById('autoRefresh').value);
+      if (interval > 0) {
+        startAutoRefresh(interval);
+      }
+    }
+
+    function handleRefreshChange(event) {
+      const interval = parseInt(event.target.value);
+      localStorage.setItem(REFRESH_INTERVAL_KEY, interval.toString());
+      
+      // Clear existing interval
+      if (refreshIntervalId) {
+        clearInterval(refreshIntervalId);
+        refreshIntervalId = null;
+      }
+      
+      // Start new interval if not "Off"
+      if (interval > 0) {
+        startAutoRefresh(interval);
+      }
+    }
+
+    function startAutoRefresh(interval) {
+      refreshIntervalId = setInterval(() => {
+        loadData();
+        renderData();
+      }, interval);
     }
 
     // Initialize on load
