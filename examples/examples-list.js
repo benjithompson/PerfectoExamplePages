@@ -22,6 +22,12 @@ window.EXAMPLE_GROUPS = [
     ]
   },
   {
+    groupName: 'Performance',
+    examples: [
+      { file: 'loadtest.html', name: 'Loadtest Data' }
+    ]
+  },
+  {
     groupName: 'External Pages',
     examples: [
       { file: 'http://dbankdemo.com/bank', name: 'Bank Demo' },

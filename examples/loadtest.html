@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Loadtest Data | Performance Testing</title>
+  <meta name="description" content="Track and analyze URL parameters and request data for load testing" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../themes/default.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin:0; font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text); line-height:1.4; min-height:100vh; display:flex; flex-direction:column; }
+
+    /* HEADER */
+    header { position:sticky; top:0; z-index:50; backdrop-filter:blur(18px); background:linear-gradient(145deg,var(--color-bg-alt),var(--color-surface) 60%); border-bottom:1px solid var(--color-border); display:flex; flex-wrap:wrap; align-items:center; gap:1rem; padding:.85rem clamp(1rem,3vw,2rem); box-shadow:var(--shadow-xs); }
+    .brand { font-weight:600; letter-spacing:.5px; font-size:1rem; display:flex; align-items:center; gap:.55rem; }
+    header a, header button { font:inherit; cursor:pointer; border:1px solid var(--color-border); background:var(--color-surface-alt); color:var(--color-text-dim); padding:.55rem .85rem; border-radius:var(--radius-sm); display:inline-flex; align-items:center; gap:.45rem; font-size:.75rem; font-weight:600; letter-spacing:.8px; text-transform:uppercase; text-decoration:none; transition:var(--transition); }
+    header a:hover, header button:hover { color:var(--color-text); border-color:var(--color-accent); }
+
+    /* LAYOUT */
+    main { flex:1; width:100%; max-width:1400px; margin:0 auto; padding:1.6rem clamp(1rem,3vw,2.4rem) 3.5rem; }
+    .page-title { margin:0 0 1.5rem 0; font-size:clamp(1.9rem,3.5vw,2.8rem); line-height:1.1; letter-spacing:.5px; font-weight:600; background:linear-gradient(92deg,var(--color-text) 10%, var(--color-accent) 95%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+    /* STATS PANEL */
+    .stats-panel { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:1.5rem; box-shadow:var(--shadow-md); margin-bottom:1.5rem; }
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .stat-card { background:var(--color-bg-alt); border:1px solid var(--color-border); border-radius:var(--radius); padding:1rem; }
+    .stat-label { font-size:.75rem; text-transform:uppercase; letter-spacing:1px; color:var(--color-text-dim); margin-bottom:.5rem; font-weight:600; }
+    .stat-value { font-size:1.8rem; font-weight:700; color:var(--color-accent); }
+
+    /* REQUEST TABLE */
+    .request-table-section { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:1.5rem; box-shadow:var(--shadow-md); margin-bottom:1.5rem; }
+    .request-table-section h2 { margin:0 0 1rem 0; font-size:1.3rem; font-weight:700; }
+    .request-table { width:100%; border-collapse:collapse; }
+    .request-table thead { background:var(--color-bg-alt); }
+    .request-table th { text-align:left; padding:.75rem 1rem; font-size:.75rem; text-transform:uppercase; letter-spacing:1px; color:var(--color-text-dim); font-weight:600; border-bottom:2px solid var(--color-border); }
+    .request-table td { padding:.75rem 1rem; border-bottom:1px solid var(--color-border); font-family:monospace; font-size:.9rem; }
+    .request-table tbody tr:hover { background:var(--color-bg-alt); }
+    .request-table tbody tr:last-child td { border-bottom:none; }
+    .param-col { color:var(--color-accent); font-weight:600; }
+    .value-col { color:var(--color-text); }
+    .count-col { text-align:center; font-weight:700; color:var(--color-accent); }
+    .table-empty { text-align:center; padding:2rem; color:var(--color-text-dim); font-style:italic; }
+
+    /* CONTROLS */
+    .controls { display:flex; gap:1rem; align-items:center; padding-bottom:1.5rem; border-bottom:2px solid var(--color-border); }
+    .btn { font:inherit; cursor:pointer; border:1px solid var(--color-border); background:var(--color-surface-alt); color:var(--color-text); padding:.75rem 1.25rem; border-radius:var(--radius-sm); font-size:.85rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; transition:var(--transition); display:inline-flex; align-items:center; gap:.5rem; }
+    .btn:hover { background:var(--color-accent); color:#fff; border-color:var(--color-accent); }
+    .btn-danger { background:#e74c3c; color:#fff; border-color:#e74c3c; }
+    .btn-danger:hover { background:#c0392b; border-color:#c0392b; }
+
+    /* PARAMETER GROUPS */
+    .param-section { margin-top:1.5rem; }
+    .param-group { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:1.5rem; box-shadow:var(--shadow-md); margin-bottom:1.5rem; }
+    .param-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; padding-bottom:.75rem; border-bottom:2px solid var(--color-border); }
+    .param-name { font-size:1.2rem; font-weight:700; color:var(--color-text); display:flex; align-items:center; gap:.5rem; }
+    .param-count { font-size:.85rem; font-weight:600; background:var(--color-accent); color:#fff; padding:.35rem .75rem; border-radius:20px; }
+    
+    .value-list { display:flex; flex-direction:column; gap:.75rem; }
+    .value-item { display:flex; align-items:center; justify-content:space-between; padding:1rem; background:var(--color-bg-alt); border:1px solid var(--color-border); border-radius:var(--radius); transition:var(--transition); }
+    .value-item:hover { border-color:var(--color-accent); box-shadow:var(--shadow-sm); }
+    .value-text { font-family:monospace; font-size:.9rem; font-weight:500; color:var(--color-text); flex:1; word-break:break-all; }
+    .value-count { display:flex; align-items:center; gap:.5rem; }
+    .count-badge { font-size:.9rem; font-weight:700; background:var(--color-surface); border:2px solid var(--color-accent); color:var(--color-accent); padding:.4rem .85rem; border-radius:var(--radius-sm); min-width:60px; text-align:center; }
+
+    .empty-state { text-align:center; padding:3rem 2rem; color:var(--color-text-dim); }
+    .empty-icon { font-size:4rem; margin-bottom:1rem; opacity:0.5; }
+    .empty-text { font-size:1.1rem; font-weight:600; margin-bottom:.5rem; }
+    .empty-hint { font-size:.9rem; opacity:0.8; }
+
+    @media (max-width:768px) {
+      .stats-grid { grid-template-columns:1fr; }
+      .controls { flex-direction:column; align-items:stretch; }
+      .param-header { flex-direction:column; align-items:flex-start; gap:.5rem; }
+      .request-table { font-size:.8rem; }
+      .request-table th, .request-table td { padding:.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header role="banner">
+    <div class="brand">
+      <span>📊</span>
+      <strong>Loadtest Data</strong>
+    </div>
+    <div style="display:flex;gap:.5rem;">
+      <a href="../index.html">← Back to Examples</a>
+      <button id="themeToggle" type="button" title="Toggle theme">🌗 Theme</button>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="page-title">Loadtest Data Analytics</h1>
+
+    <!-- STATS PANEL -->
+    <div class="stats-panel">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Requests</div>
+          <div class="stat-value" id="totalRequests">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Unique Parameters</div>
+          <div class="stat-value" id="uniqueParams">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Unique Values</div>
+          <div class="stat-value" id="uniqueValues">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Session Start</div>
+          <div class="stat-value" id="sessionStart" style="font-size:1rem;">--</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REQUEST TABLE -->
+    <div class="request-table-section">
+      <h2>Request Parameters</h2>
+      <table class="request-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+            <th>Count</th>
+          </tr>
+        </thead>
+        <tbody id="requestTableBody">
+          <tr>
+            <td colspan="3" class="table-empty">No request data yet</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="stats-panel">
+      <div class="controls">
+        <button class="btn btn-danger" id="resetBtn">🔄 Reset Data</button>
+        <button class="btn" id="exportBtn">📥 Export JSON</button>
+      </div>
+    </div>
+
+    <!-- CLIENT INFO -->
+    <div class="client-info" style="display:none;">
+      <h2>Client Information</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Origin</div>
+          <div class="info-value" id="clientOrigin">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">User Agent</div>
+          <div class="info-value" id="clientUserAgent">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Referrer</div>
+          <div class="info-value" id="clientReferrer">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Language</div>
+          <div class="info-value" id="clientLanguage">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Screen Resolution</div>
+          <div class="info-value" id="clientScreen">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Current URL</div>
+          <div class="info-value" id="clientUrl">--</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARAMETER GROUPS -->
+    <div class="param-section">
+      <div id="paramContainer"></div>
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">No URL Parameters Detected</div>
+        <div class="empty-hint">Add parameters to the URL to start tracking (e.g., ?user=test&session=123)</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../theme.js"></script>
+  <script>
+    // Data Store (persisted in localStorage)
+    const STORAGE_KEY = 'loadtest-data';
+    
+    let requestData = {
+      totalRequests: 0,
+      sessionStart: null,
+      parameters: {}
+      // Structure: { paramName: { values: { value1: count, value2: count }, totalCount: N } }
+    };
+
+    // Initialize
+    function init() {
+      loadData();
+      updateClientInfo();
+      processCurrentRequest();
+      renderData();
+      setupEventListeners();
+    }
+
+    // Load persisted data
+    function loadData() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          requestData = JSON.parse(stored);
+        } catch (e) {
+          console.error('Failed to load stored data:', e);
+        }
+      }
+      if (!requestData.sessionStart) {
+        requestData.sessionStart = new Date().toISOString();
+      }
+    }
+
+    // Save data to localStorage
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(requestData));
+      } catch (e) {
+        console.error('Failed to save data:', e);
+      }
+    }
+
+    // Update client information
+    function updateClientInfo() {
+      document.getElementById('clientOrigin').textContent = window.location.origin;
+      document.getElementById('clientUserAgent').textContent = navigator.userAgent;
+      document.getElementById('clientReferrer').textContent = document.referrer || 'Direct';
+      document.getElementById('clientLanguage').textContent = navigator.language;
+      document.getElementById('clientScreen').textContent = `${screen.width}x${screen.height}`;
+      document.getElementById('clientUrl').textContent = window.location.href;
+    }
+
+    // Process current page request
+    function processCurrentRequest() {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      if (urlParams.toString()) {
+        requestData.totalRequests++;
+        
+        for (const [key, value] of urlParams.entries()) {
+          if (!requestData.parameters[key]) {
+            requestData.parameters[key] = {
+              values: {},
+              totalCount: 0
+            };
+          }
+          
+          if (!requestData.parameters[key].values[value]) {
+            requestData.parameters[key].values[value] = 0;
+          }
+          
+          requestData.parameters[key].values[value]++;
+          requestData.parameters[key].totalCount++;
+        }
+        
+        saveData();
+      }
+    }
+
+    // Render all data
+    function renderData() {
+      updateStats();
+      renderParameters();
+    }
+
+    // Update statistics
+    function updateStats() {
+      document.getElementById('totalRequests').textContent = requestData.totalRequests.toLocaleString();
+      document.getElementById('uniqueParams').textContent = Object.keys(requestData.parameters).length;
+      
+      let totalUniqueValues = 0;
+      Object.values(requestData.parameters).forEach(param => {
+        totalUniqueValues += Object.keys(param.values).length;
+      });
+      document.getElementById('uniqueValues').textContent = totalUniqueValues;
+      
+      if (requestData.sessionStart) {
+        const startDate = new Date(requestData.sessionStart);
+        document.getElementById('sessionStart').textContent = startDate.toLocaleString();
+      }
+    }
+
+    // Render parameter groups
+    function renderParameters() {
+      const container = document.getElementById('paramContainer');
+      const emptyState = document.getElementById('emptyState');
+      
+      const paramKeys = Object.keys(requestData.parameters);
+      
+      if (paramKeys.length === 0) {
+        container.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      emptyState.style.display = 'none';
+      
+      // Sort parameters by name
+      paramKeys.sort();
+      
+      container.innerHTML = paramKeys.map(paramName => {
+        const param = requestData.parameters[paramName];
+        const values = param.values;
+        const valueKeys = Object.keys(values).sort((a, b) => values[b] - values[a]); // Sort by count descending
+        
+        return `
+          <div class="param-group">
+            <div class="param-header">
+              <div class="param-name">
+                <span>🔑</span>
+                <code>${escapeHtml(paramName)}</code>
+              </div>
+              <div class="param-count">${param.totalCount} request${param.totalCount !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="value-list">
+              ${valueKeys.map(value => `
+                <div class="value-item">
+                  <div class="value-text">${escapeHtml(value)}</div>
+                  <div class="value-count">
+                    <div class="count-badge">${values[value]}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Escape HTML
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Reset data
+    function resetData() {
+      if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+        requestData = {
+          totalRequests: 0,
+          sessionStart: new Date().toISOString(),
+          parameters: {}
+        };
+        saveData();
+        renderData();
+      }
+    }
+
+    // Export data as JSON
+    function exportData() {
+      const dataStr = JSON.stringify(requestData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `loadtest-data-${Date.now()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    // Event listeners
+    function setupEventListeners() {
+      document.getElementById('resetBtn').addEventListener('click', resetData);
+      document.getElementById('exportBtn').addEventListener('click', exportData);
+    }
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>
