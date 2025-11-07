@@ -102,6 +102,7 @@
       }
     })();
   </script>
+  <script src="./supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -330,7 +331,6 @@
     // Supabase and Data Store
     const STORAGE_KEY = 'loadtest-data';
     const REFRESH_INTERVAL_KEY = 'loadtest-refresh-interval';
-    const SUPABASE_CONFIG_KEY = 'supabase-config';
     
     let supabase = null;
     let supabaseConfig = {
@@ -348,14 +348,27 @@
     let refreshIntervalId = null;
     let realtimeChannel = null;
 
-    // Initialize Supabase
+    // Initialize Supabase from config file
     function initSupabase() {
-      const stored = localStorage.getItem(SUPABASE_CONFIG_KEY);
+      // Check if config is loaded from supabase-config.js
+      if (window.SUPABASE_CONFIG) {
+        supabaseConfig = {
+          url: window.SUPABASE_CONFIG.url,
+          key: window.SUPABASE_CONFIG.anonKey,
+          enabled: window.SUPABASE_CONFIG.enabled
+        };
+      }
+      
+      // Allow localStorage override for manual configuration
+      const stored = localStorage.getItem('supabase-config-override');
       if (stored) {
         try {
-          supabaseConfig = JSON.parse(stored);
+          const override = JSON.parse(stored);
+          if (override.enabled) {
+            supabaseConfig = override;
+          }
         } catch (e) {
-          console.error('Failed to load Supabase config:', e);
+          console.error('Failed to load Supabase config override:', e);
         }
       }
       
@@ -841,13 +854,16 @@
     }
 
     function saveConfigModal() {
-      supabaseConfig = {
+      const newConfig = {
         url: document.getElementById('supabaseUrl').value.trim(),
         key: document.getElementById('supabaseKey').value.trim(),
         enabled: document.getElementById('useSupabase').checked
       };
       
-      localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify(supabaseConfig));
+      // Save as override in localStorage (takes precedence over config file)
+      localStorage.setItem('supabase-config-override', JSON.stringify(newConfig));
+      
+      supabaseConfig = newConfig;
       
       // Reinitialize Supabase
       if (realtimeChannel) {
@@ -862,7 +878,7 @@
       // Reload data
       loadData().then(() => renderData());
       
-      alert('Configuration saved! Page will now use ' + (supabaseConfig.enabled ? 'Supabase' : 'localStorage'));
+      alert('Configuration saved! Page will now use ' + (supabaseConfig.enabled ? 'Supabase' : 'localStorage') + '\n\nNote: To make this permanent across deployments, update supabase-config.js in the repository.');
     }
 
     // Auto-refresh functionality

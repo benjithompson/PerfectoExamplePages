@@ -1,6 +1,17 @@
 # Supabase Setup Guide for Loadtest Data
 
-## 1. Create a Supabase Project
+## Why Supabase?
+
+- ✅ **No manual configuration**: Set it up once in the repo, works for everyone
+- ✅ **JMeter ready**: JMeter uses the same GitHub Pages URL, no separate auth needed
+- ✅ **Real-time updates**: Dashboard auto-refreshes when data changes
+- ✅ **Cross-session data**: All test runs accumulate in one database
+- ✅ **Free tier**: 500MB storage, unlimited API requests
+- ✅ **Public anon key is safe**: Security enforced by Row Level Security
+
+## Quick Setup (5 minutes)
+
+### 1. Create a Supabase Project
 
 1. Go to [https://supabase.com](https://supabase.com)
 2. Sign up or log in
@@ -71,6 +82,28 @@ CREATE POLICY "Allow all access to request_counts" ON request_counts
 
 ## 4. Configure the Loadtest Page
 
+### Option A: Repository Configuration (Recommended for GitHub Pages)
+
+1. Open `examples/supabase-config.js` in your code editor
+2. Replace the placeholder values:
+   ```javascript
+   window.SUPABASE_CONFIG = {
+     url: 'https://xxxxx.supabase.co', // Your project URL
+     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', // Your anon key
+     enabled: true // Set to true to enable
+   };
+   ```
+3. Commit and push to GitHub
+4. The configuration is now available to all users and JMeter
+
+**Benefits:**
+- ✅ No manual configuration needed by users
+- ✅ JMeter can access the same endpoint
+- ✅ Configuration persists across deployments
+- ✅ Anon key is safe to commit (security via RLS)
+
+### Option B: Manual Browser Configuration (Testing/Development)
+
 1. Open the loadtest page in your browser
 2. Click the **⚙️ Config** button in the header
 3. Paste:
@@ -78,6 +111,8 @@ CREATE POLICY "Allow all access to request_counts" ON request_counts
    - **Supabase Anon Key**: Your anon public key
 4. Check **"Enable Supabase"**
 5. Click **Save**
+
+**Note:** This saves to localStorage and won't affect other users or JMeter.
 
 ## 5. Test It Out
 
@@ -93,7 +128,30 @@ CREATE POLICY "Allow all access to request_counts" ON request_counts
 
 ## 6. For JMeter Integration
 
-JMeter can POST directly to Supabase REST API:
+### Method 1: Direct Page Access (Simplest)
+
+JMeter can hit the GitHub Pages URL directly with parameters:
+
+**URL**: `https://YOUR_USERNAME.github.io/PerfectoExamplePages/examples/loadtest.html?user=test1&session=abc&action=view`
+
+- The page will auto-detect JMeter (via User-Agent)
+- Returns JSON response with request data
+- Automatically saves to Supabase
+- No authentication needed (uses config from supabase-config.js)
+
+**JMeter HTTP Request Setup:**
+```
+Method: GET
+URL: https://YOUR_USERNAME.github.io/PerfectoExamplePages/examples/loadtest.html
+Parameters:
+  - user: ${USER_ID}
+  - session: ${SESSION_ID}
+  - action: ${ACTION}
+```
+
+### Method 2: Direct Supabase API (Advanced)
+
+For direct database access without the HTML page:
 
 **URL**: `https://YOUR_PROJECT.supabase.co/rest/v1/request_counts`
 
@@ -105,16 +163,18 @@ Content-Type: application/json
 Prefer: resolution=merge-duplicates
 ```
 
-**Body**:
+**Body** (for updating counts):
 ```json
 {
   "parameter_name": "user",
-  "parameter_value": "test1",
+  "parameter_value": "${USER_ID}",
   "count": 1,
-  "first_seen": "2025-11-07T12:00:00Z",
-  "last_seen": "2025-11-07T12:00:00Z"
+  "first_seen": "${__time(yyyy-MM-dd'T'HH:mm:ss'Z',)}",
+  "last_seen": "${__time(yyyy-MM-dd'T'HH:mm:ss'Z',)}"
 }
 ```
+
+**Recommended**: Use Method 1 for simplicity - just hit the GitHub Pages URL with query parameters.
 
 ## Features
 
