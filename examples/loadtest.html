@@ -179,43 +179,22 @@
       </table>
     </div>
 
-    <!-- CONTROLS -->
-    <div class="stats-panel">
-      <div class="controls">
-        <button class="btn btn-danger" id="resetBtn">🔄 Reset Data</button>
-        <button class="btn" id="exportBtn">📥 Export JSON</button>
-      </div>
-    </div>
-
-    <!-- CLIENT INFO -->
-    <div class="client-info" style="display:none;">
-      <h2>Client Information</h2>
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">Origin</div>
-          <div class="info-value" id="clientOrigin">--</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">User Agent</div>
-          <div class="info-value" id="clientUserAgent">--</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Referrer</div>
-          <div class="info-value" id="clientReferrer">--</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Language</div>
-          <div class="info-value" id="clientLanguage">--</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Screen Resolution</div>
-          <div class="info-value" id="clientScreen">--</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Current URL</div>
-          <div class="info-value" id="clientUrl">--</div>
-        </div>
-      </div>
+    <!-- SESSION DATA TABLE -->
+    <div class="request-table-section">
+      <h2>Session Data</h2>
+      <table class="request-table">
+        <thead>
+          <tr>
+            <th>Session ID</th>
+            <th>Request Count</th>
+          </tr>
+        </thead>
+        <tbody id="sessionTableBody">
+          <tr>
+            <td colspan="2" class="table-empty">No session data yet</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- PARAMETER GROUPS -->
@@ -515,6 +494,7 @@
     function renderData() {
       updateStats();
       renderRequestTable();
+      renderSessionTable();
       renderParameters();
     }
 
@@ -596,6 +576,34 @@
         const startDate = new Date(requestData.sessionStart);
         document.getElementById('sessionStart').textContent = startDate.toLocaleString();
       }
+    }
+
+    // Render session table
+    function renderSessionTable() {
+      const tbody = document.getElementById('sessionTableBody');
+      
+      // Check if we have session data
+      const sessionParam = requestData.parameters['session'];
+      
+      if (!sessionParam || !sessionParam.values || Object.keys(sessionParam.values).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="2" class="table-empty">No session data yet</td></tr>';
+        return;
+      }
+      
+      // Get all session values and sort by count (descending)
+      const sessions = Object.entries(sessionParam.values)
+        .map(([sessionId, data]) => ({
+          id: sessionId,
+          count: data.count
+        }))
+        .sort((a, b) => b.count - a.count);
+      
+      tbody.innerHTML = sessions.map(session => `
+        <tr>
+          <td>${escapeHtml(session.id)}</td>
+          <td>${session.count.toLocaleString()}</td>
+        </tr>
+      `).join('');
     }
 
     // Render parameter groups
