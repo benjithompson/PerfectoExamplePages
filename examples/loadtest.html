@@ -102,6 +102,7 @@
       }
     })();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -183,7 +184,8 @@
       <span>📊</span>
       <strong>Loadtest Data</strong>
     </div>
-    <div style="display:flex;gap:.5rem;align-items:center;">
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+      <button id="configBtn" type="button" title="Configure Supabase" style="padding:.25rem .5rem;border-radius:4px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);cursor:pointer;">⚙️ Config</button>
       <label for="autoRefresh" style="font-size:.9rem;">Auto Refresh:</label>
       <select id="autoRefresh" style="padding:.25rem .5rem;border-radius:4px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);">
         <option value="0">Off</option>
@@ -197,6 +199,31 @@
       <button id="themeToggle" type="button" title="Toggle theme">🌗 Theme</button>
     </div>
   </header>
+
+  <!-- Supabase Configuration Modal -->
+  <div id="configModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:var(--color-surface);padding:2rem;border-radius:8px;max-width:500px;width:90%;">
+      <h2 style="margin-top:0;">Supabase Configuration</h2>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;margin-bottom:.5rem;font-weight:600;">Supabase URL</label>
+        <input type="text" id="supabaseUrl" placeholder="https://xxxxx.supabase.co" style="width:100%;padding:.5rem;border:1px solid var(--color-border);border-radius:4px;background:var(--color-bg);color:var(--color-text);">
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;margin-bottom:.5rem;font-weight:600;">Supabase Anon Key</label>
+        <input type="password" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="width:100%;padding:.5rem;border:1px solid var(--color-border);border-radius:4px;background:var(--color-bg);color:var(--color-text);">
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="display:flex;align-items:center;gap:.5rem;">
+          <input type="checkbox" id="useSupabase">
+          <span>Enable Supabase (fallback to localStorage if disabled)</span>
+        </label>
+      </div>
+      <div style="display:flex;gap:.5rem;justify-content:flex-end;">
+        <button id="cancelConfig" style="padding:.5rem 1rem;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);border-radius:4px;cursor:pointer;">Cancel</button>
+        <button id="saveConfig" style="padding:.5rem 1rem;border:none;background:var(--color-accent);color:white;border-radius:4px;cursor:pointer;">Save</button>
+      </div>
+    </div>
+  </div>
 
   <main>
     <h1 class="page-title">Loadtest Test Data Results</h1>
@@ -300,9 +327,17 @@
 
   <script src="../theme.js"></script>
   <script>
-    // Data Store (persisted in localStorage)
+    // Supabase and Data Store
     const STORAGE_KEY = 'loadtest-data';
     const REFRESH_INTERVAL_KEY = 'loadtest-refresh-interval';
+    const SUPABASE_CONFIG_KEY = 'supabase-config';
+    
+    let supabase = null;
+    let supabaseConfig = {
+      url: '',
+      key: '',
+      enabled: false
+    };
     
     let requestData = {
       totalRequests: 0,
@@ -311,9 +346,52 @@
       // Structure: { paramName: { values: { value1: { count: N, firstSeen: timestamp, lastSeen: timestamp } }, totalCount: N } }
     };
     let refreshIntervalId = null;
+    let realtimeChannel = null;
+
+    // Initialize Supabase
+    function initSupabase() {
+      const stored = localStorage.getItem(SUPABASE_CONFIG_KEY);
+      if (stored) {
+        try {
+          supabaseConfig = JSON.parse(stored);
+        } catch (e) {
+          console.error('Failed to load Supabase config:', e);
+        }
+      }
+      
+      if (supabaseConfig.enabled && supabaseConfig.url && supabaseConfig.key) {
+        try {
+          supabase = window.supabase.createClient(supabaseConfig.url, supabaseConfig.key);
+          setupRealtimeSubscription();
+          console.log('Supabase initialized');
+        } catch (e) {
+          console.error('Failed to initialize Supabase:', e);
+          supabase = null;
+        }
+      }
+    }
+
+    // Setup real-time subscription for auto-updates
+    function setupRealtimeSubscription() {
+      if (!supabase) return;
+      
+      realtimeChannel = supabase
+        .channel('request_updates')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'request_counts' },
+          (payload) => {
+            console.log('Real-time update:', payload);
+            loadData();
+            renderData();
+          }
+        )
+        .subscribe();
+    }
 
     // Initialize
     function init() {
+      initSupabase();
+      loadConfigUI();
       loadData();
       loadRefreshInterval();
       processCurrentRequest();
@@ -323,7 +401,82 @@
     }
 
     // Load persisted data
-    function loadData() {
+    async function loadData() {
+      if (supabase && supabaseConfig.enabled) {
+        await loadDataFromSupabase();
+      } else {
+        loadDataFromLocalStorage();
+      }
+    }
+
+    // Load from Supabase
+    async function loadDataFromSupabase() {
+      try {
+        // Load session info
+        const { data: session, error: sessionError } = await supabase
+          .from('session')
+          .select('*')
+          .eq('id', 1)
+          .single();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          // Try to create session if it doesn't exist
+          if (sessionError.code === 'PGRST116') {
+            await supabase.from('session').insert({
+              id: 1,
+              start_time: new Date().toISOString(),
+              total_requests: 0
+            });
+            requestData.sessionStart = new Date().toISOString();
+            requestData.totalRequests = 0;
+          }
+        } else if (session) {
+          requestData.sessionStart = session.start_time;
+          requestData.totalRequests = session.total_requests;
+        }
+        
+        // Load request counts
+        const { data: counts, error: countsError } = await supabase
+          .from('request_counts')
+          .select('*')
+          .order('parameter_name')
+          .order('count', { ascending: false });
+        
+        if (countsError) {
+          console.error('Counts error:', countsError);
+          return;
+        }
+        
+        requestData.parameters = {};
+        if (counts && counts.length) {
+          counts.forEach(row => {
+            const { parameter_name, parameter_value, count, first_seen, last_seen } = row;
+            
+            if (!requestData.parameters[parameter_name]) {
+              requestData.parameters[parameter_name] = {
+                values: {},
+                totalCount: 0
+              };
+            }
+            
+            requestData.parameters[parameter_name].values[parameter_value] = {
+              count: count,
+              firstSeen: first_seen,
+              lastSeen: last_seen
+            };
+            requestData.parameters[parameter_name].totalCount += count;
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load data from Supabase:', error);
+        // Fallback to localStorage
+        loadDataFromLocalStorage();
+      }
+    }
+
+    // Load from localStorage
+    function loadDataFromLocalStorage() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         try {
@@ -347,39 +500,116 @@
     }
 
     // Process current page request
-    function processCurrentRequest() {
+    async function processCurrentRequest() {
       const urlParams = new URLSearchParams(window.location.search);
       
       if (urlParams.toString()) {
-        requestData.totalRequests++;
         const now = new Date().toISOString();
+        
+        if (supabase && supabaseConfig.enabled) {
+          await processRequestToSupabase(urlParams, now);
+        } else {
+          processRequestToLocalStorage(urlParams, now);
+        }
+      }
+    }
+
+    // Process request to Supabase
+    async function processRequestToSupabase(urlParams, now) {
+      try {
+        // Update total requests
+        const { error: updateError } = await supabase
+          .rpc('increment_total_requests');
+        
+        if (updateError) console.error('Update error:', updateError);
         
         for (const [key, value] of urlParams.entries()) {
           if (key === 'format') continue; // Skip format parameter
           
-          if (!requestData.parameters[key]) {
-            requestData.parameters[key] = {
-              values: {},
-              totalCount: 0
-            };
-          }
+          // Upsert request count (insert or update)
+          const { error: upsertError } = await supabase
+            .from('request_counts')
+            .upsert({
+              parameter_name: key,
+              parameter_value: value,
+              count: 1,
+              first_seen: now,
+              last_seen: now
+            }, {
+              onConflict: 'parameter_name,parameter_value',
+              ignoreDuplicates: false
+            });
           
-          if (!requestData.parameters[key].values[value]) {
-            requestData.parameters[key].values[value] = {
-              count: 0,
-              firstSeen: now,
-              lastSeen: now
-            };
-          } else {
-            requestData.parameters[key].values[value].lastSeen = now;
+          if (upsertError) {
+            console.error('Upsert error:', upsertError);
+            // Try increment instead
+            const { data: existing } = await supabase
+              .from('request_counts')
+              .select('count')
+              .eq('parameter_name', key)
+              .eq('parameter_value', value)
+              .single();
+            
+            if (existing) {
+              await supabase
+                .from('request_counts')
+                .update({
+                  count: existing.count + 1,
+                  last_seen: now
+                })
+                .eq('parameter_name', key)
+                .eq('parameter_value', value);
+            } else {
+              await supabase
+                .from('request_counts')
+                .insert({
+                  parameter_name: key,
+                  parameter_value: value,
+                  count: 1,
+                  first_seen: now,
+                  last_seen: now
+                });
+            }
           }
-          
-          requestData.parameters[key].values[value].count++;
-          requestData.parameters[key].totalCount++;
         }
         
-        saveData();
+        await loadData();
+      } catch (error) {
+        console.error('Failed to process request to Supabase:', error);
+        // Fallback to localStorage
+        processRequestToLocalStorage(urlParams, now);
       }
+    }
+
+    // Process request to localStorage
+    function processRequestToLocalStorage(urlParams, now) {
+      requestData.totalRequests++;
+      
+      for (const [key, value] of urlParams.entries()) {
+        if (key === 'format') continue; // Skip format parameter
+        
+        if (!requestData.parameters[key]) {
+          requestData.parameters[key] = {
+            values: {},
+            totalCount: 0
+          };
+        }
+        
+        if (!requestData.parameters[key].values[value]) {
+          requestData.parameters[key].values[value] = {
+            count: 0,
+            firstSeen: now,
+            lastSeen: now
+          };
+        } else {
+          requestData.parameters[key].values[value].lastSeen = now;
+        }
+        
+        requestData.parameters[key].values[value].count++;
+        requestData.parameters[key].totalCount++;
+      }
+      
+      saveData();
     }
 
     // Render all data
@@ -533,14 +763,34 @@
     }
 
     // Reset data
-    function resetData() {
+    async function resetData() {
       if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-        requestData = {
-          totalRequests: 0,
-          sessionStart: new Date().toISOString(),
-          parameters: {}
-        };
-        saveData();
+        if (supabase && supabaseConfig.enabled) {
+          try {
+            // Delete all request counts
+            await supabase.from('request_counts').delete().neq('parameter_name', '___NONE___');
+            
+            // Reset session
+            await supabase
+              .from('session')
+              .update({
+                total_requests: 0,
+                start_time: new Date().toISOString()
+              })
+              .eq('id', 1);
+            
+            await loadData();
+          } catch (error) {
+            console.error('Failed to reset Supabase data:', error);
+          }
+        } else {
+          requestData = {
+            totalRequests: 0,
+            sessionStart: new Date().toISOString(),
+            parameters: {}
+          };
+          saveData();
+        }
         renderData();
       }
     }
@@ -564,6 +814,55 @@
       document.getElementById('resetBtn').addEventListener('click', resetData);
       document.getElementById('exportBtn').addEventListener('click', exportData);
       document.getElementById('autoRefresh').addEventListener('change', handleRefreshChange);
+      document.getElementById('configBtn').addEventListener('click', openConfigModal);
+      document.getElementById('saveConfig').addEventListener('click', saveConfigModal);
+      document.getElementById('cancelConfig').addEventListener('click', closeConfigModal);
+      
+      // Close modal on background click
+      document.getElementById('configModal').addEventListener('click', (e) => {
+        if (e.target.id === 'configModal') closeConfigModal();
+      });
+    }
+
+    // Config modal functions
+    function loadConfigUI() {
+      document.getElementById('supabaseUrl').value = supabaseConfig.url || '';
+      document.getElementById('supabaseKey').value = supabaseConfig.key || '';
+      document.getElementById('useSupabase').checked = supabaseConfig.enabled || false;
+    }
+
+    function openConfigModal() {
+      loadConfigUI();
+      document.getElementById('configModal').style.display = 'flex';
+    }
+
+    function closeConfigModal() {
+      document.getElementById('configModal').style.display = 'none';
+    }
+
+    function saveConfigModal() {
+      supabaseConfig = {
+        url: document.getElementById('supabaseUrl').value.trim(),
+        key: document.getElementById('supabaseKey').value.trim(),
+        enabled: document.getElementById('useSupabase').checked
+      };
+      
+      localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify(supabaseConfig));
+      
+      // Reinitialize Supabase
+      if (realtimeChannel) {
+        realtimeChannel.unsubscribe();
+        realtimeChannel = null;
+      }
+      supabase = null;
+      initSupabase();
+      
+      closeConfigModal();
+      
+      // Reload data
+      loadData().then(() => renderData());
+      
+      alert('Configuration saved! Page will now use ' + (supabaseConfig.enabled ? 'Supabase' : 'localStorage'));
     }
 
     // Auto-refresh functionality
