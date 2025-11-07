@@ -7,10 +7,10 @@
    - URL: `https://ssetwtfacvbknkzghdib.supabase.co/rest/v1/rpc/track_request`
    - Method: POST
    - Headers: `apikey`, `Authorization: Bearer`, `Content-Type: application/json`
-   - Body: `{"p_session_id": "session_1", "p_user_agent": "JMeter", "p_parameters": {"user": "test", "action": "view"}}`
+   - Body: `{"p_session_id": "${SESSION_ID}", "p_user_agent": "JMeter", "p_parameters": {"your_field": "your_value"}}`
 3. **Run test** → View results at `loadtest.html`
 
-**That's it!** One SQL setup, one HTTP request per iteration.
+**That's it!** One SQL setup, one HTTP request per iteration. The `p_parameters` object can contain any fields you want to track.
 
 ---
 
@@ -58,19 +58,25 @@ Content-Type: application/json
   "p_session_id": "${SESSION_ID}",
   "p_user_agent": "JMeter-Thread-${__threadNum}",
   "p_parameters": {
-    "user": "${USER_ID}",
-    "action": "view",
-    "thread": "${__threadNum}"
+    "username": "${USERNAME}",
+    "password": "${PASSWORD}"
   }
 }
 ```
 
 **That's it!** This single request:
 - ✅ Increments the session count (updates Total Requests)
-- ✅ Tracks all parameters (user, action, thread, etc.)
+- ✅ Tracks all parameters you define in `p_parameters`
 - ✅ Handles both INSERT and UPDATE automatically
 
-You can add as many parameters as you want in the `p_parameters` object.
+**Note:** The `p_parameters` object is completely flexible - add any key-value pairs you want to track. You can even omit it entirely if you only want to track sessions:
+
+```json
+{
+  "p_session_id": "${SESSION_ID}",
+  "p_user_agent": "JMeter"
+}
+```
 
 ### Step 4: Complete JMeter Test Plan Structure
 
@@ -98,18 +104,23 @@ Thread Group
           "p_session_id": "${SESSION_ID}",
           "p_user_agent": "JMeter-Thread-${__threadNum}",
           "p_parameters": {
-            "user": "${USER_ID}",
-            "action": "view",
-            "thread": "${__threadNum}"
+            "username": "${USERNAME}",
+            "password": "${PASSWORD}"
           }
         }
 ```
 
 **That's it!** Each iteration will:
 - ✅ Increment the session count (Total Requests)
-- ✅ Track all parameters in `p_parameters`
+- ✅ Track all parameters in `p_parameters` (completely customizable)
 - ✅ Update first_seen/last_seen timestamps
 - ✅ Handle both new and existing records automatically
+
+**Note:** `p_parameters` can contain ANY fields you want to track. Common examples:
+- Login credentials: `username`, `password`
+- Form data: `firstName`, `lastName`, `email`
+- Test data: `orderId`, `productId`, `quantity`
+- Metadata: `testRun`, `environment`, `iteration`
 
 ## Variables to Use in JMeter
 
@@ -118,8 +129,15 @@ Create these in a "User Defined Variables" config element:
 ```
 SUPABASE_URL: ssetwtfacvbknkzghdib.supabase.co (without https://)
 SUPABASE_KEY: YOUR_ANON_KEY_HERE
-USER_ID: user_${__Random(1,1000,)}
 SESSION_ID: thread_${__threadNum}
+```
+
+**Add your own custom variables** for whatever you want to track in `p_parameters`:
+```
+USERNAME: ${__CSVRead(users.csv,0)}
+PASSWORD: ${__CSVRead(users.csv,1)}
+ORDER_ID: order_${__UUID}
+PRODUCT_ID: ${__Random(1,100,)}
 ```
 
 **Important Notes:**
@@ -130,23 +148,59 @@ SESSION_ID: thread_${__threadNum}
 
 ### Adding Custom Parameters
 
-You can track any parameters you want in the `p_parameters` object:
+The `p_parameters` object is **completely flexible** - you can track any data you want:
 
+**Example 1: Login Test**
 ```json
 {
   "p_session_id": "${SESSION_ID}",
   "p_user_agent": "JMeter",
   "p_parameters": {
-    "user": "${USER_ID}",
-    "action": "${ACTION}",
-    "page": "${PAGE_NAME}",
-    "iteration": "${__iterationNum}",
-    "custom_field": "any_value"
+    "username": "${USERNAME}",
+    "password": "${PASSWORD}",
+    "loginType": "standard"
   }
 }
 ```
 
-All these parameters will appear in the Request Parameters table on the dashboard.
+**Example 2: E-commerce Test**
+```json
+{
+  "p_session_id": "${SESSION_ID}",
+  "p_user_agent": "JMeter",
+  "p_parameters": {
+    "productId": "${PRODUCT_ID}",
+    "quantity": "${QUANTITY}",
+    "paymentMethod": "credit_card"
+  }
+}
+```
+
+**Example 3: API Test**
+```json
+{
+  "p_session_id": "${SESSION_ID}",
+  "p_user_agent": "JMeter",
+  "p_parameters": {
+    "endpoint": "/api/users",
+    "method": "POST",
+    "statusCode": "${STATUS_CODE}"
+  }
+}
+```
+
+**Example 4: Session-only (no parameters)**
+```json
+{
+  "p_session_id": "${SESSION_ID}",
+  "p_user_agent": "JMeter"
+}
+```
+
+All parameters will appear in the Request Parameters table on the dashboard, showing you:
+- Which values were used most frequently
+- First and last time each value was seen
+- How many times each value appeared
 
 ## Verification
 
@@ -215,9 +269,17 @@ If successful, you'll see an empty response (HTTP 204 or 200). Then check `loadt
   "p_session_id": "thread_1",
   "p_user_agent": "JMeter",
   "p_parameters": {
-    "user": "user_123",
-    "action": "view"
+    "username": "john.doe@example.com",
+    "environment": "staging"
   }
+}
+```
+
+Or with no parameters (just tracking sessions):
+```json
+{
+  "p_session_id": "thread_1",
+  "p_user_agent": "JMeter"
 }
 ```
 
@@ -243,13 +305,20 @@ If successful, you'll see an empty response (HTTP 204 or 200). Then check `loadt
   "p_session_id": "${SESSION_ID}",
   "p_user_agent": "JMeter-Thread-${__threadNum}",
   "p_parameters": {
-    "user": "${USER_ID}",
-    "action": "view",
-    "thread": "${__threadNum}",
-    "iteration": "${__iterationNum}"
+    "username": "${USERNAME}",
+    "password": "${PASSWORD}"
   }
 }
 ```
+
+**Customize `p_parameters` with ANY fields you want to track!**
+
+Examples:
+- `"username": "${USERNAME}"` - Track which usernames are being tested
+- `"orderId": "${ORDER_ID}"` - Track order IDs in e-commerce tests  
+- `"endpoint": "/api/login"` - Track which API endpoints are hit
+- `"iteration": "${__iterationNum}"` - Track iteration numbers
+- Or leave it empty: `"p_parameters": {}` to only track sessions
 
 ### What Gets Tracked
 
