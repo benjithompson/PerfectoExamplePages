@@ -305,12 +305,12 @@
     }
 
     // Initialize
-    function init() {
+    async function init() {
       initSupabase();
       loadConfigUI();
-      loadData();
+      await loadData();
       loadRefreshInterval();
-      processCurrentRequest();
+      await processCurrentRequest();
       renderData();
       setupEventListeners();
       setupAutoRefresh();
