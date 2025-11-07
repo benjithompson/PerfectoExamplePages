@@ -102,6 +102,7 @@
       }
     })();
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -253,6 +254,9 @@
       <div class="controls">
         <button class="btn btn-danger" id="resetBtn">🔄 Reset Data</button>
         <button class="btn" id="exportBtn">📥 Export JSON</button>
+        <button class="btn" id="downloadDbBtn">💾 Download Database</button>
+        <label class="btn" for="uploadDbInput" style="cursor:pointer;">📤 Upload Database</label>
+        <input type="file" id="uploadDbInput" accept=".db,.sqlite,.sqlite3" style="display:none;">
       </div>
     </div>
 
@@ -300,21 +304,113 @@
 
   <script src="../theme.js"></script>
   <script>
-    // Data Store (persisted in localStorage)
+    // SQLite Database Manager
     const STORAGE_KEY = 'loadtest-data';
     const REFRESH_INTERVAL_KEY = 'loadtest-refresh-interval';
+    const DB_NAME = 'loadtest.db';
     
+    let db = null;
+    let SQL = null;
     let requestData = {
       totalRequests: 0,
       sessionStart: null,
       parameters: {}
-      // Structure: { paramName: { values: { value1: { count: N, firstSeen: timestamp, lastSeen: timestamp } }, totalCount: N } }
     };
-
     let refreshIntervalId = null;
 
+    // Initialize SQL.js and database
+    async function initDatabase() {
+      try {
+        SQL = await initSqlJs({
+          locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+        });
+        
+        // Try to load existing database from localStorage
+        const savedDb = localStorage.getItem(DB_NAME);
+        if (savedDb) {
+          const buffer = Uint8Array.from(atob(savedDb), c => c.charCodeAt(0));
+          db = new SQL.Database(buffer);
+        } else {
+          db = new SQL.Database();
+          createTables();
+        }
+        
+        // Ensure tables exist
+        ensureTables();
+        
+      } catch (error) {
+        console.error('Failed to initialize database:', error);
+        // Fallback to creating new database
+        db = new SQL.Database();
+        createTables();
+      }
+    }
+
+    // Create database tables
+    function createTables() {
+      db.run(`
+        CREATE TABLE IF NOT EXISTS session (
+          id INTEGER PRIMARY KEY,
+          start_time TEXT NOT NULL,
+          total_requests INTEGER DEFAULT 0
+        )
+      `);
+      
+      db.run(`
+        CREATE TABLE IF NOT EXISTS requests (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          timestamp TEXT NOT NULL,
+          parameter_name TEXT NOT NULL,
+          parameter_value TEXT NOT NULL,
+          UNIQUE(parameter_name, parameter_value)
+        )
+      `);
+      
+      db.run(`
+        CREATE TABLE IF NOT EXISTS request_counts (
+          parameter_name TEXT NOT NULL,
+          parameter_value TEXT NOT NULL,
+          count INTEGER DEFAULT 0,
+          first_seen TEXT NOT NULL,
+          last_seen TEXT NOT NULL,
+          PRIMARY KEY(parameter_name, parameter_value)
+        )
+      `);
+      
+      // Initialize session if doesn't exist
+      const sessionExists = db.exec("SELECT COUNT(*) as count FROM session WHERE id = 1");
+      if (!sessionExists.length || sessionExists[0].values[0][0] === 0) {
+        db.run("INSERT INTO session (id, start_time, total_requests) VALUES (1, ?, 0)", 
+               [new Date().toISOString()]);
+      }
+      
+      saveDatabase();
+    }
+
+    // Ensure tables exist (for loaded databases)
+    function ensureTables() {
+      const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table'");
+      const tableNames = tables.length ? tables[0].values.flat() : [];
+      
+      if (!tableNames.includes('session') || !tableNames.includes('request_counts')) {
+        createTables();
+      }
+    }
+
+    // Save database to localStorage
+    function saveDatabase() {
+      try {
+        const data = db.export();
+        const base64 = btoa(String.fromCharCode.apply(null, data));
+        localStorage.setItem(DB_NAME, base64);
+      } catch (error) {
+        console.error('Failed to save database:', error);
+      }
+    }
+
     // Initialize
-    function init() {
+    async function init() {
+      await initDatabase();
       loadData();
       loadRefreshInterval();
       processCurrentRequest();
@@ -323,28 +419,51 @@
       setupAutoRefresh();
     }
 
-    // Load persisted data
+    // Load data from database
     function loadData() {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        try {
-          requestData = JSON.parse(stored);
-        } catch (e) {
-          console.error('Failed to load stored data:', e);
+      try {
+        // Load session info
+        const sessionResult = db.exec("SELECT start_time, total_requests FROM session WHERE id = 1");
+        if (sessionResult.length && sessionResult[0].values.length) {
+          requestData.sessionStart = sessionResult[0].values[0][0];
+          requestData.totalRequests = sessionResult[0].values[0][1];
         }
-      }
-      if (!requestData.sessionStart) {
-        requestData.sessionStart = new Date().toISOString();
+        
+        // Load request counts
+        const countsResult = db.exec(`
+          SELECT parameter_name, parameter_value, count, first_seen, last_seen 
+          FROM request_counts
+          ORDER BY parameter_name, count DESC
+        `);
+        
+        requestData.parameters = {};
+        if (countsResult.length && countsResult[0].values.length) {
+          countsResult[0].values.forEach(row => {
+            const [paramName, paramValue, count, firstSeen, lastSeen] = row;
+            
+            if (!requestData.parameters[paramName]) {
+              requestData.parameters[paramName] = {
+                values: {},
+                totalCount: 0
+              };
+            }
+            
+            requestData.parameters[paramName].values[paramValue] = {
+              count: count,
+              firstSeen: firstSeen,
+              lastSeen: lastSeen
+            };
+            requestData.parameters[paramName].totalCount += count;
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load data from database:', error);
       }
     }
 
-    // Save data to localStorage
+    // Save data (deprecated - using database now)
     function saveData() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(requestData));
-      } catch (e) {
-        console.error('Failed to save data:', e);
-      }
+      saveDatabase();
     }
 
     // Process current page request
@@ -352,32 +471,37 @@
       const urlParams = new URLSearchParams(window.location.search);
       
       if (urlParams.toString()) {
-        requestData.totalRequests++;
         const now = new Date().toISOString();
         
+        // Update total requests
+        db.run("UPDATE session SET total_requests = total_requests + 1 WHERE id = 1");
+        
         for (const [key, value] of urlParams.entries()) {
-          if (!requestData.parameters[key]) {
-            requestData.parameters[key] = {
-              values: {},
-              totalCount: 0
-            };
-          }
+          if (key === 'format') continue; // Skip format parameter
           
-          if (!requestData.parameters[key].values[value]) {
-            requestData.parameters[key].values[value] = {
-              count: 0,
-              firstSeen: now,
-              lastSeen: now
-            };
+          // Check if this parameter-value combination exists
+          const existing = db.exec(
+            "SELECT count, first_seen FROM request_counts WHERE parameter_name = ? AND parameter_value = ?",
+            [key, value]
+          );
+          
+          if (existing.length && existing[0].values.length) {
+            // Update existing record
+            db.run(
+              "UPDATE request_counts SET count = count + 1, last_seen = ? WHERE parameter_name = ? AND parameter_value = ?",
+              [now, key, value]
+            );
           } else {
-            requestData.parameters[key].values[value].lastSeen = now;
+            // Insert new record
+            db.run(
+              "INSERT INTO request_counts (parameter_name, parameter_value, count, first_seen, last_seen) VALUES (?, ?, 1, ?, ?)",
+              [key, value, now, now]
+            );
           }
-          
-          requestData.parameters[key].values[value].count++;
-          requestData.parameters[key].totalCount++;
         }
         
-        saveData();
+        saveDatabase();
+        loadData(); // Reload data to update in-memory structure
       }
     }
 
@@ -524,12 +648,10 @@
     // Reset data
     function resetData() {
       if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-        requestData = {
-          totalRequests: 0,
-          sessionStart: new Date().toISOString(),
-          parameters: {}
-        };
-        saveData();
+        db.run("DELETE FROM request_counts");
+        db.run("UPDATE session SET total_requests = 0, start_time = ? WHERE id = 1", [new Date().toISOString()]);
+        saveDatabase();
+        loadData();
         renderData();
       }
     }
@@ -548,10 +670,55 @@
       URL.revokeObjectURL(url);
     }
 
+    // Download database file
+    function downloadDatabase() {
+      try {
+        const data = db.export();
+        const blob = new Blob([data], { type: 'application/x-sqlite3' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `loadtest-${Date.now()}.db`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Failed to download database:', error);
+        alert('Failed to download database');
+      }
+    }
+
+    // Upload database file
+    function uploadDatabase(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const buffer = new Uint8Array(e.target.result);
+          db = new SQL.Database(buffer);
+          ensureTables();
+          saveDatabase();
+          loadData();
+          renderData();
+          alert('Database uploaded successfully!');
+        } catch (error) {
+          console.error('Failed to load database:', error);
+          alert('Failed to load database file. Please ensure it is a valid SQLite database.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+      event.target.value = ''; // Reset input
+    }
+
     // Event listeners
     function setupEventListeners() {
       document.getElementById('resetBtn').addEventListener('click', resetData);
       document.getElementById('exportBtn').addEventListener('click', exportData);
+      document.getElementById('downloadDbBtn').addEventListener('click', downloadDatabase);
+      document.getElementById('uploadDbInput').addEventListener('change', uploadDatabase);
       document.getElementById('autoRefresh').addEventListener('change', handleRefreshChange);
     }
 
