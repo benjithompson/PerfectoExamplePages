@@ -30,17 +30,6 @@
 3. Copy and paste this SQL:
 
 ```sql
--- Create session table
-CREATE TABLE session (
-  id INTEGER PRIMARY KEY,
-  start_time TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  total_requests INTEGER DEFAULT 0
-);
-
--- Insert initial session
-INSERT INTO session (id, start_time, total_requests) 
-VALUES (1, NOW(), 0);
-
 -- Create request_counts table
 CREATE TABLE request_counts (
   parameter_name TEXT NOT NULL,
@@ -51,22 +40,10 @@ CREATE TABLE request_counts (
   PRIMARY KEY (parameter_name, parameter_value)
 );
 
--- Create function to increment total requests
-CREATE OR REPLACE FUNCTION increment_total_requests()
-RETURNS void AS $$
-BEGIN
-  UPDATE session SET total_requests = total_requests + 1 WHERE id = 1;
-END;
-$$ LANGUAGE plpgsql;
-
 -- Enable Row Level Security (RLS)
-ALTER TABLE session ENABLE ROW LEVEL SECURITY;
 ALTER TABLE request_counts ENABLE ROW LEVEL SECURITY;
 
--- Create policies to allow all operations (for public access)
-CREATE POLICY "Allow all access to session" ON session
-  FOR ALL USING (true) WITH CHECK (true);
-
+-- Create policy to allow all operations (for public access)
 CREATE POLICY "Allow all access to request_counts" ON request_counts
   FOR ALL USING (true) WITH CHECK (true);
 ```
