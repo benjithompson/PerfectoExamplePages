@@ -130,11 +130,12 @@
             <th>Parameter</th>
             <th>Value</th>
             <th>Count</th>
+            <th>First Seen</th>
           </tr>
         </thead>
         <tbody id="requestTableBody">
           <tr>
-            <td colspan="3" class="table-empty">No request data yet</td>
+            <td colspan="4" class="table-empty">No request data yet</td>
           </tr>
         </tbody>
       </table>
@@ -199,7 +200,7 @@
       totalRequests: 0,
       sessionStart: null,
       parameters: {}
-      // Structure: { paramName: { values: { value1: count, value2: count }, totalCount: N } }
+      // Structure: { paramName: { values: { value1: { count: N, firstSeen: timestamp } }, totalCount: N } }
     };
 
     // Initialize
@@ -240,6 +241,7 @@
       
       if (urlParams.toString()) {
         requestData.totalRequests++;
+        const now = new Date().toISOString();
         
         for (const [key, value] of urlParams.entries()) {
           if (!requestData.parameters[key]) {
@@ -250,10 +252,13 @@
           }
           
           if (!requestData.parameters[key].values[value]) {
-            requestData.parameters[key].values[value] = 0;
+            requestData.parameters[key].values[value] = {
+              count: 0,
+              firstSeen: now
+            };
           }
           
-          requestData.parameters[key].values[value]++;
+          requestData.parameters[key].values[value].count++;
           requestData.parameters[key].totalCount++;
         }
         
@@ -274,7 +279,7 @@
       const paramKeys = Object.keys(requestData.parameters);
       
       if (paramKeys.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="table-empty">No request data yet</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No request data yet</td></tr>';
         return;
       }
       
@@ -286,14 +291,25 @@
       paramKeys.forEach(paramName => {
         const param = requestData.parameters[paramName];
         const values = param.values;
-        const valueKeys = Object.keys(values).sort((a, b) => values[b] - values[a]); // Sort by count descending
+        
+        // Handle both old format (number) and new format (object with count/firstSeen)
+        const valueKeys = Object.keys(values).sort((a, b) => {
+          const countA = typeof values[a] === 'number' ? values[a] : values[a].count;
+          const countB = typeof values[b] === 'number' ? values[b] : values[b].count;
+          return countB - countA;
+        });
         
         valueKeys.forEach(value => {
+          const valueData = values[value];
+          const count = typeof valueData === 'number' ? valueData : valueData.count;
+          const firstSeen = typeof valueData === 'number' ? '--' : new Date(valueData.firstSeen).toLocaleString();
+          
           rows.push(`
             <tr>
               <td class="param-col">${escapeHtml(paramName)}</td>
               <td class="value-col">${escapeHtml(value)}</td>
-              <td class="count-col">${values[value]}</td>
+              <td class="count-col">${count}</td>
+              <td class="param-col">${firstSeen}</td>
             </tr>
           `);
         });
@@ -346,7 +362,13 @@
       container.innerHTML = paramKeys.map(paramName => {
         const param = requestData.parameters[paramName];
         const values = param.values;
-        const valueKeys = Object.keys(values).sort((a, b) => values[b] - values[a]); // Sort by count descending
+        
+        // Handle both old format (number) and new format (object with count/firstSeen)
+        const valueKeys = Object.keys(values).sort((a, b) => {
+          const countA = typeof values[a] === 'number' ? values[a] : values[a].count;
+          const countB = typeof values[b] === 'number' ? values[b] : values[b].count;
+          return countB - countA;
+        });
         
         return `
           <div class="param-group">
@@ -358,14 +380,17 @@
               <div class="param-count">${param.totalCount} request${param.totalCount !== 1 ? 's' : ''}</div>
             </div>
             <div class="value-list">
-              ${valueKeys.map(value => `
+              ${valueKeys.map(value => {
+                const valueData = values[value];
+                const count = typeof valueData === 'number' ? valueData : valueData.count;
+                return `
                 <div class="value-item">
                   <div class="value-text">${escapeHtml(value)}</div>
                   <div class="value-count">
-                    <div class="count-badge">${values[value]}</div>
+                    <div class="count-badge">${count}</div>
                   </div>
                 </div>
-              `).join('')}
+              `;}).join('')}
             </div>
           </div>
         `;
