@@ -1,5 +1,19 @@
 # JMeter Setup for Loadtest Data
 
+## Quick Start (TL;DR)
+
+1. **Run SQL**: Copy `supabase-jmeter-functions.sql` into Supabase SQL Editor and run it
+2. **Add HTTP Request in JMeter**:
+   - URL: `https://ssetwtfacvbknkzghdib.supabase.co/rest/v1/rpc/track_request`
+   - Method: POST
+   - Headers: `apikey`, `Authorization: Bearer`, `Content-Type: application/json`
+   - Body: `{"p_session_id": "session_1", "p_user_agent": "JMeter", "p_parameters": {"user": "test", "action": "view"}}`
+3. **Run test** → View results at `loadtest.html`
+
+**That's it!** One SQL setup, one HTTP request per iteration.
+
+---
+
 ## Important: JavaScript Limitation
 
 ⚠️ **JMeter does not execute JavaScript** by default. When JMeter makes an HTTP request to the `loadtest.html` page, it only receives the HTML source code - it does **not** run the JavaScript that inserts data into Supabase.
@@ -8,22 +22,27 @@ Therefore, for JMeter integration, you must use **direct Supabase REST API calls
 
 ## Direct Supabase API Integration
 
-### Step 1: Get Your Credentials
+### Step 1: Create the PostgreSQL Function
+
+In your Supabase SQL Editor, run the SQL from `supabase-jmeter-functions.sql`. This creates a function called `track_request` that handles everything in one call:
+- Increments session count (for Total Requests)
+- Tracks all parameters and their values
+- Handles both new and existing records
+
+### Step 2: Get Your Credentials
 
 From your `supabase-config.js` file:
 - **Supabase URL**: `https://ssetwtfacvbknkzghdib.supabase.co`
 - **Anon Key**: Your public anon key (safe to use in JMeter)
 
-### Step 2: JMeter HTTP Request Setup for Request Counts
-
-#### A. Track Request Parameters
+### Step 3: Single JMeter HTTP Request (Recommended)
 
 **HTTP Request Configuration:**
 ```
-Name: Track Request Parameter
+Name: Track Request
 Method: POST
 Server: ssetwtfacvbknkzghdib.supabase.co
-Path: /rest/v1/request_counts
+Path: /rest/v1/rpc/track_request
 ```
 
 **Headers (Add via HTTP Header Manager):**
@@ -31,191 +50,213 @@ Path: /rest/v1/request_counts
 apikey: YOUR_ANON_KEY
 Authorization: Bearer YOUR_ANON_KEY
 Content-Type: application/json
-Prefer: resolution=merge-duplicates
 ```
 
 **Body Data (JSON):**
 ```json
-{
-  "parameter_name": "user",
-  "parameter_value": "${USER_ID}",
-  "count": 1,
-  "first_seen": "${__time(yyyy-MM-dd'T'HH:mm:ss.SSS'Z',)}",
-  "last_seen": "${__time(yyyy-MM-dd'T'HH:mm:ss.SSS'Z',)}"
-}
-```
-
-**Note:** The `Prefer: resolution=merge-duplicates` header tells Supabase to automatically handle increments on conflict (using the composite primary key).
-
-#### B. Track Session
-
-**HTTP Request Configuration:**
-```
-Name: Track Session
-Method: POST
-Server: ssetwtfacvbknkzghdib.supabase.co
-Path: /rest/v1/sessions
-```
-
-**Headers:**
-```
-apikey: YOUR_ANON_KEY
-Authorization: Bearer YOUR_ANON_KEY
-Content-Type: application/json
-Prefer: resolution=merge-duplicates
-```
-
-**Body Data (JSON):**
-```json
-{
-  "session_id": "${SESSION_ID}",
-  "count": 1,
-  "first_seen": "${__time(yyyy-MM-dd'T'HH:mm:ss.SSS'Z',)}",
-  "last_seen": "${__time(yyyy-MM-dd'T'HH:mm:ss.SSS'Z',)}",
-  "user_agent": "Apache-HttpClient/JMeter"
-}
-```
-
-### Step 3: Better Approach - Use Upsert with Increment
-
-Unfortunately, Supabase's `merge-duplicates` doesn't automatically increment counts. We need a different approach using **PostgreSQL functions** or **client-side logic**.
-
-#### Option A: Create a PostgreSQL Function (Recommended)
-
-In your Supabase SQL Editor, create this function:
-
-```sql
--- Function to increment request count
-CREATE OR REPLACE FUNCTION increment_request_count(
-  p_parameter_name TEXT,
-  p_parameter_value TEXT
-)
-RETURNS void AS $$
-BEGIN
-  INSERT INTO request_counts (parameter_name, parameter_value, count, first_seen, last_seen)
-  VALUES (p_parameter_name, p_parameter_value, 1, NOW(), NOW())
-  ON CONFLICT (parameter_name, parameter_value)
-  DO UPDATE SET
-    count = request_counts.count + 1,
-    last_seen = NOW();
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Function to increment session count
-CREATE OR REPLACE FUNCTION increment_session_count(
-  p_session_id TEXT,
-  p_user_agent TEXT
-)
-RETURNS void AS $$
-BEGIN
-  INSERT INTO sessions (session_id, count, first_seen, last_seen, user_agent)
-  VALUES (p_session_id, 1, NOW(), NOW(), p_user_agent)
-  ON CONFLICT (session_id)
-  DO UPDATE SET
-    count = sessions.count + 1,
-    last_seen = NOW();
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-```
-
-Then in JMeter, call the function via RPC:
-
-**For Request Counts:**
-```
-Method: POST
-Server: ssetwtfacvbknkzghdib.supabase.co
-Path: /rest/v1/rpc/increment_request_count
-
-Headers:
-apikey: YOUR_ANON_KEY
-Authorization: Bearer YOUR_ANON_KEY
-Content-Type: application/json
-
-Body:
-{
-  "p_parameter_name": "user",
-  "p_parameter_value": "${USER_ID}"
-}
-```
-
-**For Sessions:**
-```
-Method: POST
-Server: ssetwtfacvbknkzghdib.supabase.co
-Path: /rest/v1/rpc/increment_session_count
-
-Headers:
-apikey: YOUR_ANON_KEY
-Authorization: Bearer YOUR_ANON_KEY
-Content-Type: application/json
-
-Body:
 {
   "p_session_id": "${SESSION_ID}",
-  "p_user_agent": "Apache-HttpClient/JMeter"
+  "p_user_agent": "JMeter-Thread-${__threadNum}",
+  "p_parameters": {
+    "user": "${USER_ID}",
+    "action": "view",
+    "thread": "${__threadNum}"
+  }
 }
 ```
 
+**That's it!** This single request:
+- ✅ Increments the session count (updates Total Requests)
+- ✅ Tracks all parameters (user, action, thread, etc.)
+- ✅ Handles both INSERT and UPDATE automatically
+
+You can add as many parameters as you want in the `p_parameters` object.
+
 ### Step 4: Complete JMeter Test Plan Structure
+
+**Simple Structure - Just ONE HTTP Request:**
 
 ```
 Thread Group
 ├── User Defined Variables
 │   ├── SUPABASE_URL = ssetwtfacvbknkzghdib.supabase.co
 │   ├── SUPABASE_KEY = YOUR_ANON_KEY
-│   ├── SESSION_ID = session_jmeter_${__threadNum}_${__time(,)}
+│   ├── SESSION_ID = thread_${__threadNum}
+│   ├── USER_ID = user_${__Random(1,1000,)}
 │
-├── HTTP Header Manager
+├── HTTP Header Manager (applies to all requests below)
 │   ├── apikey: ${SUPABASE_KEY}
 │   ├── Authorization: Bearer ${SUPABASE_KEY}
 │   ├── Content-Type: application/json
 │
-├── HTTP Request - Increment Session Count
-│   ├── Method: POST
-│   ├── Path: /rest/v1/rpc/increment_session_count
-│   ├── Body: {"p_session_id": "${SESSION_ID}", "p_user_agent": "JMeter"}
-│
-├── HTTP Request - Track user parameter
-│   ├── Method: POST
-│   ├── Path: /rest/v1/rpc/increment_request_count
-│   ├── Body: {"p_parameter_name": "user", "p_parameter_value": "${USER_ID}"}
-│
-├── HTTP Request - Track session parameter
-│   ├── Method: POST
-│   ├── Path: /rest/v1/rpc/increment_request_count
-│   ├── Body: {"p_parameter_name": "session", "p_parameter_value": "${SESSION_ID}"}
-│
-└── HTTP Request - Track action parameter
+└── HTTP Request - Track Request (ALL-IN-ONE)
     ├── Method: POST
-    ├── Path: /rest/v1/rpc/increment_request_count
-    ├── Body: {"p_parameter_name": "action", "p_parameter_value": "view"}
+    ├── Server: ${SUPABASE_URL}
+    ├── Path: /rest/v1/rpc/track_request
+    ├── Body: 
+        {
+          "p_session_id": "${SESSION_ID}",
+          "p_user_agent": "JMeter-Thread-${__threadNum}",
+          "p_parameters": {
+            "user": "${USER_ID}",
+            "action": "view",
+            "thread": "${__threadNum}"
+          }
+        }
 ```
+
+**That's it!** Each iteration will:
+- ✅ Increment the session count (Total Requests)
+- ✅ Track all parameters in `p_parameters`
+- ✅ Update first_seen/last_seen timestamps
+- ✅ Handle both new and existing records automatically
 
 ## Variables to Use in JMeter
 
+Create these in a "User Defined Variables" config element:
+
 ```
-USER_ID: ${__Random(1,1000,)}
-SESSION_ID: thread_${__threadNum}_${__time(,)}
+SUPABASE_URL: ssetwtfacvbknkzghdib.supabase.co (without https://)
+SUPABASE_KEY: YOUR_ANON_KEY_HERE
+USER_ID: user_${__Random(1,1000,)}
+SESSION_ID: thread_${__threadNum}
 ```
+
+**Important Notes:**
+- **SESSION_ID**: Using `thread_${__threadNum}` means each thread has its own session
+  - All iterations within a thread count as requests from the same session
+  - Total Requests = number of threads × number of iterations per thread
+- If you want each iteration to be a NEW session, use: `thread_${__threadNum}_${__RandomString(8,abcdefghijklmnopqrstuvwxyz0123456789,)}`
+
+### Adding Custom Parameters
+
+You can track any parameters you want in the `p_parameters` object:
+
+```json
+{
+  "p_session_id": "${SESSION_ID}",
+  "p_user_agent": "JMeter",
+  "p_parameters": {
+    "user": "${USER_ID}",
+    "action": "${ACTION}",
+    "page": "${PAGE_NAME}",
+    "iteration": "${__iterationNum}",
+    "custom_field": "any_value"
+  }
+}
+```
+
+All these parameters will appear in the Request Parameters table on the dashboard.
 
 ## Verification
 
-After running your JMeter test:
-1. Open `loadtest.html` in a browser
-2. You should see the data populated from your JMeter test
-3. Check the "Session Data" table to see your JMeter sessions
+### Test with curl (Optional)
+
+Before setting up JMeter, you can test the function with curl:
+
+```bash
+curl -X POST 'https://ssetwtfacvbknkzghdib.supabase.co/rest/v1/rpc/track_request' \
+  -H "apikey: YOUR_ANON_KEY" \
+  -H "Authorization: Bearer YOUR_ANON_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "p_session_id": "test_session_1",
+    "p_user_agent": "curl_test",
+    "p_parameters": {
+      "user": "test_user",
+      "action": "test"
+    }
+  }'
+```
+
+If successful, you'll see an empty response (HTTP 204 or 200). Then check `loadtest.html` to see the data!
+
+### After Running JMeter Test
+
+1. Open `loadtest.html` in a browser (or visit your GitHub Pages URL)
+2. You should see:
+   - **Total Requests**: Number of iterations you ran
+   - **Unique Parameters**: All the parameter names you tracked
+   - **Request Parameters table**: Each parameter with its values and counts
+   - **Session Data table**: Your JMeter session(s) with request counts
 
 ## Troubleshooting
 
+**Total Requests showing 0:**
+- ⚠️ Make sure you ran the SQL from `supabase-jmeter-functions.sql` to create the `track_request` function
+- Verify you're calling `/rest/v1/rpc/track_request` (not the old individual functions)
+- Check that you're passing `p_session_id` in the request body
+
 **401 Unauthorized:**
-- Check your anon key is correct
-- Verify RLS policies allow public access
+- Check your anon key is correct in the headers
+- Verify RLS policies allow public access (run the SQL from SUPABASE_SETUP.md)
+- Make sure the function has GRANT EXECUTE permissions (included in supabase-jmeter-functions.sql)
 
 **Function does not exist:**
-- Make sure you created the PostgreSQL functions in Supabase SQL Editor
-- Check function names match exactly
+- Make sure you ran the SQL from `supabase-jmeter-functions.sql` in Supabase SQL Editor
+- Function name must be exactly: `track_request`
+- Check the verification query at the end of the SQL file
 
 **No data appearing:**
-- Verify the functions were created successfully
 - Check JMeter View Results Tree for error responses
 - Look at the response body for Supabase error messages
+- Verify you're using POST method (not GET)
+- Check that Content-Type header is `application/json`
+- Make sure the JSON body is valid (use a JSON validator)
+
+**Parameters not showing:**
+- Verify `p_parameters` is a valid JSON object in the request body
+- Each key-value pair in `p_parameters` becomes a tracked parameter
+- Check that the JSON is properly formatted with quotes around keys and string values
+
+**Example of a working request body:**
+```json
+{
+  "p_session_id": "thread_1",
+  "p_user_agent": "JMeter",
+  "p_parameters": {
+    "user": "user_123",
+    "action": "view"
+  }
+}
+```
+
+---
+
+## Quick Reference Card
+
+### JMeter HTTP Request Setup
+
+| Setting | Value |
+|---------|-------|
+| **Method** | POST |
+| **Server** | `ssetwtfacvbknkzghdib.supabase.co` |
+| **Path** | `/rest/v1/rpc/track_request` |
+| **Header: apikey** | `YOUR_ANON_KEY` |
+| **Header: Authorization** | `Bearer YOUR_ANON_KEY` |
+| **Header: Content-Type** | `application/json` |
+
+### Request Body Template
+
+```json
+{
+  "p_session_id": "${SESSION_ID}",
+  "p_user_agent": "JMeter-Thread-${__threadNum}",
+  "p_parameters": {
+    "user": "${USER_ID}",
+    "action": "view",
+    "thread": "${__threadNum}",
+    "iteration": "${__iterationNum}"
+  }
+}
+```
+
+### What Gets Tracked
+
+- **Session Count** → Shows as "Total Requests" on dashboard
+- **Each parameter** → Shows in "Request Parameters" table with individual counts
+- **First/Last Seen** → Automatically tracked with timestamps
+
+### Test Results
+
+View at: `http://localhost:8888/loadtest.html` or your GitHub Pages URL
