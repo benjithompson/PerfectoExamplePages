@@ -224,10 +224,6 @@
 
     // Initialize Supabase from config file
     function initSupabase() {
-      console.log('Initializing Supabase...');
-      console.log('window.SUPABASE_CONFIG:', window.SUPABASE_CONFIG);
-      console.log('window.supabase:', window.supabase);
-      
       // Check if config is loaded from supabase-config.js
       if (window.SUPABASE_CONFIG) {
         supabaseConfig = {
@@ -250,24 +246,17 @@
         }
       }
       
-      console.log('Final config:', supabaseConfig);
-      
       if (supabaseConfig.enabled && supabaseConfig.url && supabaseConfig.key) {
         try {
           supabase = window.supabase.createClient(supabaseConfig.url, supabaseConfig.key);
           setupRealtimeSubscription();
-          console.log('Supabase initialized successfully:', supabase);
+          console.log('Supabase initialized');
         } catch (e) {
           console.error('Failed to initialize Supabase:', e);
           supabase = null;
         }
-      } else {
-        console.warn('Supabase not enabled or missing config:', {
-          enabled: supabaseConfig.enabled,
-          hasUrl: !!supabaseConfig.url,
-          hasKey: !!supabaseConfig.key
-        });
       }
+    }
     }
 
     // Setup real-time subscription for auto-updates
@@ -278,8 +267,7 @@
         .channel('request_updates')
         .on('postgres_changes', 
           { event: '*', schema: 'public', table: 'request_counts' },
-          (payload) => {
-            console.log('Real-time update:', payload);
+          () => {
             loadData();
             renderData();
           }
@@ -309,7 +297,6 @@
 
     // Load from Supabase
     async function loadDataFromSupabase() {
-      console.log('Loading data from Supabase...');
       try {
         // Load request counts
         const { data: counts, error: countsError } = await supabase
@@ -317,8 +304,6 @@
           .select('*')
           .order('parameter_name')
           .order('count', { ascending: false });
-        
-        console.log('Request counts loaded:', counts, 'Error:', countsError);
         
         if (countsError) {
           console.error('Counts error:', countsError);
@@ -330,8 +315,6 @@
           .from('sessions')
           .select('*')
           .order('count', { ascending: false });
-        
-        console.log('Sessions loaded:', sessions, 'Error:', sessionsError);
         
         if (sessionsError) {
           console.error('Sessions error:', sessionsError);
@@ -353,9 +336,6 @@
               earliestSeen = first_seen;
             }
             
-            // Sum up total requests
-            requestData.totalRequests += count;
-            
             if (!requestData.parameters[parameter_name]) {
               requestData.parameters[parameter_name] = {
                 values: {},
@@ -376,7 +356,7 @@
           requestData.sessionStart = new Date().toISOString();
         }
         
-        // Load session data
+        // Load session data and calculate total requests
         if (sessions && sessions.length) {
           sessions.forEach(row => {
             requestData.sessions[row.session_id] = {
@@ -385,10 +365,10 @@
               lastSeen: row.last_seen,
               userAgent: row.user_agent
             };
+            // Total requests = sum of all session counts (each session tracks actual page visits)
+            requestData.totalRequests += row.count;
           });
         }
-        
-        console.log('Final requestData:', requestData);
       } catch (error) {
         console.error('Failed to load data from Supabase:', error);
       }
@@ -398,20 +378,11 @@
     async function processCurrentRequest() {
       const urlParams = new URLSearchParams(window.location.search);
       
-      console.log('Processing request:', {
-        hasParams: !!urlParams.toString(),
-        params: urlParams.toString(),
-        hasSupabase: !!supabase,
-        configEnabled: supabaseConfig.enabled,
-        config: supabaseConfig
-      });
-      
       if (supabase && supabaseConfig.enabled) {
         const now = new Date().toISOString();
         
         // Always track session, even without URL params
         if (!urlParams.toString()) {
-          console.log('No URL parameters - only tracking session');
           await trackSession(now);
         } else {
           // Process both session and parameters
@@ -426,15 +397,11 @@
         const sessionId = currentSessionId;
         const userAgent = navigator.userAgent;
         
-        console.log('Tracking session:', sessionId);
-        
         const { data: existingSession, error: sessionSelectError } = await supabase
           .from('sessions')
           .select('count, first_seen')
           .eq('session_id', sessionId)
           .maybeSingle();
-        
-        console.log('Existing session:', existingSession, 'Error:', sessionSelectError);
         
         if (sessionSelectError) {
           console.error('Session select error:', sessionSelectError);
@@ -442,24 +409,19 @@
         }
         
         if (existingSession) {
-          console.log('Updating existing session...');
-          const { data: updateData, error: updateError } = await supabase
+          const { error: updateError } = await supabase
             .from('sessions')
             .update({
               count: existingSession.count + 1,
               last_seen: now
             })
-            .eq('session_id', sessionId)
-            .select();
+            .eq('session_id', sessionId);
           
           if (updateError) {
             console.error('Session update error:', updateError);
-          } else {
-            console.log('Session updated successfully:', updateData);
           }
         } else {
-          console.log('Inserting new session...');
-          const { data: insertData, error: insertError } = await supabase
+          const { error: insertError } = await supabase
             .from('sessions')
             .insert({
               session_id: sessionId,
@@ -467,18 +429,14 @@
               first_seen: now,
               last_seen: now,
               user_agent: userAgent
-            })
-            .select();
+            });
           
           if (insertError) {
             console.error('Session insert error:', insertError);
-          } else {
-            console.log('Session inserted successfully:', insertData);
           }
         }
         
         await loadData();
-        console.log('Data reloaded after session tracking');
       } catch (error) {
         console.error('Failed to track session:', error);
       }
@@ -486,13 +444,10 @@
 
     // Process request to Supabase
     async function processRequestToSupabase(urlParams, now) {
-      console.log('Processing request to Supabase:', urlParams.toString());
       try {
         // Track session
         const sessionId = currentSessionId;
         const userAgent = navigator.userAgent;
-        
-        console.log('Session ID:', sessionId);
         
         // Update session count
         const { data: existingSession, error: sessionSelectError } = await supabase
@@ -501,31 +456,24 @@
           .eq('session_id', sessionId)
           .maybeSingle();
         
-        console.log('Existing session:', existingSession, 'Error:', sessionSelectError);
-        
         if (sessionSelectError) {
           console.error('Session select error:', sessionSelectError);
         }
         
         if (existingSession) {
-          console.log('Updating existing session...');
-          const { data: updateData, error: updateError } = await supabase
+          const { error: updateError } = await supabase
             .from('sessions')
             .update({
               count: existingSession.count + 1,
               last_seen: now
             })
-            .eq('session_id', sessionId)
-            .select();
+            .eq('session_id', sessionId);
           
           if (updateError) {
             console.error('Session update error:', updateError);
-          } else {
-            console.log('Session updated successfully:', updateData);
           }
         } else {
-          console.log('Inserting new session...');
-          const { data: insertData, error: insertError } = await supabase
+          const { error: insertError } = await supabase
             .from('sessions')
             .insert({
               session_id: sessionId,
@@ -533,20 +481,15 @@
               first_seen: now,
               last_seen: now,
               user_agent: userAgent
-            })
-            .select();
+            });
           
           if (insertError) {
             console.error('Session insert error:', insertError);
-          } else {
-            console.log('Session inserted successfully:', insertData);
           }
         }
         
         // Track parameters
         for (const [key, value] of urlParams.entries()) {
-          console.log(`Processing parameter: ${key}=${value}`);
-          
           // Check if this parameter-value combination exists
           const { data: existing, error: selectError } = await supabase
             .from('request_counts')
@@ -555,35 +498,28 @@
             .eq('parameter_value', value)
             .maybeSingle();
           
-          console.log(`Existing record for ${key}=${value}:`, existing, 'Error:', selectError);
-          
           if (selectError) {
             console.error('Select error:', selectError);
             continue;
           }
           
           if (existing) {
-            console.log(`Updating count for ${key}=${value} from ${existing.count} to ${existing.count + 1}`);
             // Update existing record - increment count and update last_seen
-            const { data: updateData, error: updateError } = await supabase
+            const { error: updateError } = await supabase
               .from('request_counts')
               .update({
                 count: existing.count + 1,
                 last_seen: now
               })
               .eq('parameter_name', key)
-              .eq('parameter_value', value)
-              .select();
+              .eq('parameter_value', value);
             
             if (updateError) {
               console.error('Update error:', updateError);
-            } else {
-              console.log(`Successfully updated ${key}=${value}:`, updateData);
             }
           } else {
-            console.log(`Inserting new record for ${key}=${value}`);
             // Insert new record
-            const { data: insertData, error: insertError } = await supabase
+            const { error: insertError } = await supabase
               .from('request_counts')
               .insert({
                 parameter_name: key,
@@ -591,20 +527,15 @@
                 count: 1,
                 first_seen: now,
                 last_seen: now
-              })
-              .select();
+              });
             
             if (insertError) {
               console.error('Insert error:', insertError);
-            } else {
-              console.log(`Successfully inserted ${key}=${value}:`, insertData);
             }
           }
         }
         
-        console.log('Reloading data after processing...');
         await loadData();
-        console.log('Data reloaded successfully');
       } catch (error) {
         console.error('Failed to process request to Supabase:', error);
       }
@@ -851,16 +782,14 @@
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
-      // DOM is already ready, but check if Supabase library is loaded
+      // DOM is already ready, check if Supabase library is loaded
       if (window.supabase) {
         init();
       } else {
         // Wait for Supabase library to load
-        console.log('Waiting for Supabase library to load...');
         const checkSupabase = setInterval(() => {
           if (window.supabase) {
             clearInterval(checkSupabase);
-            console.log('Supabase library loaded, initializing...');
             init();
           }
         }, 100);
@@ -870,8 +799,7 @@
           clearInterval(checkSupabase);
           if (!window.supabase) {
             console.error('Supabase library failed to load after 5 seconds');
-            // Still try to initialize (will work without Supabase)
-            init();
+            init(); // Still initialize (will work without Supabase)
           }
         }, 5000);
       }
