@@ -5,6 +5,103 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Loadtest Data | Performance Testing</title>
   <meta name="description" content="Track and analyze URL parameters and request data for load testing" />
+  <script>
+    // Check if request is from a non-browser client (JMeter, curl, etc.)
+    // If so, return JSON response instead of HTML
+    (function() {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const acceptHeader = 'text/html'; // Browsers typically send Accept: text/html
+      
+      // Check for common non-browser user agents or if explicitly requesting JSON
+      const isNonBrowser = userAgent.includes('jmeter') || 
+                          userAgent.includes('apache-httpclient') ||
+                          userAgent.includes('java/') ||
+                          userAgent.includes('python-requests') ||
+                          userAgent.includes('curl') ||
+                          userAgent.includes('wget') ||
+                          window.location.search.includes('format=json');
+      
+      if (isNonBrowser) {
+        // Stop HTML rendering
+        document.open();
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const STORAGE_KEY = 'loadtest-data';
+        
+        // Load existing data
+        let requestData = {
+          totalRequests: 0,
+          sessionStart: null,
+          parameters: {}
+        };
+        
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          try {
+            requestData = JSON.parse(stored);
+          } catch (e) {
+            console.error('Failed to load stored data:', e);
+          }
+        }
+        
+        if (!requestData.sessionStart) {
+          requestData.sessionStart = new Date().toISOString();
+        }
+        
+        // Process current request
+        if (urlParams.toString()) {
+          requestData.totalRequests++;
+          const now = new Date().toISOString();
+          
+          for (const [key, value] of urlParams.entries()) {
+            if (key === 'format') continue; // Skip format parameter
+            
+            if (!requestData.parameters[key]) {
+              requestData.parameters[key] = {
+                values: {},
+                totalCount: 0
+              };
+            }
+            
+            if (!requestData.parameters[key].values[value]) {
+              requestData.parameters[key].values[value] = {
+                count: 0,
+                firstSeen: now,
+                lastSeen: now
+              };
+            } else {
+              requestData.parameters[key].values[value].lastSeen = now;
+            }
+            
+            requestData.parameters[key].values[value].count++;
+            requestData.parameters[key].totalCount++;
+          }
+          
+          // Save data
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(requestData));
+          } catch (e) {
+            console.error('Failed to save data:', e);
+          }
+        }
+        
+        // Return JSON response
+        document.write(JSON.stringify({
+          success: true,
+          timestamp: new Date().toISOString(),
+          requestProcessed: urlParams.toString() !== '',
+          totalRequests: requestData.totalRequests,
+          sessionStart: requestData.sessionStart,
+          uniqueParameters: Object.keys(requestData.parameters).length,
+          parameters: requestData.parameters
+        }, null, 2));
+        
+        document.close();
+        throw new Error('JSON_RESPONSE_SENT'); // Stop further execution
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
