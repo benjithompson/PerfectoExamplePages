@@ -201,7 +201,6 @@
     // Initialize
     function init() {
       loadData();
-      updateClientInfo();
       processCurrentRequest();
       renderData();
       setupEventListeners();
@@ -229,16 +228,6 @@
       } catch (e) {
         console.error('Failed to save data:', e);
       }
-    }
-
-    // Update client information
-    function updateClientInfo() {
-      document.getElementById('clientOrigin').textContent = window.location.origin;
-      document.getElementById('clientUserAgent').textContent = navigator.userAgent;
-      document.getElementById('clientReferrer').textContent = document.referrer || 'Direct';
-      document.getElementById('clientLanguage').textContent = navigator.language;
-      document.getElementById('clientScreen').textContent = `${screen.width}x${screen.height}`;
-      document.getElementById('clientUrl').textContent = window.location.href;
     }
 
     // Process current page request
@@ -271,7 +260,42 @@
     // Render all data
     function renderData() {
       updateStats();
+      renderRequestTable();
       renderParameters();
+    }
+
+    // Render request table
+    function renderRequestTable() {
+      const tbody = document.getElementById('requestTableBody');
+      const paramKeys = Object.keys(requestData.parameters);
+      
+      if (paramKeys.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="table-empty">No request data yet</td></tr>';
+        return;
+      }
+      
+      // Sort parameters by name
+      paramKeys.sort();
+      
+      // Build table rows
+      const rows = [];
+      paramKeys.forEach(paramName => {
+        const param = requestData.parameters[paramName];
+        const values = param.values;
+        const valueKeys = Object.keys(values).sort((a, b) => values[b] - values[a]); // Sort by count descending
+        
+        valueKeys.forEach(value => {
+          rows.push(`
+            <tr>
+              <td class="param-col">${escapeHtml(paramName)}</td>
+              <td class="value-col">${escapeHtml(value)}</td>
+              <td class="count-col">${values[value]}</td>
+            </tr>
+          `);
+        });
+      });
+      
+      tbody.innerHTML = rows.join('');
     }
 
     // Update statistics
