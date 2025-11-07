@@ -12,7 +12,7 @@
 window.SUPABASE_CONFIG = {
   url: 'https://ssetwtfacvbknkzghdib.supabase.co', // e.g., https://xxxxx.supabase.co
   anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNzZXR3dGZhY3Zia25remdoZGliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1Mzg5MzQsImV4cCI6MjA3ODExNDkzNH0.HLyFH1mRst6u6DDAMcaNzRp6c829qf5wcWQEA9C9uXw', // Public anon key - SAFE to commit
-  enabled: false // Set to true once configured
+  enabled: true // Set to true once configured
 };
 
 // Setup Instructions:
