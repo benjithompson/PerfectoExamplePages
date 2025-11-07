@@ -131,11 +131,12 @@
             <th>Value</th>
             <th>Count</th>
             <th>First Seen</th>
+            <th>Last Seen</th>
           </tr>
         </thead>
         <tbody id="requestTableBody">
           <tr>
-            <td colspan="4" class="table-empty">No request data yet</td>
+            <td colspan="5" class="table-empty">No request data yet</td>
           </tr>
         </tbody>
       </table>
@@ -200,7 +201,7 @@
       totalRequests: 0,
       sessionStart: null,
       parameters: {}
-      // Structure: { paramName: { values: { value1: { count: N, firstSeen: timestamp } }, totalCount: N } }
+      // Structure: { paramName: { values: { value1: { count: N, firstSeen: timestamp, lastSeen: timestamp } }, totalCount: N } }
     };
 
     // Initialize
@@ -254,8 +255,11 @@
           if (!requestData.parameters[key].values[value]) {
             requestData.parameters[key].values[value] = {
               count: 0,
-              firstSeen: now
+              firstSeen: now,
+              lastSeen: now
             };
+          } else {
+            requestData.parameters[key].values[value].lastSeen = now;
           }
           
           requestData.parameters[key].values[value].count++;
@@ -279,7 +283,7 @@
       const paramKeys = Object.keys(requestData.parameters);
       
       if (paramKeys.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No request data yet</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No request data yet</td></tr>';
         return;
       }
       
@@ -292,7 +296,7 @@
         const param = requestData.parameters[paramName];
         const values = param.values;
         
-        // Handle both old format (number) and new format (object with count/firstSeen)
+        // Handle both old format (number) and new format (object with count/firstSeen/lastSeen)
         const valueKeys = Object.keys(values).sort((a, b) => {
           const countA = typeof values[a] === 'number' ? values[a] : values[a].count;
           const countB = typeof values[b] === 'number' ? values[b] : values[b].count;
@@ -303,6 +307,7 @@
           const valueData = values[value];
           const count = typeof valueData === 'number' ? valueData : valueData.count;
           const firstSeen = typeof valueData === 'number' ? '--' : new Date(valueData.firstSeen).toLocaleString();
+          const lastSeen = typeof valueData === 'number' ? '--' : new Date(valueData.lastSeen).toLocaleString();
           
           rows.push(`
             <tr>
@@ -310,6 +315,7 @@
               <td class="value-col">${escapeHtml(value)}</td>
               <td class="count-col">${count}</td>
               <td class="param-col">${firstSeen}</td>
+              <td class="param-col">${lastSeen}</td>
             </tr>
           `);
         });
