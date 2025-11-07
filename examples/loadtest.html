@@ -406,9 +406,81 @@
         config: supabaseConfig
       });
       
-      if (urlParams.toString() && supabase && supabaseConfig.enabled) {
+      if (supabase && supabaseConfig.enabled) {
         const now = new Date().toISOString();
-        await processRequestToSupabase(urlParams, now);
+        
+        // Always track session, even without URL params
+        if (!urlParams.toString()) {
+          console.log('No URL parameters - only tracking session');
+          await trackSession(now);
+        } else {
+          // Process both session and parameters
+          await processRequestToSupabase(urlParams, now);
+        }
+      }
+    }
+    
+    // Track session only (used when no URL params)
+    async function trackSession(now) {
+      try {
+        const sessionId = currentSessionId;
+        const userAgent = navigator.userAgent;
+        
+        console.log('Tracking session:', sessionId);
+        
+        const { data: existingSession, error: sessionSelectError } = await supabase
+          .from('sessions')
+          .select('count, first_seen')
+          .eq('session_id', sessionId)
+          .maybeSingle();
+        
+        console.log('Existing session:', existingSession, 'Error:', sessionSelectError);
+        
+        if (sessionSelectError) {
+          console.error('Session select error:', sessionSelectError);
+          return;
+        }
+        
+        if (existingSession) {
+          console.log('Updating existing session...');
+          const { data: updateData, error: updateError } = await supabase
+            .from('sessions')
+            .update({
+              count: existingSession.count + 1,
+              last_seen: now
+            })
+            .eq('session_id', sessionId)
+            .select();
+          
+          if (updateError) {
+            console.error('Session update error:', updateError);
+          } else {
+            console.log('Session updated successfully:', updateData);
+          }
+        } else {
+          console.log('Inserting new session...');
+          const { data: insertData, error: insertError } = await supabase
+            .from('sessions')
+            .insert({
+              session_id: sessionId,
+              count: 1,
+              first_seen: now,
+              last_seen: now,
+              user_agent: userAgent
+            })
+            .select();
+          
+          if (insertError) {
+            console.error('Session insert error:', insertError);
+          } else {
+            console.log('Session inserted successfully:', insertData);
+          }
+        }
+        
+        await loadData();
+        console.log('Data reloaded after session tracking');
+      } catch (error) {
+        console.error('Failed to track session:', error);
       }
     }
 
