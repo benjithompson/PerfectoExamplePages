@@ -36,9 +36,16 @@
     /* REQUEST TABLE */
     .request-table-section { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:1.5rem; box-shadow:var(--shadow-md); margin-bottom:1.5rem; }
     .request-table-section h2 { margin:0 0 1rem 0; font-size:1.3rem; font-weight:700; }
+    .table-wrapper { overflow-x:auto; max-height:600px; overflow-y:auto; border:1px solid var(--color-border); border-radius:var(--radius); }
+    .table-controls { display:flex; gap:1rem; margin-bottom:1rem; align-items:center; flex-wrap:wrap; }
+    .search-input { padding:.5rem .75rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-bg); color:var(--color-text); font-size:.9rem; flex:1; min-width:200px; }
     .request-table { width:100%; border-collapse:collapse; }
-    .request-table thead { background:var(--color-bg-alt); }
-    .request-table th { text-align:left; padding:.75rem 1rem; font-size:.75rem; text-transform:uppercase; letter-spacing:1px; color:var(--color-text-dim); font-weight:600; border-bottom:2px solid var(--color-border); }
+    .request-table thead { background:var(--color-bg-alt); position:sticky; top:0; z-index:10; }
+    .request-table th { text-align:left; padding:.75rem 1rem; font-size:.75rem; text-transform:uppercase; letter-spacing:1px; color:var(--color-text-dim); font-weight:600; border-bottom:2px solid var(--color-border); cursor:pointer; user-select:none; }
+    .request-table th:hover { background:var(--color-surface); }
+    .request-table th.sortable::after { content:'⇅'; margin-left:.5rem; opacity:.3; }
+    .request-table th.sort-asc::after { content:'↑'; opacity:1; }
+    .request-table th.sort-desc::after { content:'↓'; opacity:1; }
     .request-table td { padding:.75rem 1rem; border-bottom:1px solid var(--color-border); font-family:monospace; font-size:.9rem; }
     .request-table tbody tr:hover { background:var(--color-bg-alt); }
     .request-table tbody tr:last-child td { border-bottom:none; }
@@ -48,11 +55,13 @@
     .table-empty { text-align:center; padding:2rem; color:var(--color-text-dim); font-style:italic; }
 
     /* CONTROLS */
-    .controls { display:flex; gap:1rem; align-items:center; padding-bottom:1.5rem; border-bottom:2px solid var(--color-border); }
+    .controls { display:flex; gap:1rem; align-items:center; margin-top:1rem; flex-wrap:wrap; }
     .btn { font:inherit; cursor:pointer; border:1px solid var(--color-border); background:var(--color-surface-alt); color:var(--color-text); padding:.75rem 1.25rem; border-radius:var(--radius-sm); font-size:.85rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; transition:var(--transition); display:inline-flex; align-items:center; gap:.5rem; }
     .btn:hover { background:var(--color-accent); color:#fff; border-color:var(--color-accent); }
     .btn-danger { background:#e74c3c; color:#fff; border-color:#e74c3c; }
     .btn-danger:hover { background:#c0392b; border-color:#c0392b; }
+    .btn-success { background:#27ae60; color:#fff; border-color:#27ae60; }
+    .btn-success:hover { background:#229954; border-color:#229954; }
 
     @media (max-width:768px) {
       .stats-grid { grid-template-columns:1fr; }
@@ -132,49 +141,60 @@
       </div>
     </div>
 
+    <!-- CONTROLS -->
+    <div class="stats-panel">
+      <div class="controls">
+        <button class="btn btn-danger" id="resetBtn">🔄 Reset Data</button>
+        <button class="btn btn-success" id="exportBtn">📥 Export as JSON</button>
+      </div>
+    </div>
+
     <!-- REQUEST TABLE -->
     <div class="request-table-section">
       <h2>Request Parameters</h2>
-      <table class="request-table">
-        <thead>
-          <tr>
-            <th>Parameter</th>
-            <th>Value</th>
-            <th>Count</th>
-            <th>First Seen</th>
-            <th>Last Seen</th>
-          </tr>
-        </thead>
-        <tbody id="requestTableBody">
-          <tr>
-            <td colspan="5" class="table-empty">No request data yet</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-controls">
+        <input type="text" id="requestSearchInput" class="search-input" placeholder="Search parameters or values...">
+      </div>
+      <div class="table-wrapper">
+        <table class="request-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-column="parameter">Parameter</th>
+              <th class="sortable" data-column="value">Value</th>
+              <th class="sortable" data-column="count">Count</th>
+              <th class="sortable" data-column="firstSeen">First Seen</th>
+              <th class="sortable" data-column="lastSeen">Last Seen</th>
+            </tr>
+          </thead>
+          <tbody id="requestTableBody">
+            <tr>
+              <td colspan="5" class="table-empty">No request data yet</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- SESSION DATA TABLE -->
     <div class="request-table-section">
       <h2>Session Data</h2>
-      <table class="request-table">
-        <thead>
-          <tr>
-            <th>Session ID</th>
-            <th>Request Count</th>
-          </tr>
-        </thead>
-        <tbody id="sessionTableBody">
-          <tr>
-            <td colspan="2" class="table-empty">No session data yet</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- CONTROLS -->
-    <div class="stats-panel">
-      <div class="controls">
-        <button class="btn btn-danger" id="resetBtn">🔄 Reset Data</button>
+      <div class="table-controls">
+        <input type="text" id="sessionSearchInput" class="search-input" placeholder="Search session IDs...">
+      </div>
+      <div class="table-wrapper">
+        <table class="request-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-column="sessionId">Session ID</th>
+              <th class="sortable" data-column="count">Request Count</th>
+            </tr>
+          </thead>
+          <tbody id="sessionTableBody">
+            <tr>
+              <td colspan="2" class="table-empty">No session data yet</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </main>
@@ -203,6 +223,14 @@
     let refreshIntervalId = null;
     let realtimeChannel = null;
     let currentSessionId = null;
+
+    // Sorting state
+    let requestTableSort = { column: null, direction: 'asc' };
+    let sessionTableSort = { column: null, direction: 'asc' };
+
+    // Search state
+    let requestSearchTerm = '';
+    let sessionSearchTerm = '';
 
     // Get or create session ID
     function getSessionId() {
@@ -557,41 +585,82 @@
         return;
       }
       
-      // Sort parameters by name
-      paramKeys.sort();
-      
-      // Build table rows
+      // Build flat array for sorting/filtering
       const rows = [];
       paramKeys.forEach(paramName => {
         const param = requestData.parameters[paramName];
         const values = param.values;
         
-        // Handle both old format (number) and new format (object with count/firstSeen/lastSeen)
-        const valueKeys = Object.keys(values).sort((a, b) => {
-          const countA = typeof values[a] === 'number' ? values[a] : values[a].count;
-          const countB = typeof values[b] === 'number' ? values[b] : values[b].count;
-          return countB - countA;
-        });
-        
-        valueKeys.forEach(value => {
+        Object.keys(values).forEach(value => {
           const valueData = values[value];
           const count = typeof valueData === 'number' ? valueData : valueData.count;
-          const firstSeen = typeof valueData === 'number' ? '--' : new Date(valueData.firstSeen).toLocaleString();
-          const lastSeen = typeof valueData === 'number' ? '--' : new Date(valueData.lastSeen).toLocaleString();
+          const firstSeen = typeof valueData === 'number' ? null : new Date(valueData.firstSeen);
+          const lastSeen = typeof valueData === 'number' ? null : new Date(valueData.lastSeen);
           
-          rows.push(`
-            <tr>
-              <td class="param-col">${escapeHtml(paramName)}</td>
-              <td class="value-col">${escapeHtml(value)}</td>
-              <td class="count-col">${count}</td>
-              <td class="param-col">${firstSeen}</td>
-              <td class="param-col">${lastSeen}</td>
-            </tr>
-          `);
+          rows.push({
+            parameter: paramName,
+            value: value,
+            count: count,
+            firstSeen: firstSeen,
+            lastSeen: lastSeen,
+            firstSeenDisplay: firstSeen ? firstSeen.toLocaleString() : '--',
+            lastSeenDisplay: lastSeen ? lastSeen.toLocaleString() : '--'
+          });
         });
       });
       
-      tbody.innerHTML = rows.join('');
+      // Filter by search term
+      const filteredRows = requestSearchTerm 
+        ? rows.filter(row => 
+            row.parameter.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
+            row.value.toLowerCase().includes(requestSearchTerm.toLowerCase())
+          )
+        : rows;
+      
+      // Sort if column selected
+      if (requestTableSort.column) {
+        filteredRows.sort((a, b) => {
+          let valA = a[requestTableSort.column];
+          let valB = b[requestTableSort.column];
+          
+          // Handle dates
+          if (requestTableSort.column === 'firstSeen' || requestTableSort.column === 'lastSeen') {
+            valA = valA ? valA.getTime() : 0;
+            valB = valB ? valB.getTime() : 0;
+          }
+          
+          // Handle strings vs numbers
+          if (typeof valA === 'string') {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+          }
+          
+          if (valA < valB) return requestTableSort.direction === 'asc' ? -1 : 1;
+          if (valA > valB) return requestTableSort.direction === 'asc' ? 1 : -1;
+          return 0;
+        });
+      } else {
+        // Default sort: by parameter name, then count descending
+        filteredRows.sort((a, b) => {
+          if (a.parameter < b.parameter) return -1;
+          if (a.parameter > b.parameter) return 1;
+          return b.count - a.count;
+        });
+      }
+      
+      // Render rows
+      tbody.innerHTML = filteredRows.map(row => `
+        <tr>
+          <td class="param-col">${escapeHtml(row.parameter)}</td>
+          <td class="value-col">${escapeHtml(row.value)}</td>
+          <td class="count-col">${row.count}</td>
+          <td class="param-col">${row.firstSeenDisplay}</td>
+          <td class="param-col">${row.lastSeenDisplay}</td>
+        </tr>
+      `).join('');
+      
+      // Update sort indicators
+      updateSortIndicators('request');
     }
 
     // Update statistics
@@ -643,21 +712,50 @@
         return;
       }
       
-      // Get all sessions and sort by count (descending)
-      const sessions = Object.entries(requestData.sessions)
+      // Get all sessions
+      let sessions = Object.entries(requestData.sessions)
         .map(([sessionId, data]) => ({
-          id: sessionId,
+          sessionId: sessionId,
           count: data.count,
           userAgent: data.userAgent || 'Unknown'
-        }))
-        .sort((a, b) => b.count - a.count);
+        }));
+      
+      // Filter by search term
+      if (sessionSearchTerm) {
+        sessions = sessions.filter(s => 
+          s.sessionId.toLowerCase().includes(sessionSearchTerm.toLowerCase())
+        );
+      }
+      
+      // Sort if column selected
+      if (sessionTableSort.column) {
+        sessions.sort((a, b) => {
+          let valA = a[sessionTableSort.column];
+          let valB = b[sessionTableSort.column];
+          
+          if (typeof valA === 'string') {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+          }
+          
+          if (valA < valB) return sessionTableSort.direction === 'asc' ? -1 : 1;
+          if (valA > valB) return sessionTableSort.direction === 'asc' ? 1 : -1;
+          return 0;
+        });
+      } else {
+        // Default sort: by count descending
+        sessions.sort((a, b) => b.count - a.count);
+      }
       
       tbody.innerHTML = sessions.map(session => `
         <tr>
-          <td title="${escapeHtml(session.userAgent)}">${escapeHtml(session.id)}</td>
+          <td title="${escapeHtml(session.userAgent)}">${escapeHtml(session.sessionId)}</td>
           <td>${session.count.toLocaleString()}</td>
         </tr>
       `).join('');
+      
+      // Update sort indicators
+      updateSortIndicators('session');
     }
 
     // Escape HTML
@@ -665,6 +763,88 @@
       const div = document.createElement('div');
       div.textContent = str;
       return div.innerHTML;
+    }
+
+    // Update sort indicators on table headers
+    function updateSortIndicators(tableType) {
+      const table = tableType === 'request' 
+        ? document.querySelector('.request-table-section .request-table')
+        : document.querySelectorAll('.request-table-section .request-table')[1];
+      
+      const sortState = tableType === 'request' ? requestTableSort : sessionTableSort;
+      
+      // Remove all sort classes
+      table.querySelectorAll('th').forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+      });
+      
+      // Add sort class to active column
+      if (sortState.column) {
+        const th = table.querySelector(`th[data-column="${sortState.column}"]`);
+        if (th) {
+          th.classList.add(sortState.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+        }
+      }
+    }
+
+    // Handle table header click for sorting
+    function handleSort(tableType, column) {
+      const sortState = tableType === 'request' ? requestTableSort : sessionTableSort;
+      
+      // Toggle direction if same column, otherwise default to ascending
+      if (sortState.column === column) {
+        sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortState.column = column;
+        sortState.direction = 'asc';
+      }
+      
+      // Re-render table
+      if (tableType === 'request') {
+        renderRequestTable();
+      } else {
+        renderSessionTable();
+      }
+    }
+
+    // Handle search input
+    function handleSearch(tableType, searchTerm) {
+      if (tableType === 'request') {
+        requestSearchTerm = searchTerm;
+        renderRequestTable();
+      } else {
+        sessionSearchTerm = searchTerm;
+        renderSessionTable();
+      }
+    }
+
+    // Export data as JSON
+    function exportDataAsJSON() {
+      const exportData = {
+        exportDate: new Date().toISOString(),
+        sessionId: currentSessionId,
+        stats: {
+          totalRequests: requestData.totalRequests,
+          sessionStart: requestData.sessionStart,
+          uniqueParameters: Object.keys(requestData.parameters).length,
+          uniqueValues: Object.values(requestData.parameters).reduce((sum, param) => 
+            sum + Object.keys(param.values).length, 0),
+        },
+        parameters: requestData.parameters,
+        sessions: requestData.sessions
+      };
+      
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      const filename = `loadtest-data-${new Date().toISOString().split('T')[0]}.json`;
+      link.download = filename;
+      link.click();
+      
+      URL.revokeObjectURL(url);
     }
 
     // Reset data
@@ -689,11 +869,49 @@
 
     // Event listeners
     function setupEventListeners() {
+      // Buttons
       document.getElementById('resetBtn').addEventListener('click', resetData);
+      document.getElementById('exportBtn').addEventListener('click', exportDataAsJSON);
       document.getElementById('autoRefresh').addEventListener('change', handleRefreshChange);
       document.getElementById('configBtn').addEventListener('click', openConfigModal);
       document.getElementById('saveConfig').addEventListener('click', saveConfigModal);
       document.getElementById('cancelConfig').addEventListener('click', closeConfigModal);
+      
+      // Search inputs
+      const requestSearchInput = document.getElementById('requestSearchInput');
+      const sessionSearchInput = document.getElementById('sessionSearchInput');
+      
+      let requestSearchTimeout;
+      requestSearchInput.addEventListener('input', (e) => {
+        clearTimeout(requestSearchTimeout);
+        requestSearchTimeout = setTimeout(() => {
+          handleSearch('request', e.target.value);
+        }, 300);
+      });
+      
+      let sessionSearchTimeout;
+      sessionSearchInput.addEventListener('input', (e) => {
+        clearTimeout(sessionSearchTimeout);
+        sessionSearchTimeout = setTimeout(() => {
+          handleSearch('session', e.target.value);
+        }, 300);
+      });
+      
+      // Table sorting - request table
+      document.querySelectorAll('.request-table-section .request-table th.sortable').forEach(th => {
+        th.addEventListener('click', () => {
+          const column = th.getAttribute('data-column');
+          handleSort('request', column);
+        });
+      });
+      
+      // Table sorting - session table
+      document.querySelectorAll('.request-table-section:last-of-type .request-table th.sortable').forEach(th => {
+        th.addEventListener('click', () => {
+          const column = th.getAttribute('data-column');
+          handleSort('session', column);
+        });
+      });
       
       // Close modal on background click
       document.getElementById('configModal').addEventListener('click', (e) => {
