@@ -1,6 +1,11 @@
-# W-2 Form Playwright Tests
+# Playwright Tests
 
-Comprehensive end-to-end tests for the W-2 tax form and summary page.
+Comprehensive end-to-end tests for the example pages.
+
+## Test Files
+
+- **w2.spec.js** - W-2 tax form and summary page tests
+- **store.spec.js** - Store showcase page tests (products, cart, filters)
 
 ## Setup
 
@@ -26,6 +31,16 @@ npm test
 ### Run only W-2 tests
 ```bash
 npm run test:w2
+```
+
+### Run only Store tests
+```bash
+npx playwright test tests/store.spec.js
+```
+
+### Run specific test file
+```bash
+npx playwright test tests/<filename>.spec.js
 ```
 
 ### Run tests with browser UI visible (headed mode)
@@ -96,6 +111,39 @@ npm run report
 - ✅ Proper heading hierarchy
 - ✅ Focus management
 
+### Store Page Tests (`tests/store.spec.js`)
+
+#### Basic Functionality
+- ✅ Load page without JavaScript errors
+- ✅ Display product grid/list
+- ✅ Show all required page elements (header, filters, search)
+- ✅ Product cards have images, titles, prices, and add buttons
+
+#### Cart Functionality
+- ✅ Open cart drawer on button click
+- ✅ Close cart when overlay clicked
+- ✅ Close cart on Escape key
+- ✅ Add products to cart
+- ✅ Display cart items with details
+- ✅ Increase/decrease item quantities
+- ✅ Remove items from cart
+- ✅ Update cart count badge
+- ✅ Calculate totals (subtotal, tax, shipping)
+
+#### Filters & Search
+- ✅ Filter products by category
+- ✅ Filter products by tags
+- ✅ Search products by name
+- ✅ Sort products (featured, price, newest)
+- ✅ Clear filters and search
+- ✅ Show/hide filters panel (mobile & desktop)
+
+#### Theme & UI
+- ✅ Toggle light/dark theme
+- ✅ Persist theme preference
+- ✅ Responsive layout changes
+- ✅ Animations and transitions
+
 ## Test Browsers
 
 Tests run on:
@@ -155,11 +203,13 @@ The webServer timeout is set to 120 seconds. If your machine is slow, increase i
 
 ```
 tests/
-  └── w2.spec.js          # W-2 form and summary tests
-playwright.config.js      # Playwright configuration
-package.json             # Dependencies and scripts
-playwright-report/       # Generated test reports (gitignored)
-test-results/           # Test artifacts (gitignored)
+  ├── README.md              # This file - test documentation
+  ├── w2.spec.js             # W-2 form and summary tests
+  ├── store.spec.js          # Store page tests
+  ├── playwright-report/     # Generated HTML test reports (gitignored)
+  └── test-results/          # Test artifacts, screenshots, videos (gitignored)
+playwright.config.js         # Playwright configuration
+package.json                 # Dependencies and scripts
 ```
 
 ## Writing Additional Tests

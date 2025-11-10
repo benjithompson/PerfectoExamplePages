@@ -397,6 +397,14 @@
   const emptyMsg = document.getElementById('emptyMsg');
   const searchInput = document.getElementById('searchInput');
   const sortSelect = document.getElementById('sortSelect');
+  
+  // Menu toggle (mobile)
+  const primaryNav = document.querySelector('nav.primary') || { addEventListener: () => {} };
+  const menuToggle = document.getElementById('menuToggle');
+  let menuOpen = false;
+  function openMenu() { menuOpen = true; }
+  function closeMenu() { menuOpen = false; }
+  
   // Close menu when navigating via link (immediate UX feedback)
   primaryNav.addEventListener('click', e => { if(e.target.tagName==='A' && menuOpen) closeMenu(); });
   // Close menu on resize to desktop

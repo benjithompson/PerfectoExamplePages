@@ -70,3 +70,12 @@ coverage/
 # yarn.lock
 # pnpm-lock.yaml
 
+# ------------------------------
+# Playwright Test Artifacts
+# ------------------------------
+tests/test-results/
+tests/playwright-report/
+playwright/.cache/
+
+# Temporary test/debug files
+verify-*.js

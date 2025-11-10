@@ -6,6 +6,9 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   
+  /* Output folders */
+  outputDir: './tests/test-results',
+  
   /* Run tests in files in parallel */
   fullyParallel: true,
   
@@ -20,7 +23,7 @@ export default defineConfig({
   
   /* Reporter to use */
   reporter: [
-    ['html'],
+    ['html', { outputFolder: './tests/playwright-report' }],
     ['list']
   ],
   
