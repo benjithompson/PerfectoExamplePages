@@ -208,6 +208,7 @@
     </div>
     <div style="display:flex;align-items:center;gap:.6rem;margin-left:auto;flex-wrap:wrap;">
       <button id="themeToggle" type="button" aria-pressed="false" title="Toggle theme">🌗 Theme</button>
+      <button id="clearAllBtn" type="button" title="Clear all form fields">🗑️ Clear All</button>
       <button id="openModalBtn" type="button" class="btn outline" aria-haspopup="dialog">Open Modal</button>
     </div>
   </header>
@@ -475,6 +476,33 @@
   // Theme handled globally (theme.js)
 
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* Clear All Fields */
+    document.getElementById('clearAllBtn').addEventListener('click', () => {
+      // Clear all text inputs, emails, passwords, search fields
+      document.querySelectorAll('input[type=text], input[type=email], input[type=password], input[type=search], textarea').forEach(el => {
+        el.value = '';
+        el.classList.remove('error', 'success');
+      });
+      // Reset selects to first option
+      document.querySelectorAll('select').forEach(el => {
+        el.selectedIndex = 0;
+      });
+      // Reset checkboxes and radios
+      document.querySelectorAll('input[type=checkbox], input[type=radio]').forEach(el => {
+        el.checked = el.defaultChecked || false;
+      });
+      // Reset range inputs
+      document.querySelectorAll('input[type=range]').forEach(el => {
+        el.value = el.defaultValue || 50;
+        el.dispatchEvent(new Event('input'));
+      });
+      // Clear all field messages
+      document.querySelectorAll('.field-msg').forEach(el => {
+        el.textContent = '';
+        el.classList.remove('error', 'success');
+      });
+    });
 
     /* Validation */
     const nameInput = document.getElementById('nameInput');
