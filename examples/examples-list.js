@@ -13,7 +13,7 @@ window.EXAMPLE_GROUPS = [
       { file: 'charts.html', name: 'Charts' },
       { file: 'chess.html', name: 'Chess Game' },
       { file: 'restaurant.html', name: 'Restaurant Ordering (Xenial POC)' },
-      { file: 'insurance.html', name: 'Insurance Portal (React)' }
+      { file: 'insurance/index.html', name: 'Insurance Portal (React)' }
     ]
   },
   {

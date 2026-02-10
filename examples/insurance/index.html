@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SecureShield Insurance</title>
+  <meta name="description" content="Insurance web application example with auto, home, and account management." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Data / Constants (plain JS, no JSX) -->
+  <script src="data/constants.js"></script>
+
+  <!-- React Components (loaded in dependency order) -->
+  <script type="text/babel" src="components/LoginPage.js"></script>
+  <script type="text/babel" src="components/TopNav.js"></script>
+  <script type="text/babel" src="components/Sidebar.js"></script>
+  <script type="text/babel" src="components/Dashboard.js"></script>
+  <script type="text/babel" src="components/AutoInsurancePage.js"></script>
+  <script type="text/babel" src="components/HomeInsurancePage.js"></script>
+  <script type="text/babel" src="components/AutoClaimsPage.js"></script>
+
+  <!-- App Root -->
+  <script type="text/babel" src="App.js"></script>
+
+  <!-- Mount -->
+  <script type="text/babel">
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
