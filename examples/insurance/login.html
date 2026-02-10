@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SecureShield Insurance – Sign In</title>
+  <meta name="description" content="Sign in to your SecureShield Insurance account." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="data/constants.js"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    function LoginPage() {
+      const [username, setUsername] = React.useState('');
+      const [password, setPassword] = React.useState('');
+      const [error, setError] = React.useState('');
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (username === TEST_USER.username && password === TEST_USER.password) {
+          // Store authenticated user in sessionStorage, then navigate (real HTTP request)
+          sessionStorage.setItem('ss_user', JSON.stringify(TEST_USER));
+          window.location.href = 'index.html';
+        } else {
+          setError('Invalid username or password. Please try again.');
+        }
+      };
+
+      return (
+        <div className="login-page">
+          <div className="login-header">
+            <div className="login-logo">
+              <div className="shield">SS</div>
+              <span>SecureShield</span>
+            </div>
+          </div>
+          <div className="login-body">
+            <div className="login-card">
+              <h2>Welcome Back</h2>
+              <p className="subtitle">Sign in to manage your accounts and policies.</p>
+              {error && <div className="login-error">⚠️ {error}</div>}
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label htmlFor="username">Username</label>
+                  <input id="username" type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter your username" autoComplete="username" />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="password">Password</label>
+                  <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" autoComplete="current-password" />
+                </div>
+                <button type="submit" className="login-btn">Log In</button>
+              </form>
+              <div className="login-hint">
+                <strong>Test Credentials:</strong><br/>
+                Username: <code>elizabeth.morgan</code><br/>
+                Password: <code>Test1234!</code>
+              </div>
+            </div>
+          </div>
+          <div className="login-footer">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<LoginPage />);
+  </script>
+</body>
+</html>

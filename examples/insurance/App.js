@@ -1,12 +1,15 @@
 /* App Root Component – Routing and state management */
 function App() {
-  const [user, setUser] = React.useState(null);
+  // Read authenticated user from sessionStorage (set by login.html)
+  const stored = sessionStorage.getItem('ss_user');
+  if (!stored) {
+    window.location.href = 'login.html';
+    return null;
+  }
+  const user = JSON.parse(stored);
   const [page, setPage] = React.useState('dashboard');
 
-  const handleLogin = (u) => { setUser(u); setPage('dashboard'); };
-  const handleLogout = () => { setUser(null); setPage('dashboard'); };
-
-  if (!user) return <LoginPage onLogin={handleLogin} />;
+  const handleLogout = () => { sessionStorage.removeItem('ss_user'); window.location.href = 'login.html'; };
 
   return (
     <div>
