@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SecureShield Insurance</title>
+  <meta name="description" content="Insurance web application example with auto, home, and account management." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; -webkit-font-smoothing: antialiased; }
+    body { background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+
+    /* ---- Login Page ---- */
+    .login-page { min-height: 100vh; display: flex; flex-direction: column; background: linear-gradient(145deg, #1b2a4a 0%, #0d1b2e 100%); }
+    .login-header { background: #0d1b2e; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+    .login-logo { display: flex; align-items: center; gap: .6rem; }
+    .login-logo .shield { width: 36px; height: 36px; background: linear-gradient(135deg, #2a7fff, #0052cc); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 1rem; }
+    .login-logo span { color: #fff; font-weight: 700; font-size: 1.1rem; letter-spacing: .5px; }
+    .login-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .login-card { background: #fff; border-radius: 12px; padding: 2.8rem 2.4rem; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+    .login-card h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: .4rem; color: #1a1a2e; }
+    .login-card .subtitle { color: #6b7280; font-size: .88rem; margin-bottom: 2rem; }
+    .form-group { margin-bottom: 1.3rem; }
+    .form-group label { display: block; font-size: .78rem; font-weight: 600; color: #374151; margin-bottom: .45rem; text-transform: uppercase; letter-spacing: .6px; }
+    .form-group input { width: 100%; padding: .8rem 1rem; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: .95rem; font-family: inherit; transition: all .2s; background: #fafbfc; }
+    .form-group input:focus { outline: none; border-color: #2a7fff; box-shadow: 0 0 0 3px rgba(42,127,255,.15); background: #fff; }
+    .login-btn { width: 100%; padding: .9rem; background: linear-gradient(135deg, #2a7fff, #0052cc); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
+    .login-btn:hover { background: linear-gradient(135deg, #1a6fef, #0045b5); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(42,127,255,.35); }
+    .login-btn:active { transform: translateY(0); }
+    .login-error { background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+    .login-hint { margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid #e5e7eb; font-size: .78rem; color: #9ca3af; }
+    .login-hint strong { color: #6b7280; }
+    .login-footer { text-align: center; padding: 1.5rem; }
+    .login-footer a { color: rgba(255,255,255,.5); font-size: .75rem; text-decoration: none; margin: 0 .8rem; }
+
+    /* ---- Top Nav ---- */
+    .top-nav { background: #1b2a4a; color: #fff; position: sticky; top: 0; z-index: 100; }
+    .top-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; padding: 0 1.5rem; height: 56px; }
+    .nav-logo { display: flex; align-items: center; gap: .55rem; margin-right: 1.5rem; text-decoration: none; color: #fff; }
+    .nav-logo .shield { width: 30px; height: 30px; background: linear-gradient(135deg, #2a7fff, #0052cc); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .85rem; }
+    .nav-logo span { font-weight: 700; font-size: .95rem; letter-spacing: .4px; }
+    .nav-links { display: flex; align-items: center; gap: 0; flex: 1; }
+    .nav-links a { color: rgba(255,255,255,.75); text-decoration: none; padding: .5rem .9rem; font-size: .82rem; font-weight: 500; border-radius: 6px; transition: all .15s; }
+    .nav-links a:hover, .nav-links a.active { color: #fff; background: rgba(255,255,255,.1); }
+    .nav-right { display: flex; align-items: center; gap: .8rem; margin-left: auto; }
+    .nav-right button { background: none; border: none; color: rgba(255,255,255,.75); cursor: pointer; font-family: inherit; font-size: .82rem; font-weight: 500; padding: .45rem .7rem; border-radius: 6px; transition: all .15s; display: flex; align-items: center; gap: .4rem; }
+    .nav-right button:hover { color: #fff; background: rgba(255,255,255,.1); }
+    .nav-avatar { width: 32px; height: 32px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: .75rem; cursor: pointer; border: 2px solid rgba(255,255,255,.2); }
+
+    /* ---- Dashboard Layout ---- */
+    .dashboard { max-width: 1280px; margin: 0 auto; padding: 1.8rem 1.5rem 3rem; }
+    .greeting { font-size: 1.35rem; font-weight: 600; margin-bottom: .15rem; }
+    .greeting-sub { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.8rem; }
+    .greeting-sub a { font-size: .82rem; color: #2a7fff; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: .3rem; }
+    .greeting-sub a:hover { text-decoration: underline; }
+    .dash-grid { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start; }
+    @media(max-width: 960px) { .dash-grid { grid-template-columns: 1fr; } }
+
+    /* ---- Alert Banner ---- */
+    .alert-banner { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; display: flex; gap: .75rem; align-items: flex-start; }
+    .alert-icon { color: #f59e0b; font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+    .alert-banner p { font-size: .85rem; color: #1e40af; line-height: 1.55; }
+    .alert-banner a { color: #2563eb; font-weight: 600; }
+
+    /* ---- Section Cards ---- */
+    .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); margin-bottom: 1.2rem; overflow: hidden; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; padding: .85rem 1.2rem; border-radius: 10px 10px 0 0; }
+    .section-header.banking { background: linear-gradient(135deg, #1b2a4a, #243b5c); color: #fff; }
+    .section-header.insurance { background: linear-gradient(135deg, #92400e, #b45309); color: #fff; }
+    .section-header.retirement { background: linear-gradient(135deg, #065f46, #047857); color: #fff; }
+    .section-header h3 { font-size: 1.05rem; font-weight: 700; }
+    .section-actions { display: flex; gap: .6rem; }
+    .section-actions button { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2); color: #fff; padding: .35rem .65rem; border-radius: 6px; font-size: .68rem; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: .15rem; font-family: inherit; transition: all .15s; text-transform: capitalize; }
+    .section-actions button:hover { background: rgba(255,255,255,.25); }
+    .section-actions button .act-icon { font-size: .95rem; }
+    .section-body { padding: 0; }
+    .account-row { display: flex; align-items: center; justify-content: space-between; padding: .95rem 1.2rem; border-bottom: 1px solid #f3f4f6; transition: background .15s; cursor: pointer; }
+    .account-row:last-child { border-bottom: none; }
+    .account-row:hover { background: #f9fafb; }
+    .account-name { font-weight: 500; font-size: .9rem; color: #1a1a2e; }
+    .account-detail { font-size: .75rem; color: #9ca3af; }
+    .account-value { font-weight: 600; font-size: .95rem; color: #1a1a2e; }
+    .account-value.positive { color: #059669; }
+    .promo-row { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.2rem; border-top: 1px solid #f3f4f6; background: #fafbfc; }
+    .promo-row .promo-text { font-size: .85rem; color: #374151; }
+    .promo-row .promo-text small { display: block; color: #9ca3af; font-size: .78rem; margin-top: .15rem; }
+    .promo-link { font-size: .82rem; color: #2a7fff; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: .3rem; white-space: nowrap; }
+    .promo-link:hover { text-decoration: underline; }
+
+    /* ---- Right Sidebar ---- */
+    .sidebar-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); padding: 1.2rem; margin-bottom: 1rem; position: relative; }
+    .sidebar-card .close-btn { position: absolute; top: .8rem; right: .8rem; background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 1.1rem; padding: .2rem; line-height: 1; }
+    .sidebar-card .close-btn:hover { color: #374151; }
+    .sidebar-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; color: #1a1a2e; }
+    .sidebar-card p { font-size: .82rem; color: #6b7280; line-height: 1.5; margin-bottom: .7rem; }
+    .sidebar-card .sidebar-link { font-size: .82rem; color: #2a7fff; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; }
+    .sidebar-card .sidebar-link:hover { text-decoration: underline; }
+    .reward-points { font-size: 1.8rem; font-weight: 800; color: #1a1a2e; }
+    .reward-label { font-size: .78rem; color: #9ca3af; }
+    .perks-banner { background: linear-gradient(135deg, #1b2a4a, #2a3f5f); color: #fff; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; }
+    .perks-banner .perks-logo { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 800; font-size: .7rem; padding: .35rem .7rem; border-radius: 6px; display: inline-block; margin-bottom: .6rem; letter-spacing: .5px; }
+    .perks-banner h4 { font-size: .92rem; font-weight: 700; margin-bottom: .2rem; }
+    .perks-banner p { font-size: .8rem; color: rgba(255,255,255,.7); margin-bottom: .8rem; }
+    .perks-btn { display: block; width: 100%; text-align: center; padding: .65rem; border: 1.5px solid rgba(255,255,255,.3); border-radius: 8px; color: #fff; font-weight: 600; font-size: .82rem; background: none; cursor: pointer; font-family: inherit; transition: all .15s; text-decoration: none; }
+    .perks-btn:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.5); }
+    .perks-footer { text-align: center; margin-top: .7rem; }
+    .perks-footer a { color: #60a5fa; font-size: .78rem; text-decoration: none; font-weight: 500; }
+
+    /* ---- Insurance Detail Page ---- */
+    .page-content { max-width: 1280px; margin: 0 auto; padding: 1.8rem 1.5rem 3rem; }
+    .page-breadcrumb { font-size: .78rem; color: #9ca3af; margin-bottom: 1rem; }
+    .page-breadcrumb a { color: #2a7fff; text-decoration: none; }
+    .page-breadcrumb a:hover { text-decoration: underline; }
+    .page-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+
+    .policy-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-bottom: 1.2rem; overflow: hidden; }
+    .policy-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: 1px solid #f3f4f6; }
+    .policy-header h4 { font-size: 1rem; font-weight: 700; }
+    .policy-status { font-size: .72rem; font-weight: 600; padding: .3rem .7rem; border-radius: 20px; text-transform: uppercase; letter-spacing: .5px; }
+    .policy-status.active { background: #d1fae5; color: #065f46; }
+    .policy-body { padding: 1.2rem; }
+    .policy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; }
+    .policy-field label { display: block; font-size: .7rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: .5px; margin-bottom: .25rem; }
+    .policy-field .val { font-size: .92rem; font-weight: 500; color: #1a1a2e; }
+    .policy-footer { display: flex; gap: .6rem; padding: 1rem 1.2rem; border-top: 1px solid #f3f4f6; background: #fafbfc; }
+    .policy-footer button { padding: .55rem 1.1rem; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; color: #374151; font-size: .82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
+    .policy-footer button:hover { border-color: #2a7fff; color: #2a7fff; }
+    .policy-footer button.primary { background: #2a7fff; color: #fff; border-color: #2a7fff; }
+    .policy-footer button.primary:hover { background: #1a6fef; }
+
+    .vehicle-card { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; border-bottom: 1px solid #f3f4f6; }
+    .vehicle-card:last-child { border-bottom: none; }
+    .vehicle-icon { width: 48px; height: 48px; background: #eff6ff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .vehicle-info h5 { font-size: .9rem; font-weight: 600; margin-bottom: .15rem; }
+    .vehicle-info p { font-size: .78rem; color: #9ca3af; }
+    .vehicle-premium { margin-left: auto; text-align: right; }
+    .vehicle-premium .amt { font-size: 1rem; font-weight: 700; color: #1a1a2e; }
+    .vehicle-premium .freq { font-size: .7rem; color: #9ca3af; }
+
+    /* ---- Modal ---- */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .modal { background: #fff; border-radius: 14px; width: 100%; max-width: 500px; box-shadow: 0 25px 60px rgba(0,0,0,.2); overflow: hidden; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 1px solid #f3f4f6; }
+    .modal-header h3 { font-size: 1.1rem; font-weight: 700; }
+    .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #9ca3af; padding: .2rem; }
+    .modal-body { padding: 1.5rem; }
+    .modal-body .info-row { display: flex; justify-content: space-between; padding: .6rem 0; border-bottom: 1px solid #f3f4f6; }
+    .modal-body .info-row:last-child { border-bottom: none; }
+    .modal-body .info-label { font-size: .82rem; color: #6b7280; }
+    .modal-body .info-value { font-size: .88rem; font-weight: 600; }
+
+    /* ---- Responsive ---- */
+    @media(max-width: 768px) {
+      .nav-links { display: none; }
+      .top-nav-inner { padding: 0 1rem; }
+      .dashboard, .page-content { padding: 1.2rem 1rem 2rem; }
+      .policy-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    /* ── STATIC USER DATA ── */
+    const TEST_USER = { username: 'elizabeth.morgan', password: 'Test1234!', name: 'Elizabeth', fullName: 'Elizabeth A. Morgan', memberId: '2847391056' };
+
+    const ACCOUNTS = {
+      banking: [
+        { name: 'Platinum Visa', mask: '8683', balance: '$0.00', type: 'credit' },
+        { name: 'USAA Classic Checking', mask: '4219', balance: '$4,287.53', type: 'checking' },
+        { name: 'USAA Savings', mask: '7734', balance: '$12,841.09', type: 'savings' }
+      ],
+      insurance: [
+        { name: 'Auto Insurance (WA)', detail: 'Policy #AUT-8834721', premium: '$186.40/mo' },
+        { name: 'Homeowners', detail: '21110 4TH AVE W', premium: '$142.75/mo' },
+        { name: 'Valuable Personal Property', detail: 'JEWELRY', premium: '$23.50/mo' }
+      ],
+      retirement: [
+        { name: 'Your Retirement Savings', balance: '$87,432.18', change: '+$1,247.30', changePercent: '+1.45%' },
+        { name: 'Roth IRA', balance: '$34,219.55', change: '+$412.80', changePercent: '+1.22%' }
+      ]
+    };
+
+    const AUTO_POLICY = {
+      policyNumber: 'AUT-8834721',
+      status: 'Active',
+      effectiveDate: 'Mar 15, 2025',
+      expirationDate: 'Sep 15, 2025',
+      premium: '$186.40',
+      frequency: 'Monthly',
+      deductible: '$500',
+      bodilyInjury: '$100,000 / $300,000',
+      propertyDamage: '$100,000',
+      uninsuredMotorist: '$100,000 / $300,000',
+      vehicles: [
+        { year: '2022', make: 'Toyota', model: 'RAV4 XLE', vin: '2T3W1RFV...8241', premium: '$104.20', icon: '🚙' },
+        { year: '2019', make: 'Honda', model: 'Civic Sport', vin: '19XFC2F5...3847', premium: '$82.20', icon: '🚗' }
+      ]
+    };
+
+    const HOME_POLICY = {
+      policyNumber: 'HOM-5529183',
+      status: 'Active',
+      effectiveDate: 'Jan 01, 2025',
+      expirationDate: 'Jan 01, 2026',
+      premium: '$142.75',
+      frequency: 'Monthly',
+      dwelling: '$425,000',
+      personalProperty: '$212,500',
+      liability: '$300,000',
+      deductible: '$1,000',
+      address: '21110 4th Ave W, Seattle, WA 98199',
+      yearBuilt: '2004',
+      sqft: '2,340',
+      roofType: 'Composition Shingle'
+    };
+
+    /* ── LOGIN SCREEN ── */
+    function LoginPage({ onLogin }) {
+      const [username, setUsername] = useState('');
+      const [password, setPassword] = useState('');
+      const [error, setError] = useState('');
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (username === TEST_USER.username && password === TEST_USER.password) {
+          onLogin(TEST_USER);
+        } else {
+          setError('Invalid username or password. Please try again.');
+        }
+      };
+
+      return (
+        <div className="login-page">
+          <div className="login-header">
+            <div className="login-logo">
+              <div className="shield">SS</div>
+              <span>SecureShield</span>
+            </div>
+          </div>
+          <div className="login-body">
+            <div className="login-card">
+              <h2>Welcome Back</h2>
+              <p className="subtitle">Sign in to manage your accounts and policies.</p>
+              {error && <div className="login-error">⚠️ {error}</div>}
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label htmlFor="username">Username</label>
+                  <input id="username" type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter your username" autoComplete="username" />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="password">Password</label>
+                  <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" autoComplete="current-password" />
+                </div>
+                <button type="submit" className="login-btn">Log In</button>
+              </form>
+              <div className="login-hint">
+                <strong>Test Credentials:</strong><br/>
+                Username: <code>elizabeth.morgan</code><br/>
+                Password: <code>Test1234!</code>
+              </div>
+            </div>
+          </div>
+          <div className="login-footer">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+          </div>
+        </div>
+      );
+    }
+
+    /* ── TOP NAVIGATION ── */
+    function TopNav({ user, currentPage, onNavigate, onLogout }) {
+      return (
+        <nav className="top-nav">
+          <div className="top-nav-inner">
+            <a href="#" className="nav-logo" onClick={e => { e.preventDefault(); onNavigate('dashboard'); }}>
+              <div className="shield">SS</div>
+              <span>SecureShield</span>
+            </a>
+            <div className="nav-links">
+              <a href="#" className={currentPage === 'dashboard' ? 'active' : ''} onClick={e => { e.preventDefault(); onNavigate('dashboard'); }}>Home</a>
+              <a href="#" className={currentPage === 'auto' || currentPage === 'home-ins' ? 'active' : ''} onClick={e => { e.preventDefault(); onNavigate('auto'); }}>Insurance</a>
+              <a href="#" onClick={e => e.preventDefault()}>Banking</a>
+              <a href="#" onClick={e => e.preventDefault()}>Retirement</a>
+              <a href="#" onClick={e => e.preventDefault()}>Investing</a>
+              <a href="#" onClick={e => e.preventDefault()}>Advice</a>
+            </div>
+            <div className="nav-right">
+              <button onClick={e => e.preventDefault()}>🔍 Search</button>
+              <button onClick={e => e.preventDefault()}>💬 Chat</button>
+              <div className="nav-avatar" title={user.fullName}>{user.name.charAt(0)}</div>
+              <button onClick={onLogout}>Log Off</button>
+            </div>
+          </div>
+        </nav>
+      );
+    }
+
+    /* ── SIDEBAR ── */
+    function Sidebar() {
+      const [cards, setCards] = useState({ membership: true, tax: true, rewards: true, perks: true });
+      const hide = key => setCards(prev => ({ ...prev, [key]: false }));
+
+      return (
+        <div className="sidebar">
+          {cards.membership && (
+            <div className="sidebar-card">
+              <button className="close-btn" onClick={() => hide('membership')}>✕</button>
+              <h4>Make your membership work for you.</h4>
+              <p>Get customized offers and benefits tailored to your needs.</p>
+              <a href="#" className="sidebar-link">Personalize my membership →</a>
+            </div>
+          )}
+          {cards.tax && (
+            <div className="sidebar-card">
+              <button className="close-btn" onClick={() => hide('tax')}>✕</button>
+              <h4>Federal Tax-Filing Deadline</h4>
+              <p style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a1a2e', marginBottom: '.1rem' }}>65 days until Apr. 15, 2026</p>
+              <p>Get your refund fast. Members save on TurboTax.</p>
+              <a href="#" className="sidebar-link">Visit Tax Center →</a>
+            </div>
+          )}
+          {cards.rewards && (
+            <div className="sidebar-card">
+              <button className="close-btn" onClick={() => hide('rewards')}>✕</button>
+              <h4>Reward Balance</h4>
+              <div className="reward-points">3,222</div>
+              <div className="reward-label">Reward Points</div>
+              <br />
+              <a href="#" className="sidebar-link">Go to Rewards Center →</a>
+            </div>
+          )}
+          {cards.perks && (
+            <div className="perks-banner">
+              <div className="perks-logo">★ SECURESHIELD PERKS</div>
+              <h4>Perks: Up to 40% off Fun!</h4>
+              <p>Discounted Fun for Members</p>
+              <a href="#" className="perks-btn">Featured Deal</a>
+              <div className="perks-footer">
+                <a href="#">View all Perks →</a>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ── DASHBOARD ── */
+    function Dashboard({ onNavigate }) {
+      return (
+        <div className="dashboard">
+          <div className="greeting">Good Afternoon, ELIZABETH</div>
+          <div className="greeting-sub">
+            <a href="#">✉️ Inbox</a>
+            <a href="#">📄 Documents</a>
+            <a href="#">✏️ Edit Layout</a>
+          </div>
+
+          <div className="dash-grid">
+            <div className="main-col">
+              {/* Alert */}
+              <div className="alert-banner">
+                <span className="alert-icon">◆</span>
+                <p>
+                  SecureShield continues to monitor economic conditions and stands ready if pay disruptions occur. Relief options available Feb. 16.
+                  Our 0% interest loan available to eligible members Feb. 25, prior to the first anticipated missed paycheck.
+                  <br /><a href="#">Learn more</a>
+                </p>
+              </div>
+
+              {/* Banking */}
+              <div className="section-card">
+                <div className="section-header banking">
+                  <h3>Banking</h3>
+                  <div className="section-actions">
+                    <button><span className="act-icon">↔️</span>Transfer</button>
+                    <button><span className="act-icon">📄</span>Pay bills</button>
+                    <button><span className="act-icon">📋</span>Statements</button>
+                    <button><span className="act-icon">➕</span>Add account</button>
+                  </div>
+                </div>
+                <div className="section-body">
+                  {ACCOUNTS.banking.map((a, i) => (
+                    <div className="account-row" key={i}>
+                      <div>
+                        <div className="account-name">{a.name} <span className="account-detail">•{a.mask}</span></div>
+                      </div>
+                      <div className="account-value">{a.balance}</div>
+                    </div>
+                  ))}
+                  <div className="promo-row">
+                    <div className="promo-text">Looking for a car loan?<small>Find one made to fit your budget.</small></div>
+                    <a href="#" className="promo-link">Get started →</a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Insurance */}
+              <div className="section-card">
+                <div className="section-header insurance">
+                  <h3>Insurance</h3>
+                  <div className="section-actions">
+                    <button><span className="act-icon">🏷️</span>Claims</button>
+                    <button><span className="act-icon">🪪</span>ID card</button>
+                    <button><span className="act-icon">📄</span>Bills</button>
+                    <button><span className="act-icon">➕</span>Get quote</button>
+                  </div>
+                </div>
+                <div className="section-body">
+                  {ACCOUNTS.insurance.map((a, i) => (
+                    <div className="account-row" key={i} onClick={() => {
+                      if (a.name.includes('Auto')) onNavigate('auto');
+                      if (a.name.includes('Homeowners')) onNavigate('home-ins');
+                    }}>
+                      <div>
+                        <div className="account-name">{a.name}</div>
+                        {a.detail && <div className="account-detail">{a.detail}</div>}
+                      </div>
+                      <div className="account-value">{a.premium}</div>
+                    </div>
+                  ))}
+                  <div className="promo-row">
+                    <div className="promo-text">SecureShield Life Insurance<small>Give your loved ones a safe place to land with a budget-friendly price.</small></div>
+                    <a href="#" className="promo-link">Get started →</a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Retirement */}
+              <div className="section-card">
+                <div className="section-header retirement">
+                  <h3>Retirement &amp; Investing</h3>
+                  <div className="section-actions">
+                    <button><span className="act-icon">↔️</span>Transfer</button>
+                    <button><span className="act-icon">➕</span>Add account</button>
+                  </div>
+                </div>
+                <div className="section-body">
+                  {ACCOUNTS.retirement.map((a, i) => (
+                    <div className="account-row" key={i}>
+                      <div>
+                        <div className="account-name">{a.name}</div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div className="account-value">{a.balance}</div>
+                        <div style={{ fontSize: '.75rem', color: '#059669', fontWeight: 600 }}>{a.change} ({a.changePercent})</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <Sidebar />
+          </div>
+        </div>
+      );
+    }
+
+    /* ── AUTO INSURANCE PAGE ── */
+    function AutoInsurancePage({ onNavigate }) {
+      const [showModal, setShowModal] = useState(false);
+      const p = AUTO_POLICY;
+
+      return (
+        <div className="page-content">
+          <div className="page-breadcrumb">
+            <a href="#" onClick={e => { e.preventDefault(); onNavigate('dashboard'); }}>Home</a> / <a href="#" onClick={e => { e.preventDefault(); onNavigate('auto'); }}>Insurance</a> / Auto Insurance
+          </div>
+          <h2 className="page-title">Auto Insurance (WA)</h2>
+
+          <div className="dash-grid">
+            <div className="main-col">
+              {/* Policy Overview */}
+              <div className="policy-card">
+                <div className="policy-header">
+                  <h4>Policy Overview</h4>
+                  <span className="policy-status active">● Active</span>
+                </div>
+                <div className="policy-body">
+                  <div className="policy-grid">
+                    <div className="policy-field"><label>Policy Number</label><div className="val">{p.policyNumber}</div></div>
+                    <div className="policy-field"><label>Effective Date</label><div className="val">{p.effectiveDate}</div></div>
+                    <div className="policy-field"><label>Expiration Date</label><div className="val">{p.expirationDate}</div></div>
+                    <div className="policy-field"><label>Premium</label><div className="val">{p.premium} / {p.frequency}</div></div>
+                  </div>
+                </div>
+                <div className="policy-footer">
+                  <button className="primary" onClick={() => setShowModal(true)}>View Full Details</button>
+                  <button>Make a Payment</button>
+                  <button>File a Claim</button>
+                </div>
+              </div>
+
+              {/* Coverage */}
+              <div className="policy-card">
+                <div className="policy-header">
+                  <h4>Coverage Summary</h4>
+                </div>
+                <div className="policy-body">
+                  <div className="policy-grid">
+                    <div className="policy-field"><label>Deductible (Collision)</label><div className="val">{p.deductible}</div></div>
+                    <div className="policy-field"><label>Bodily Injury</label><div className="val">{p.bodilyInjury}</div></div>
+                    <div className="policy-field"><label>Property Damage</label><div className="val">{p.propertyDamage}</div></div>
+                    <div className="policy-field"><label>Uninsured Motorist</label><div className="val">{p.uninsuredMotorist}</div></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vehicles */}
+              <div className="policy-card">
+                <div className="policy-header">
+                  <h4>Covered Vehicles</h4>
+                </div>
+                <div className="policy-body" style={{ padding: 0 }}>
+                  {p.vehicles.map((v, i) => (
+                    <div className="vehicle-card" key={i}>
+                      <div className="vehicle-icon">{v.icon}</div>
+                      <div className="vehicle-info">
+                        <h5>{v.year} {v.make} {v.model}</h5>
+                        <p>VIN: {v.vin}</p>
+                      </div>
+                      <div className="vehicle-premium">
+                        <div className="amt">{v.premium}</div>
+                        <div className="freq">/month</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="policy-footer">
+                  <button>Add Vehicle</button>
+                  <button>Remove Vehicle</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="sidebar">
+              <div className="sidebar-card">
+                <h4>Need Help?</h4>
+                <p>Our insurance specialists are available 24/7 to assist you with claims, coverage questions, or policy changes.</p>
+                <a href="#" className="sidebar-link">📞 1-800-555-0199</a>
+              </div>
+              <div className="sidebar-card">
+                <h4>Digital ID Cards</h4>
+                <p>Access your insurance ID cards instantly from any device.</p>
+                <a href="#" className="sidebar-link">View ID Cards →</a>
+              </div>
+              <div className="sidebar-card">
+                <h4>Bundle &amp; Save</h4>
+                <p>Save up to 10% when you bundle auto and home insurance.</p>
+                <a href="#" className="sidebar-link">Get a Quote →</a>
+              </div>
+            </div>
+          </div>
+
+          {showModal && (
+            <div className="modal-overlay" onClick={() => setShowModal(false)}>
+              <div className="modal" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>Policy Details — {p.policyNumber}</h3>
+                  <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+                </div>
+                <div className="modal-body">
+                  <div className="info-row"><span className="info-label">Policy Holder</span><span className="info-value">Elizabeth A. Morgan</span></div>
+                  <div className="info-row"><span className="info-label">Policy Number</span><span className="info-value">{p.policyNumber}</span></div>
+                  <div className="info-row"><span className="info-label">Status</span><span className="info-value" style={{ color: '#059669' }}>Active</span></div>
+                  <div className="info-row"><span className="info-label">Type</span><span className="info-value">Personal Auto</span></div>
+                  <div className="info-row"><span className="info-label">Effective</span><span className="info-value">{p.effectiveDate} — {p.expirationDate}</span></div>
+                  <div className="info-row"><span className="info-label">Premium</span><span className="info-value">{p.premium}/{p.frequency}</span></div>
+                  <div className="info-row"><span className="info-label">Vehicles</span><span className="info-value">{p.vehicles.length} covered</span></div>
+                  <div className="info-row"><span className="info-label">Payment Method</span><span className="info-value">Auto Pay — Checking •4219</span></div>
+                  <div className="info-row"><span className="info-label">Next Payment</span><span className="info-value">Mar 01, 2026</span></div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ── HOME INSURANCE PAGE ── */
+    function HomeInsurancePage({ onNavigate }) {
+      const p = HOME_POLICY;
+
+      return (
+        <div className="page-content">
+          <div className="page-breadcrumb">
+            <a href="#" onClick={e => { e.preventDefault(); onNavigate('dashboard'); }}>Home</a> / <a href="#" onClick={e => { e.preventDefault(); onNavigate('auto'); }}>Insurance</a> / Homeowners
+          </div>
+          <h2 className="page-title">Homeowners Insurance</h2>
+
+          <div className="dash-grid">
+            <div className="main-col">
+              <div className="policy-card">
+                <div className="policy-header">
+                  <h4>Policy Overview</h4>
+                  <span className="policy-status active">● Active</span>
+                </div>
+                <div className="policy-body">
+                  <div className="policy-grid">
+                    <div className="policy-field"><label>Policy Number</label><div className="val">{p.policyNumber}</div></div>
+                    <div className="policy-field"><label>Effective Date</label><div className="val">{p.effectiveDate}</div></div>
+                    <div className="policy-field"><label>Expiration Date</label><div className="val">{p.expirationDate}</div></div>
+                    <div className="policy-field"><label>Premium</label><div className="val">{p.premium} / {p.frequency}</div></div>
+                  </div>
+                </div>
+                <div className="policy-footer">
+                  <button className="primary">View Full Details</button>
+                  <button>Make a Payment</button>
+                  <button>File a Claim</button>
+                </div>
+              </div>
+
+              <div className="policy-card">
+                <div className="policy-header">
+                  <h4>Property Details</h4>
+                </div>
+                <div className="policy-body">
+                  <div className="policy-grid">
+                    <div className="policy-field"><label>Address</label><div className="val">{p.address}</div></div>
+                    <div className="policy-field"><label>Year Built</label><div className="val">{p.yearBuilt}</div></div>
+                    <div className="policy-field"><label>Square Footage</label><div className="val">{p.sqft} sq ft</div></div>
+                    <div className="policy-field"><label>Roof Type</label><div className="val">{p.roofType}</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="policy-card">
+                <div className="policy-header">
+                  <h4>Coverage Summary</h4>
+                </div>
+                <div className="policy-body">
+                  <div className="policy-grid">
+                    <div className="policy-field"><label>Dwelling Coverage</label><div className="val">{p.dwelling}</div></div>
+                    <div className="policy-field"><label>Personal Property</label><div className="val">{p.personalProperty}</div></div>
+                    <div className="policy-field"><label>Personal Liability</label><div className="val">{p.liability}</div></div>
+                    <div className="policy-field"><label>Deductible</label><div className="val">{p.deductible}</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="sidebar">
+              <div className="sidebar-card">
+                <h4>Home Inventory</h4>
+                <p>Keep an up-to-date inventory of your belongings to simplify the claims process.</p>
+                <a href="#" className="sidebar-link">Start Inventory →</a>
+              </div>
+              <div className="sidebar-card">
+                <h4>Disaster Preparedness</h4>
+                <p>Review your emergency plan and ensure your coverage is adequate for natural disasters.</p>
+                <a href="#" className="sidebar-link">Review Plan →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ── APP ROOT ── */
+    function App() {
+      const [user, setUser] = useState(null);
+      const [page, setPage] = useState('dashboard');
+
+      const handleLogin = (u) => { setUser(u); setPage('dashboard'); };
+      const handleLogout = () => { setUser(null); setPage('dashboard'); };
+
+      if (!user) return <LoginPage onLogin={handleLogin} />;
+
+      return (
+        <div>
+          <TopNav user={user} currentPage={page} onNavigate={setPage} onLogout={handleLogout} />
+          {page === 'dashboard' && <Dashboard onNavigate={setPage} />}
+          {page === 'auto' && <AutoInsurancePage onNavigate={setPage} />}
+          {page === 'home-ins' && <HomeInsurancePage onNavigate={setPage} />}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

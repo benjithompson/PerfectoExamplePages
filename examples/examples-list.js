@@ -12,7 +12,8 @@ window.EXAMPLE_GROUPS = [
       { file: 'w2.html', name: 'W-2 Tax Form' },
       { file: 'charts.html', name: 'Charts' },
       { file: 'chess.html', name: 'Chess Game' },
-      { file: 'restaurant.html', name: 'Restaurant Ordering (Xenial POC)' }
+      { file: 'restaurant.html', name: 'Restaurant Ordering (Xenial POC)' },
+      { file: 'insurance.html', name: 'Insurance Portal (React)' }
     ]
   },
   {
