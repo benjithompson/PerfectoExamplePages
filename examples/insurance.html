@@ -178,6 +178,55 @@
     .modal-body .info-label { font-size: .82rem; color: #6b7280; }
     .modal-body .info-value { font-size: .88rem; font-weight: 600; }
 
+    /* ---- Claims Popover ---- */
+    .section-card { position: relative; }
+    .claims-popover { position: absolute; top: 52px; right: 12px; z-index: 60; background: #fff; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,.18); width: 320px; overflow: hidden; animation: popSlide .18s ease; }
+    @keyframes popSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .claims-popover-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.2rem .6rem; }
+    .claims-popover-header h4 { font-size: 1.3rem; font-weight: 700; color: #1a1a2e; }
+    .claims-popover-header .pop-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #9ca3af; padding: .2rem; }
+    .claims-popover-header .pop-close:hover { color: #374151; }
+    .claims-popover-body { padding: .2rem 0 .5rem; }
+    .claims-popover-body a { display: flex; align-items: center; justify-content: space-between; padding: .75rem 1.2rem; font-size: .9rem; color: #1a1a2e; text-decoration: none; font-weight: 500; transition: background .12s; border-bottom: 1px solid #f3f4f6; }
+    .claims-popover-body a:last-child { border-bottom: none; }
+    .claims-popover-body a:hover { background: #f9fafb; }
+    .claims-popover-body a .arrow { color: #9ca3af; font-size: .9rem; }
+    .claims-overlay { position: fixed; inset: 0; z-index: 55; }
+
+    /* ---- Auto Claims Page ---- */
+    .claims-page { background: #fff; }
+    .claims-hero { background: linear-gradient(135deg, #1b2a4a 0%, #243b5c 40%, #2d4a6f 100%); color: #fff; padding: 3.5rem 2rem 3rem; position: relative; overflow: hidden; }
+    .claims-hero::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 45%; background: linear-gradient(135deg, rgba(100,140,180,.3), rgba(30,60,100,.6)); clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%); }
+    .claims-hero-inner { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+    .claims-hero h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 700; margin-bottom: .5rem; }
+    .claims-hero .hero-sub { font-size: 1rem; color: rgba(255,255,255,.8); margin-bottom: 1.5rem; }
+    .claims-hero-actions { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+    .claims-hero-actions .hero-btn { padding: .65rem 1.4rem; border-radius: 6px; font-size: .85rem; font-weight: 600; cursor: pointer; font-family: inherit; text-decoration: none; transition: all .15s; border: none; }
+    .claims-hero-actions .hero-btn.primary { background: #fff; color: #1b2a4a; }
+    .claims-hero-actions .hero-btn.primary:hover { background: #e8ecf1; }
+    .claims-hero-actions .hero-btn.secondary { background: none; color: #fff; border: none; font-weight: 500; padding-left: .5rem; }
+    .claims-hero-actions .hero-btn.secondary:hover { text-decoration: underline; }
+
+    .claims-content { max-width: 960px; margin: 0 auto; padding: 3rem 2rem; }
+    .claims-content h3 { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; margin-bottom: .8rem; }
+    .claims-content p.body-text { font-size: .9rem; color: #374151; line-height: 1.7; margin-bottom: 1rem; max-width: 520px; }
+    .claims-content .check-link { font-size: .88rem; color: #2a7fff; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; }
+    .claims-content .check-link:hover { text-decoration: underline; }
+
+    .claims-process { background: #f8f9fb; padding: 3rem 2rem; }
+    .claims-process-inner { max-width: 960px; margin: 0 auto; }
+    .claims-process h3 { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; margin-bottom: .5rem; }
+    .claims-process .process-sub { font-size: .88rem; color: #6b7280; margin-bottom: 2rem; }
+    .process-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+    .process-step { display: flex; flex-direction: column; gap: .5rem; }
+    .process-step .step-num { width: 36px; height: 36px; border-radius: 50%; background: #1b2a4a; color: #fff; font-size: .85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .process-step h5 { font-size: .92rem; font-weight: 700; color: #1a1a2e; }
+    .process-step p { font-size: .82rem; color: #6b7280; line-height: 1.55; }
+    .process-step a { color: #2a7fff; font-weight: 500; text-decoration: none; font-size: .82rem; }
+    .process-step a:hover { text-decoration: underline; }
+    @media(max-width: 768px) { .process-steps { grid-template-columns: 1fr 1fr; } }
+    @media(max-width: 480px) { .process-steps { grid-template-columns: 1fr; } }
+
     /* ---- Auto Page Redesign ---- */
     .auto-page { max-width: 960px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem; }
     .auto-page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: .2rem; border-bottom: 3px solid #1b2a4a; padding-bottom: .8rem; }
@@ -556,6 +605,8 @@
 
     /* ── DASHBOARD ── */
     function Dashboard({ onNavigate }) {
+      const [claimsOpen, setClaimsOpen] = useState(false);
+
       return (
         <div className="dashboard">
           <div className="greeting">Good Afternoon, ELIZABETH</div>
@@ -609,12 +660,34 @@
                 <div className="section-header insurance">
                   <h3>Insurance</h3>
                   <div className="section-actions">
-                    <button><span className="act-icon">🏷️</span>Claims</button>
+                    <button onClick={() => setClaimsOpen(!claimsOpen)}><span className="act-icon">🏷️</span>Claims</button>
                     <button><span className="act-icon">🪪</span>ID card</button>
                     <button><span className="act-icon">📄</span>Bills</button>
                     <button><span className="act-icon">➕</span>Get quote</button>
                   </div>
                 </div>
+
+                {claimsOpen && (
+                  <React.Fragment>
+                    <div className="claims-overlay" onClick={() => setClaimsOpen(false)} />
+                    <div className="claims-popover">
+                      <div className="claims-popover-header">
+                        <h4>Claims</h4>
+                        <button className="pop-close" onClick={() => setClaimsOpen(false)}>✕</button>
+                      </div>
+                      <div className="claims-popover-body">
+                        <a href="#" onClick={e => { e.preventDefault(); setClaimsOpen(false); onNavigate('auto-claims'); }}>
+                          File an Auto Claim <span className="arrow">›</span>
+                        </a>
+                        <a href="#" onClick={e => e.preventDefault()}>File a Property Claim</a>
+                        <a href="#" onClick={e => e.preventDefault()}>Claims Center <span className="arrow">›</span></a>
+                        <a href="#" onClick={e => e.preventDefault()}>Insurance Claims Fraud</a>
+                        <a href="#" onClick={e => e.preventDefault()}>Disaster and Recovery Center</a>
+                      </div>
+                    </div>
+                  </React.Fragment>
+                )}
+
                 <div className="section-body">
                   {ACCOUNTS.insurance.map((a, i) => (
                     <div className="account-row" key={i} onClick={() => {
@@ -951,6 +1024,63 @@
       );
     }
 
+    /* ── AUTO CLAIMS PAGE ── */
+    function AutoClaimsPage({ onNavigate }) {
+      return (
+        <div className="claims-page">
+          <div className="claims-hero">
+            <div className="claims-hero-inner">
+              <h1>Auto insurance claims</h1>
+              <p className="hero-sub">We're here to help every step of the way.</p>
+              <div className="claims-hero-actions">
+                <a href="#" className="hero-btn primary" onClick={e => e.preventDefault()}>Report an auto claim</a>
+                <a href="#" className="hero-btn secondary" onClick={e => e.preventDefault()}>Check claim status  ›</a>
+              </div>
+            </div>
+          </div>
+
+          <div className="claims-content">
+            <h3>Find out what's covered before you file a claim.</h3>
+            <p className="body-text">
+              Our policies typically cover things like damage to your car from an
+              accident or if you hit another driver and are at fault. If you're not
+              sure about your coverage, you can check your policy.
+            </p>
+            <a href="#" className="check-link" onClick={e => { e.preventDefault(); onNavigate('auto'); }}>Check my policy  ›</a>
+          </div>
+
+          <div className="claims-process">
+            <div className="claims-process-inner">
+              <h3>How the auto claims process works</h3>
+              <p className="process-sub">We'll help you with every step of your claim and provide personalized updates along the way.</p>
+              <div className="process-steps">
+                <div className="process-step">
+                  <div className="step-num">1</div>
+                  <h5>Report your claim</h5>
+                  <p>Tell us what happened. Get started on secureshield.com or the SecureShield Mobile App.</p>
+                </div>
+                <div className="process-step">
+                  <div className="step-num">2</div>
+                  <h5>Get more details</h5>
+                  <p>We'll review what happened and check what your policy covers. You can also add more details in <a href="#" onClick={e => e.preventDefault()}>My Claims Center</a>.</p>
+                </div>
+                <div className="process-step">
+                  <div className="step-num">3</div>
+                  <h5>Evaluate the claim</h5>
+                  <p>We'll go over the details and figure out what to pay based on your coverage, deductible and who's responsible.</p>
+                </div>
+                <div className="process-step">
+                  <div className="step-num">4</div>
+                  <h5>Settle the claim</h5>
+                  <p>If covered, we'll make a payment to you or a third party.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     /* ── APP ROOT ── */
     function App() {
       const [user, setUser] = useState(null);
@@ -967,6 +1097,7 @@
           {page === 'dashboard' && <Dashboard onNavigate={setPage} />}
           {page === 'auto' && <AutoInsurancePage onNavigate={setPage} />}
           {page === 'home-ins' && <HomeInsurancePage onNavigate={setPage} />}
+          {page === 'auto-claims' && <AutoClaimsPage onNavigate={setPage} />}
         </div>
       );
     }
