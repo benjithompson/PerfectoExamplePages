@@ -178,12 +178,90 @@
     .modal-body .info-label { font-size: .82rem; color: #6b7280; }
     .modal-body .info-value { font-size: .88rem; font-weight: 600; }
 
+    /* ---- Auto Page Redesign ---- */
+    .auto-page { max-width: 960px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem; }
+    .auto-page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: .2rem; border-bottom: 3px solid #1b2a4a; padding-bottom: .8rem; }
+    .auto-page-header h2 { font-size: 1.45rem; font-weight: 700; color: #1a1a2e; margin: 0; }
+    .ask-btn { padding: .45rem 1.1rem; border: 1.5px solid #1b2a4a; border-radius: 6px; background: #fff; color: #1b2a4a; font-size: .8rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; white-space: nowrap; }
+    .ask-btn:hover { background: #1b2a4a; color: #fff; }
+
+    .auto-tabs { display: flex; gap: 0; border-bottom: 1px solid #d1d5db; margin-bottom: 1.3rem; margin-top: .6rem; }
+    .auto-tabs button { background: none; border: none; border-bottom: 3px solid transparent; padding: .7rem 1.2rem; font-size: .88rem; font-weight: 500; color: #6b7280; cursor: pointer; font-family: inherit; transition: all .15s; margin-bottom: -1px; }
+    .auto-tabs button:hover { color: #1a1a2e; }
+    .auto-tabs button.active { color: #1a1a2e; font-weight: 600; border-bottom-color: #1b2a4a; }
+
+    .auto-alert { background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: .9rem 1.1rem; margin-bottom: 1.3rem; display: flex; gap: .6rem; align-items: flex-start; }
+    .auto-alert .alert-dot { color: #2563eb; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .auto-alert p { font-size: .82rem; color: #1a1a2e; line-height: 1.55; font-weight: 500; }
+
+    .auto-promo { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1.2rem 1.3rem; margin-bottom: 1.3rem; }
+    .auto-promo h4 { font-size: 1.05rem; font-weight: 700; color: #2563eb; margin-bottom: .25rem; }
+    .auto-promo p { font-size: .85rem; color: #374151; margin-bottom: .6rem; }
+    .auto-promo .learn-more { display: inline-block; padding: .45rem 1rem; background: #1b2a4a; color: #fff; font-size: .75rem; font-weight: 600; border-radius: 5px; text-decoration: none; text-transform: uppercase; letter-spacing: .5px; }
+    .auto-promo .learn-more:hover { background: #243b5c; }
+
+    .action-cards-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.3rem; }
+    .action-card { background: #fff; border: 1px solid #d1d5db; border-radius: 10px; padding: 1.3rem 1rem; text-align: center; cursor: pointer; transition: all .15s; display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+    .action-card:hover { border-color: #2a7fff; box-shadow: 0 2px 8px rgba(42,127,255,.12); }
+    .action-card .card-icon { font-size: 2rem; color: #1b2a4a; margin-bottom: .2rem; }
+    .action-card .card-label { font-size: .85rem; font-weight: 600; color: #2a7fff; }
+    .action-card .card-sub { font-size: .72rem; color: #9ca3af; }
+    .action-card.premium-card { background: #fff; border-color: #d1d5db; text-align: center; }
+    .action-card.premium-card .premium-label { font-size: .72rem; color: #6b7280; font-weight: 500; }
+    .action-card.premium-card .premium-amount { font-size: 1.8rem; font-weight: 800; color: #065f46; }
+    .action-card.premium-card .premium-note { font-size: .72rem; color: #6b7280; margin-bottom: .3rem; }
+    .action-card.premium-card .disc-label { font-size: .78rem; color: #2a7fff; font-weight: 600; }
+    .action-card.premium-card .disc-amount { font-size: .95rem; font-weight: 700; color: #1a1a2e; margin-bottom: .4rem; }
+    .action-card.premium-card .pay-btn { padding: .5rem 1.3rem; background: #dc2626; color: #fff; border: none; border-radius: 5px; font-size: .78rem; font-weight: 700; cursor: pointer; font-family: inherit; text-transform: uppercase; letter-spacing: .3px; }
+    .action-card.premium-card .pay-btn:hover { background: #b91c1c; }
+
+    .action-tiles-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: .7rem; margin-bottom: 1.8rem; }
+    .action-tile { background: #fff; border: 1.5px solid #d1d5db; border-radius: 10px; padding: 1rem .6rem; text-align: center; cursor: pointer; transition: all .15s; display: flex; flex-direction: column; align-items: center; gap: .4rem; min-height: 120px; justify-content: center; }
+    .action-tile:hover { border-color: #2a7fff; box-shadow: 0 2px 8px rgba(42,127,255,.12); }
+    .action-tile .tile-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: #f0f4f8; color: #1b2a4a; }
+    .action-tile .tile-label { font-size: .72rem; font-weight: 600; color: #2a7fff; line-height: 1.3; }
+    .action-tile.highlight { background: #1b2a4a; border-color: #1b2a4a; }
+    .action-tile.highlight .tile-icon { background: rgba(255,255,255,.15); color: #fff; }
+    .action-tile.highlight .tile-label { color: #fff; }
+
+    .policy-info-bar { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem 1.3rem; margin-bottom: 1rem; display: flex; align-items: center; flex-wrap: wrap; gap: .8rem; }
+    .policy-info-bar .policy-title-group { display: flex; flex-direction: column; margin-right: auto; }
+    .policy-info-bar .policy-title-group h4 { font-size: 1rem; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: .6rem; }
+    .policy-info-bar .policy-title-group h4 a { font-size: .75rem; color: #2a7fff; font-weight: 500; }
+    .policy-info-bar .policy-title-group .cic { font-size: .75rem; color: #9ca3af; margin-top: .15rem; }
+    .policy-info-meta { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+    .policy-info-meta .meta-item { display: flex; flex-direction: column; }
+    .policy-info-meta .meta-item .meta-label { font-size: .65rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: .4px; }
+    .policy-info-meta .meta-item .meta-value { font-size: .82rem; font-weight: 500; color: #1a1a2e; }
+    .policy-info-bar .print-link { font-size: .78rem; color: #2a7fff; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: .3rem; white-space: nowrap; }
+
+    .vehicle-row-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 1rem; overflow: hidden; }
+    .vehicle-row-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.3rem; border-bottom: 1px solid #f3f4f6; flex-wrap: wrap; gap: .5rem; }
+    .vehicle-row-header .veh-name { font-size: 1rem; font-weight: 700; color: #1a1a2e; }
+    .vehicle-row-header .veh-cost { text-align: right; }
+    .vehicle-row-header .veh-cost .veh-price { font-size: 1.15rem; font-weight: 700; color: #065f46; }
+    .vehicle-row-header .veh-cost .veh-per { font-size: .72rem; color: #6b7280; }
+    .vehicle-row-header .veh-deductibles { text-align: right; }
+    .vehicle-row-header .veh-deductibles .ded-label { font-size: .65rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; }
+    .vehicle-row-header .veh-deductibles .ded-value { font-size: .78rem; color: #1a1a2e; font-style: italic; }
+    .vehicle-row-body { display: grid; grid-template-columns: 100px 1fr 1fr; gap: 1rem; padding: 1rem 1.3rem; align-items: start; }
+    .vehicle-row-body .veh-img { width: 90px; height: 60px; background: #f0f4f8; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+    .vehicle-row-detail { display: flex; flex-direction: column; gap: .3rem; }
+    .vehicle-row-detail .detail-row { display: flex; align-items: flex-start; gap: .4rem; font-size: .8rem; }
+    .vehicle-row-detail .detail-row .dlabel { color: #6b7280; font-weight: 500; white-space: nowrap; }
+    .vehicle-row-detail .detail-row .dvalue { color: #1a1a2e; }
+    .vehicle-row-detail .detail-row a { color: #2a7fff; font-size: .75rem; font-weight: 500; text-decoration: none; }
+    .vehicle-row-detail .detail-row a:hover { text-decoration: underline; }
+
     /* ---- Responsive ---- */
     @media(max-width: 768px) {
       .nav-links { display: none; }
       .top-nav-inner { padding: 0 1rem; }
-      .dashboard, .page-content { padding: 1.2rem 1rem 2rem; }
+      .dashboard, .page-content, .auto-page { padding: 1.2rem 1rem 2rem; }
       .policy-grid { grid-template-columns: 1fr; }
+      .action-cards-row { grid-template-columns: 1fr; }
+      .action-tiles-row { grid-template-columns: repeat(2, 1fr); }
+      .vehicle-row-body { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -590,118 +668,203 @@
 
     /* ── AUTO INSURANCE PAGE ── */
     function AutoInsurancePage({ onNavigate }) {
-      const [showModal, setShowModal] = useState(false);
+      const [activeTab, setActiveTab] = useState('summary');
       const p = AUTO_POLICY;
 
       return (
-        <div className="page-content">
-          <div className="page-breadcrumb">
-            <a href="#" onClick={e => { e.preventDefault(); onNavigate('dashboard'); }}>Home</a> / <a href="#" onClick={e => { e.preventDefault(); onNavigate('auto'); }}>Insurance</a> / Auto Insurance
+        <div className="auto-page">
+          <div className="auto-page-header">
+            <h2>My Auto Insurance Policy (WA)</h2>
+            <button className="ask-btn">Ask SecureShield</button>
           </div>
-          <h2 className="page-title">Auto Insurance (WA)</h2>
 
-          <div className="dash-grid">
-            <div className="main-col">
-              {/* Policy Overview */}
-              <div className="policy-card">
-                <div className="policy-header">
-                  <h4>Policy Overview</h4>
-                  <span className="policy-status active">● Active</span>
+          <div className="auto-tabs">
+            <button className={activeTab === 'summary' ? 'active' : ''} onClick={() => setActiveTab('summary')}>Summary</button>
+            <button className={activeTab === 'coverage' ? 'active' : ''} onClick={() => setActiveTab('coverage')}>Coverage</button>
+            <button className={activeTab === 'discounts' ? 'active' : ''} onClick={() => setActiveTab('discounts')}>Discounts &amp; Savings</button>
+          </div>
+
+          {activeTab === 'summary' && (
+            <div>
+              {/* Alert */}
+              <div className="auto-alert">
+                <span className="alert-dot">ℹ️</span>
+                <p>Your auto ID card and Proof of Insurance have been e-mailed, and coverage is effective immediately. Your 2025 TOYOTA 86 will be added as of 12:01 a.m. Standard Time on 11/10/2025. Any premium changes will be reflected in your next billing statement.</p>
+              </div>
+
+              {/* Promo */}
+              <div className="auto-promo">
+                <h4>Get small business insurance.</h4>
+                <p>Let us help protect what you've worked hard for.</p>
+                <a href="#" className="learn-more">Learn More</a>
+              </div>
+
+              {/* Action Cards Row */}
+              <div className="action-cards-row">
+                <div className="action-card">
+                  <div className="card-icon">⬇️</div>
+                  <div className="card-label">Get Auto ID Cards</div>
+                  <div className="card-sub">For Registration and Legal Purposes</div>
                 </div>
-                <div className="policy-body">
-                  <div className="policy-grid">
-                    <div className="policy-field"><label>Policy Number</label><div className="val">{p.policyNumber}</div></div>
-                    <div className="policy-field"><label>Effective Date</label><div className="val">{p.effectiveDate}</div></div>
-                    <div className="policy-field"><label>Expiration Date</label><div className="val">{p.expirationDate}</div></div>
-                    <div className="policy-field"><label>Premium</label><div className="val">{p.premium} / {p.frequency}</div></div>
-                  </div>
+                <div className="action-card">
+                  <div className="card-icon">⬇️</div>
+                  <div className="card-label">Get Proof of Coverage</div>
+                  <div className="card-sub">For Lienholder or Leasing Company</div>
                 </div>
-                <div className="policy-footer">
-                  <button className="primary" onClick={() => setShowModal(true)}>View Full Details</button>
-                  <button>Make a Payment</button>
-                  <button>File a Claim</button>
+                <div className="action-card premium-card">
+                  <div className="premium-label">Six-Month Premium</div>
+                  <div className="premium-amount">$992.24</div>
+                  <div className="premium-note">after discounts &amp; savings</div>
+                  <div className="disc-label">Discounts &amp; Savings</div>
+                  <div className="disc-amount">$927.46</div>
+                  <button className="pay-btn">View and Pay Bill</button>
                 </div>
               </div>
 
-              {/* Coverage */}
-              <div className="policy-card">
-                <div className="policy-header">
-                  <h4>Coverage Summary</h4>
+              {/* Action Tiles Row */}
+              <div className="action-tiles-row">
+                <div className="action-tile">
+                  <div className="tile-icon">🚗</div>
+                  <div className="tile-label">Add, Replace or Delete a Vehicle</div>
                 </div>
+                <div className="action-tile">
+                  <div className="tile-icon">🔄</div>
+                  <div className="tile-label">View or Update Coverage and Deductibles</div>
+                </div>
+                <div className="action-tile">
+                  <div className="tile-icon">📍</div>
+                  <div className="tile-label">Change Vehicle Location</div>
+                </div>
+                <div className="action-tile highlight">
+                  <div className="tile-icon">🛡️</div>
+                  <div className="tile-label">Save $40.24 on your Auto. Add Life Insurance</div>
+                </div>
+                <div className="action-tile">
+                  <div className="tile-icon">🐷</div>
+                  <div className="tile-label">Want a Lower Premium?</div>
+                </div>
+              </div>
+
+              {/* Policy Info Bar */}
+              <div className="policy-info-bar">
+                <div className="policy-title-group">
+                  <h4>Washington Auto Policy <a href="#">» Nickname This Account</a></h4>
+                  <span className="cic">CIC 10944759 7101</span>
+                </div>
+                <div className="policy-info-meta">
+                  <div className="meta-item">
+                    <span className="meta-label">Company Code</span>
+                    <span className="meta-value">459</span>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">Policy Term</span>
+                    <span className="meta-value">Nov 05, 2025 - May 05, 2026</span>
+                  </div>
+                </div>
+                <a href="#" className="print-link">🖨️ Print | Feb 09, 2026</a>
+              </div>
+
+              {/* Vehicle Rows */}
+              {p.vehicles.map((v, i) => (
+                <div className="vehicle-row-card" key={i}>
+                  <div className="vehicle-row-header">
+                    <span className="veh-name">{v.year} {v.make.toUpperCase()} {v.model.toUpperCase()}</span>
+                    <div className="veh-cost">
+                      <span className="veh-price">$ {(parseFloat(v.premium.replace('$','')) * 6).toFixed(2)}</span>
+                      <span className="veh-per"> per 6 months</span>
+                    </div>
+                    <div className="veh-deductibles">
+                      <div className="ded-label">Deductibles</div>
+                      <div className="ded-value">Comprehensive {p.deductible} / Collision 1,000</div>
+                    </div>
+                  </div>
+                  <div className="vehicle-row-body">
+                    <div className="veh-img">{v.icon}</div>
+                    <div className="vehicle-row-detail">
+                      <div className="detail-row">
+                        <span className="dlabel">Vehicle Location</span>
+                        <a href="#">» Edit</a>
+                      </div>
+                      <div className="detail-row">
+                        <span className="dvalue">21110 4TH AVE W</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="dvalue">SEATTLE, WA 98199</span>
+                      </div>
+                    </div>
+                    <div className="vehicle-row-detail">
+                      <div className="detail-row">
+                        <span className="dlabel">Drivers License Information</span>
+                        <a href="#">» Edit</a>
+                      </div>
+                      <div className="detail-row">
+                        <span className="dvalue">ELIZABETH A MORGAN</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="dvalue">WA • MORG***E482LN</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'coverage' && (
+            <div>
+              <div className="policy-card" style={{ marginTop: '1rem' }}>
+                <div className="policy-header"><h4>Coverage Summary</h4></div>
                 <div className="policy-body">
                   <div className="policy-grid">
                     <div className="policy-field"><label>Deductible (Collision)</label><div className="val">{p.deductible}</div></div>
                     <div className="policy-field"><label>Bodily Injury</label><div className="val">{p.bodilyInjury}</div></div>
                     <div className="policy-field"><label>Property Damage</label><div className="val">{p.propertyDamage}</div></div>
                     <div className="policy-field"><label>Uninsured Motorist</label><div className="val">{p.uninsuredMotorist}</div></div>
+                    <div className="policy-field"><label>Comprehensive Deductible</label><div className="val">$500</div></div>
+                    <div className="policy-field"><label>Medical Payments</label><div className="val">$10,000</div></div>
+                    <div className="policy-field"><label>Rental Reimbursement</label><div className="val">$50/day, $1,500 max</div></div>
+                    <div className="policy-field"><label>Roadside Assistance</label><div className="val">Included</div></div>
                   </div>
                 </div>
               </div>
-
-              {/* Vehicles */}
-              <div className="policy-card">
-                <div className="policy-header">
-                  <h4>Covered Vehicles</h4>
-                </div>
-                <div className="policy-body" style={{ padding: 0 }}>
-                  {p.vehicles.map((v, i) => (
-                    <div className="vehicle-card" key={i}>
-                      <div className="vehicle-icon">{v.icon}</div>
-                      <div className="vehicle-info">
-                        <h5>{v.year} {v.make} {v.model}</h5>
-                        <p>VIN: {v.vin}</p>
-                      </div>
-                      <div className="vehicle-premium">
-                        <div className="amt">{v.premium}</div>
-                        <div className="freq">/month</div>
-                      </div>
+              {p.vehicles.map((v, i) => (
+                <div className="policy-card" key={i}>
+                  <div className="policy-header"><h4>{v.year} {v.make} {v.model}</h4></div>
+                  <div className="policy-body">
+                    <div className="policy-grid">
+                      <div className="policy-field"><label>Collision Deductible</label><div className="val">$1,000</div></div>
+                      <div className="policy-field"><label>Comprehensive Deductible</label><div className="val">{p.deductible}</div></div>
+                      <div className="policy-field"><label>Emergency Roadside</label><div className="val">Included</div></div>
+                      <div className="policy-field"><label>Rental Car</label><div className="val">$50/day</div></div>
                     </div>
-                  ))}
+                  </div>
                 </div>
-                <div className="policy-footer">
-                  <button>Add Vehicle</button>
-                  <button>Remove Vehicle</button>
-                </div>
-              </div>
+              ))}
             </div>
+          )}
 
-            <div className="sidebar">
-              <div className="sidebar-card">
-                <h4>Need Help?</h4>
-                <p>Our insurance specialists are available 24/7 to assist you with claims, coverage questions, or policy changes.</p>
-                <a href="#" className="sidebar-link">📞 1-800-555-0199</a>
-              </div>
-              <div className="sidebar-card">
-                <h4>Digital ID Cards</h4>
-                <p>Access your insurance ID cards instantly from any device.</p>
-                <a href="#" className="sidebar-link">View ID Cards →</a>
-              </div>
-              <div className="sidebar-card">
-                <h4>Bundle &amp; Save</h4>
-                <p>Save up to 10% when you bundle auto and home insurance.</p>
-                <a href="#" className="sidebar-link">Get a Quote →</a>
-              </div>
-            </div>
-          </div>
-
-          {showModal && (
-            <div className="modal-overlay" onClick={() => setShowModal(false)}>
-              <div className="modal" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
-                  <h3>Policy Details — {p.policyNumber}</h3>
-                  <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+          {activeTab === 'discounts' && (
+            <div>
+              <div className="policy-card" style={{ marginTop: '1rem' }}>
+                <div className="policy-header"><h4>Your Discounts &amp; Savings</h4></div>
+                <div className="policy-body">
+                  <div style={{ marginBottom: '1rem' }}>
+                    <p style={{ fontSize: '.85rem', color: '#374151', marginBottom: '1rem' }}>You're saving <strong style={{ color: '#065f46', fontSize: '1.1rem' }}>$927.46</strong> on your six-month premium thanks to the following discounts:</p>
+                  </div>
+                  <div className="policy-grid">
+                    <div className="policy-field"><label>Multi-Policy Discount</label><div className="val" style={{ color: '#065f46' }}>-$312.18</div></div>
+                    <div className="policy-field"><label>Safe Driver Discount</label><div className="val" style={{ color: '#065f46' }}>-$198.40</div></div>
+                    <div className="policy-field"><label>Defensive Driving</label><div className="val" style={{ color: '#065f46' }}>-$74.52</div></div>
+                    <div className="policy-field"><label>Vehicle Safety Features</label><div className="val" style={{ color: '#065f46' }}>-$89.30</div></div>
+                    <div className="policy-field"><label>Low Mileage Discount</label><div className="val" style={{ color: '#065f46' }}>-$142.80</div></div>
+                    <div className="policy-field"><label>Loyalty Discount</label><div className="val" style={{ color: '#065f46' }}>-$110.26</div></div>
+                  </div>
                 </div>
-                <div className="modal-body">
-                  <div className="info-row"><span className="info-label">Policy Holder</span><span className="info-value">Elizabeth A. Morgan</span></div>
-                  <div className="info-row"><span className="info-label">Policy Number</span><span className="info-value">{p.policyNumber}</span></div>
-                  <div className="info-row"><span className="info-label">Status</span><span className="info-value" style={{ color: '#059669' }}>Active</span></div>
-                  <div className="info-row"><span className="info-label">Type</span><span className="info-value">Personal Auto</span></div>
-                  <div className="info-row"><span className="info-label">Effective</span><span className="info-value">{p.effectiveDate} — {p.expirationDate}</span></div>
-                  <div className="info-row"><span className="info-label">Premium</span><span className="info-value">{p.premium}/{p.frequency}</span></div>
-                  <div className="info-row"><span className="info-label">Vehicles</span><span className="info-value">{p.vehicles.length} covered</span></div>
-                  <div className="info-row"><span className="info-label">Payment Method</span><span className="info-value">Auto Pay — Checking •4219</span></div>
-                  <div className="info-row"><span className="info-label">Next Payment</span><span className="info-value">Mar 01, 2026</span></div>
-                </div>
+              </div>
+              <div className="auto-promo" style={{ marginTop: '1rem' }}>
+                <h4>Want even more savings?</h4>
+                <p>Add Life Insurance to save an additional $40.24 on your auto policy. Bundle and save with SecureShield.</p>
+                <a href="#" className="learn-more">Get a Quote</a>
               </div>
             </div>
           )}
