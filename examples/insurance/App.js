@@ -7,17 +7,27 @@ function App() {
     return null;
   }
   const user = JSON.parse(stored);
-  const [page, setPage] = React.useState('dashboard');
+
+  // Support hash-based deep links (e.g. index.html#auto)
+  const initialPage = window.location.hash ? window.location.hash.slice(1) : 'dashboard';
+  const [page, setPage] = React.useState(initialPage);
+
+  const handleNavigate = (target) => {
+    if (target === 'auto-claims') {
+      window.location.href = 'auto-claims.html';
+      return;
+    }
+    setPage(target);
+  };
 
   const handleLogout = () => { sessionStorage.removeItem('ss_user'); window.location.href = 'login.html'; };
 
   return (
     <div>
-      <TopNav user={user} currentPage={page} onNavigate={setPage} onLogout={handleLogout} />
-      {page === 'dashboard' && <Dashboard onNavigate={setPage} />}
-      {page === 'auto' && <AutoInsurancePage onNavigate={setPage} />}
-      {page === 'home-ins' && <HomeInsurancePage onNavigate={setPage} />}
-      {page === 'auto-claims' && <AutoClaimsPage onNavigate={setPage} />}
+      <TopNav user={user} currentPage={page} onNavigate={handleNavigate} onLogout={handleLogout} />
+      {page === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
+      {page === 'auto' && <AutoInsurancePage onNavigate={handleNavigate} />}
+      {page === 'home-ins' && <HomeInsurancePage onNavigate={handleNavigate} />}
     </div>
   );
 }

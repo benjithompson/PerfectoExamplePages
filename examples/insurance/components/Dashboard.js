@@ -71,7 +71,7 @@ function Dashboard({ onNavigate }) {
                     <button className="pop-close" onClick={() => setClaimsOpen(false)}>✕</button>
                   </div>
                   <div className="claims-popover-body">
-                    <a href="#" onClick={e => { e.preventDefault(); setClaimsOpen(false); onNavigate('auto-claims'); }}>
+                    <a href="auto-claims.html" onClick={() => setClaimsOpen(false)}>
                       File an Auto Claim <span className="arrow">›</span>
                     </a>
                     <a href="#" onClick={e => e.preventDefault()}>File a Property Claim</a>
