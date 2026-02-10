@@ -53,6 +53,29 @@
     .nav-right button:hover { color: #fff; background: rgba(255,255,255,.1); }
     .nav-avatar { width: 32px; height: 32px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: .75rem; cursor: pointer; border: 2px solid rgba(255,255,255,.2); }
 
+    /* ---- Mega Menu ---- */
+    .mega-overlay { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,.35); }
+    .mega-menu { position: absolute; top: 100%; left: 0; right: 0; z-index: 95; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,.18); border-top: 3px solid #2a7fff; animation: megaSlide .2s ease; }
+    @keyframes megaSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    .mega-menu-inner { max-width: 1280px; margin: 0 auto; display: flex; padding: 0; }
+    .mega-columns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; padding: 1.6rem 1.5rem 1.8rem; }
+    .mega-col h5 { font-size: .82rem; font-weight: 700; color: #1a1a2e; margin-bottom: .7rem; letter-spacing: .3px; }
+    .mega-col ul { list-style: none; padding: 0; margin: 0 0 1.2rem; }
+    .mega-col ul li { margin-bottom: .1rem; }
+    .mega-col ul li a { display: block; padding: .32rem 0; font-size: .82rem; color: #2a7fff; text-decoration: none; font-weight: 400; transition: color .12s; }
+    .mega-col ul li a:hover { color: #0052cc; text-decoration: underline; }
+    .mega-col .view-all { font-size: .82rem; color: #2a7fff; font-weight: 600; text-decoration: none; display: inline-block; margin-top: .3rem; }
+    .mega-col .view-all:hover { text-decoration: underline; }
+    .mega-sidebar { width: 260px; background: #f8f9fb; border-left: 1px solid #e5e7eb; padding: 1.4rem 1.3rem; display: flex; flex-direction: column; gap: .15rem; }
+    .mega-sidebar a { display: flex; align-items: center; gap: .6rem; padding: .55rem .5rem; font-size: .82rem; color: #1a1a2e; text-decoration: none; font-weight: 500; border-radius: 6px; transition: background .12s; }
+    .mega-sidebar a:hover { background: #e8ecf1; }
+    .mega-sidebar a .mega-icon { font-size: .9rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-link-wrap { position: relative; display: flex; align-items: center; }
+    .nav-link-wrap > a { color: rgba(255,255,255,.75); text-decoration: none; padding: .5rem .9rem; font-size: .82rem; font-weight: 500; border-radius: 6px; transition: all .15s; }
+    .nav-link-wrap > a:hover, .nav-link-wrap > a.active { color: #fff; background: rgba(255,255,255,.1); }
+    .nav-link-wrap > a.mega-open { color: #fff; background: rgba(255,255,255,.15); }
+    @media(max-width: 768px) { .mega-columns { grid-template-columns: repeat(2, 1fr); } .mega-sidebar { width: 100%; border-left: none; border-top: 1px solid #e5e7eb; } .mega-menu-inner { flex-direction: column; } }
+
     /* ---- Dashboard Layout ---- */
     .dashboard { max-width: 1280px; margin: 0 auto; padding: 1.8rem 1.5rem 3rem; }
     .greeting { font-size: 1.35rem; font-weight: 600; margin-bottom: .15rem; }
@@ -168,7 +191,7 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useRef } = React;
 
     /* ── STATIC USER DATA ── */
     const TEST_USER = { username: 'elizabeth.morgan', password: 'Test1234!', name: 'Elizabeth', fullName: 'Elizabeth A. Morgan', memberId: '2847391056' };
@@ -279,22 +302,71 @@
       );
     }
 
+    /* ── INSURANCE MEGA MENU DATA ── */
+    const MEGA_MENU = {
+      columns: [
+        { title: 'Vehicle Insurance', links: ['Auto','Pay as You Drive','Motorcycle','ATV','RV and Motorhome','Boat','Bicycle and E-Bike','Classic and Collector Car','Aviation'], viewAll: 'View All Insurance' },
+        { title: 'Property Insurance', links: ['Renters','Homeowners','Condo','Landlord','Personal Property','Flood','Mobile Home','Collectibles','Cell Phone Protection'] },
+        { title: 'Life Insurance', sub: [
+          { heading: 'Life Insurance', links: ['Long-Term Care'] },
+          { heading: 'Umbrella Insurance', links: [] },
+          { heading: 'Health Insurance', links: ['Medicare Plans','Individual and Family Plans','Dental','Vision','Supplemental Health Gap'] }
+        ]},
+        { title: 'Business Insurance', sub: [
+          { heading: 'Business Insurance', links: ['Commercial General Liability','Business Owners Policy','Commercial Auto'] },
+          { heading: 'Overseas Insurance', links: [] },
+          { heading: 'Additional Insurance', links: ['Pet','Travel','Event'] }
+        ]}
+      ],
+      sidebar: [
+        { icon: '🏷️', label: 'Claims' },
+        { icon: '🚗', label: 'Roadside Assistance' },
+        { icon: '🪪', label: 'Auto ID Card' },
+        { icon: '🏠', label: 'Auto and Property Insurance Bill' },
+        { icon: '💰', label: 'Life Insurance and Other Bills' },
+        { icon: '⚙️', label: 'Manage Auto and Property Insurance' },
+        { icon: '📋', label: 'View All Insurance Support' }
+      ]
+    };
+
     /* ── TOP NAVIGATION ── */
     function TopNav({ user, currentPage, onNavigate, onLogout }) {
+      const [megaOpen, setMegaOpen] = useState(false);
+      const megaRef = useRef(null);
+
+      useEffect(() => {
+        if (!megaOpen) return;
+        const handleKey = (e) => { if (e.key === 'Escape') setMegaOpen(false); };
+        document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+      }, [megaOpen]);
+
+      const handleInsuranceClick = (e) => {
+        e.preventDefault();
+        setMegaOpen(prev => !prev);
+      };
+
+      const closeMega = () => setMegaOpen(false);
+
+      const navTo = (page) => { closeMega(); onNavigate(page); };
+
       return (
-        <nav className="top-nav">
+        <nav className="top-nav" style={{ position: 'sticky', top: 0 }}>
           <div className="top-nav-inner">
-            <a href="#" className="nav-logo" onClick={e => { e.preventDefault(); onNavigate('dashboard'); }}>
+            <a href="#" className="nav-logo" onClick={e => { e.preventDefault(); navTo('dashboard'); }}>
               <div className="shield">SS</div>
               <span>SecureShield</span>
             </a>
             <div className="nav-links">
-              <a href="#" className={currentPage === 'dashboard' ? 'active' : ''} onClick={e => { e.preventDefault(); onNavigate('dashboard'); }}>Home</a>
-              <a href="#" className={currentPage === 'auto' || currentPage === 'home-ins' ? 'active' : ''} onClick={e => { e.preventDefault(); onNavigate('auto'); }}>Insurance</a>
+              <a href="#" className={currentPage === 'dashboard' ? 'active' : ''} onClick={e => { e.preventDefault(); navTo('dashboard'); }}>Home</a>
+              <div className="nav-link-wrap">
+                <a href="#" className={(currentPage === 'auto' || currentPage === 'home-ins' ? 'active' : '') + (megaOpen ? ' mega-open' : '')} onClick={handleInsuranceClick}>Insurance</a>
+              </div>
               <a href="#" onClick={e => e.preventDefault()}>Banking</a>
               <a href="#" onClick={e => e.preventDefault()}>Retirement</a>
               <a href="#" onClick={e => e.preventDefault()}>Investing</a>
               <a href="#" onClick={e => e.preventDefault()}>Advice</a>
+              <a href="#" onClick={e => e.preventDefault()}>Perks</a>
             </div>
             <div className="nav-right">
               <button onClick={e => e.preventDefault()}>🔍 Search</button>
@@ -303,6 +375,54 @@
               <button onClick={onLogout}>Log Off</button>
             </div>
           </div>
+
+          {megaOpen && (
+            <React.Fragment>
+              <div className="mega-overlay" onClick={closeMega} />
+              <div className="mega-menu" ref={megaRef}>
+                <div className="mega-menu-inner">
+                  <div className="mega-columns">
+                    {MEGA_MENU.columns.map((col, ci) => (
+                      <div className="mega-col" key={ci}>
+                        {col.links ? (
+                          <React.Fragment>
+                            <h5>{col.title}</h5>
+                            <ul>
+                              {col.links.map((l, li) => (
+                                <li key={li}><a href="#" onClick={e => { e.preventDefault(); if (l === 'Auto') navTo('auto'); else if (l === 'Homeowners') navTo('home-ins'); }}>{l}</a></li>
+                              ))}
+                            </ul>
+                            {col.viewAll && <a href="#" className="view-all" onClick={e => e.preventDefault()}>{col.viewAll}</a>}
+                          </React.Fragment>
+                        ) : col.sub ? (
+                          col.sub.map((s, si) => (
+                            <React.Fragment key={si}>
+                              <h5>{s.heading}</h5>
+                              {s.links.length > 0 && (
+                                <ul>
+                                  {s.links.map((l, li) => (
+                                    <li key={li}><a href="#" onClick={e => e.preventDefault()}>{l}</a></li>
+                                  ))}
+                                </ul>
+                              )}
+                            </React.Fragment>
+                          ))
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mega-sidebar">
+                    {MEGA_MENU.sidebar.map((item, i) => (
+                      <a href="#" key={i} onClick={e => e.preventDefault()}>
+                        <span className="mega-icon">{item.icon}</span>
+                        {item.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </React.Fragment>
+          )}
         </nav>
       );
     }
