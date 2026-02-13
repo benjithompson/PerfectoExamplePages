@@ -4,7 +4,7 @@
 
 var TEST_USER = {
   username: 'sarah.mitchell',
-  password: 'Secure#987',
+  password: 'Test1234!',
   name: 'Sarah',
   fullName: 'Sarah J. Mitchell',
   email: 'sarah.mitchell@email.com',
@@ -55,7 +55,7 @@ var HOME_POLICY = {
   expirationDate: 'Jan 01, 2026',
   premium: '$158.25',
   frequency: 'Monthly',
-  dwelling: '$475,000',
+  dwelling: '$275,000',
   personalProperty: '$237,500',
   liability: '$300,000',
   deductible: '$1,000',
