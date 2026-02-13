@@ -1,12 +1,22 @@
 /* App Root Component – Routing and state management */
 function App() {
-  // Read authenticated user from sessionStorage (set by login.html)
-  const stored = sessionStorage.getItem('ss_user');
-  if (!stored) {
-    window.location.href = 'login.html';
-    return null;
-  }
-  const user = JSON.parse(stored);
+  // Validate auth session (JWT-like token with expiry + idle check)
+  const user = AuthManager.requireAuth();
+  if (!user) return null; // redirect already initiated
+
+  // Start idle timeout monitoring
+  React.useEffect(() => {
+    AuthManager.startIdleWatch();
+    return () => AuthManager.stopIdleWatch();
+  }, []);
+
+  // Listen for session-about-to-expire warnings
+  const [sessionWarning, setSessionWarning] = React.useState(false);
+  React.useEffect(() => {
+    const onWarning = () => setSessionWarning(true);
+    window.addEventListener('ss-session-warning', onWarning);
+    return () => window.removeEventListener('ss-session-warning', onWarning);
+  }, []);
 
   // Support hash-based deep links (e.g. index.html#auto)
   const initialPage = window.location.hash ? window.location.hash.slice(1) : 'dashboard';
@@ -55,7 +65,7 @@ function App() {
     setPaymentOpen(true);
   };
 
-  const handleLogout = () => { sessionStorage.removeItem('ss_user'); window.location.href = 'login.html'; };
+  const handleLogout = () => AuthManager.logout();
 
   return (
     <div>
@@ -84,6 +94,15 @@ function App() {
       <TransferModal isOpen={transferOpen} onClose={() => setTransferOpen(false)} />
       <GetQuote isOpen={quoteOpen} onClose={() => setQuoteOpen(false)} />
       <IDCardViewer isOpen={idCardOpen} onClose={() => setIdCardOpen(false)} />
+
+      {/* Session expiry warning banner */}
+      {sessionWarning && (
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 999, background: '#fef3c7', borderTop: '2px solid #f59e0b', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+          <span style={{ fontSize: '.88rem', color: '#92400e', fontWeight: 500 }}>⏱️ Your session will expire soon due to inactivity.</span>
+          <button onClick={() => { AuthManager.refreshSession(); setSessionWarning(false); }} style={{ padding: '.4rem 1rem', background: '#2a7fff', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', fontSize: '.82rem' }}>Keep me signed in</button>
+          <button onClick={handleLogout} style={{ padding: '.4rem 1rem', background: '#fff', color: '#374151', border: '1px solid #d1d5db', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', fontSize: '.82rem' }}>Log out</button>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,7 +6,7 @@ function IDCardViewer({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const v = AUTO_POLICY.vehicles[selectedVehicle];
-  const user = JSON.parse(sessionStorage.getItem('ss_user') || '{}');
+  const user = AuthManager.getUser() || {};
 
   const handleEmail = () => {
     setEmailSent(true);

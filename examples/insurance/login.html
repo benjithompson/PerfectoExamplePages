@@ -44,6 +44,7 @@
   <div id="root"></div>
 
   <script src="data/constants.js"></script>
+  <script src="data/auth.js"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -54,11 +55,22 @@
       const [password, setPassword] = React.useState('');
       const [error, setError] = React.useState('');
 
+      // Check for session expiry / timeout message from redirect
+      const params = new URLSearchParams(window.location.search);
+      const reason = params.get('reason');
+
+      // If already authenticated, skip login
+      React.useEffect(() => {
+        if (AuthManager.isAuthenticated()) {
+          window.location.href = 'index.html';
+        }
+      }, []);
+
       const handleSubmit = (e) => {
         e.preventDefault();
         if (username === TEST_USER.username && password === TEST_USER.password) {
-          // Store authenticated user in sessionStorage, then navigate (real HTTP request)
-          sessionStorage.setItem('ss_user', JSON.stringify(TEST_USER));
+          // Create authenticated session with expiry token
+          AuthManager.login(TEST_USER);
           window.location.href = 'index.html';
         } else {
           setError('Invalid username or password. Please try again.');
@@ -77,6 +89,7 @@
             <div className="login-card">
               <h2>Welcome Back</h2>
               <p className="subtitle">Sign in to manage your accounts and policies.</p>
+              {reason && !error && <div className="login-error" style={{ background: '#fffbeb', borderColor: '#f59e0b', color: '#92400e' }}>⏱️ {reason}. Please sign in again.</div>}
               {error && <div className="login-error">⚠️ {error}</div>}
               <form onSubmit={handleSubmit}>
                 <div className="form-group">

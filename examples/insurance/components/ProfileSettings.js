@@ -1,6 +1,6 @@
 /* ProfileSettings Component – Account profile and settings page */
 function ProfileSettings({ onNavigate }) {
-  const stored = JSON.parse(sessionStorage.getItem('ss_user') || '{}');
+  const stored = AuthManager.getUser() || {};
   const [profile, setProfile] = React.useState({
     fullName: stored.fullName || 'Elizabeth A. Morgan',
     email: 'elizabeth.morgan@email.com',

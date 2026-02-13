@@ -48,15 +48,15 @@
   <div id="root"></div>
 
   <script src="data/constants.js"></script>
+  <script src="data/auth.js"></script>
   <script type="text/babel" src="components/TopNav.js"></script>
 
   <script type="text/babel">
-    // Auth guard – redirect to login if no session
-    const stored = sessionStorage.getItem('ss_user');
-    if (!stored) {
-      window.location.href = 'login.html';
+    // Auth guard – validate session token
+    const user = AuthManager.requireAuth();
+    if (user) {
+      AuthManager.startIdleWatch();
     }
-    const user = stored ? JSON.parse(stored) : null;
 
     function AutoClaimsApp() {
       const [showWizard, setShowWizard] = React.useState(false);
@@ -86,10 +86,7 @@
         else window.location.href = 'index.html';
       };
 
-      const handleLogout = () => {
-        sessionStorage.removeItem('ss_user');
-        window.location.href = 'login.html';
-      };
+      const handleLogout = () => AuthManager.logout();
 
       const updateClaim = (k, v) => setClaimData(prev => ({ ...prev, [k]: v }));
 
