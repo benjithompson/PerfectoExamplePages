@@ -59,11 +59,30 @@
     const user = stored ? JSON.parse(stored) : null;
 
     function AutoClaimsApp() {
+      const [showWizard, setShowWizard] = React.useState(false);
+      const [wizardStep, setWizardStep] = React.useState(1);
+      const [claimSubmitted, setClaimSubmitted] = React.useState(false);
+      const [claimData, setClaimData] = React.useState({
+        vehicle: '',
+        incidentType: '',
+        date: '',
+        location: '',
+        description: '',
+        otherParty: false,
+        policeReport: false,
+        injuries: 'none'
+      });
+
       const handleNavigate = (page) => {
         if (page === 'dashboard') window.location.href = 'index.html';
         else if (page === 'auto') window.location.href = 'index.html#auto';
         else if (page === 'home-ins') window.location.href = 'index.html#home-ins';
         else if (page === 'auto-claims') window.location.reload();
+        else if (page === 'banking') window.location.href = 'index.html#banking';
+        else if (page === 'rewards') window.location.href = 'index.html#rewards';
+        else if (page === 'perks') window.location.href = 'index.html#perks';
+        else if (page === 'documents') window.location.href = 'index.html#documents';
+        else if (page === 'profile') window.location.href = 'index.html#profile';
         else window.location.href = 'index.html';
       };
 
@@ -72,60 +91,227 @@
         window.location.href = 'login.html';
       };
 
-      return (
-        <div>
-          <TopNav user={user} currentPage="auto-claims" onNavigate={handleNavigate} onLogout={handleLogout} />
-          <div className="claims-page">
-            <div className="claims-hero">
-              <div className="claims-hero-inner">
-                <h1>Auto insurance claims</h1>
-                <p className="hero-sub">We're here to help every step of the way.</p>
-                <div className="claims-hero-actions">
-                  <a href="#" className="hero-btn primary" onClick={e => e.preventDefault()}>Report an auto claim</a>
-                  <a href="#" className="hero-btn secondary" onClick={e => e.preventDefault()}>Check claim status  ›</a>
+      const updateClaim = (k, v) => setClaimData(prev => ({ ...prev, [k]: v }));
+
+      const incidentTypes = ['Collision with another vehicle', 'Single-car accident', 'Hit and run', 'Parking lot damage', 'Weather/Natural disaster', 'Animal collision', 'Theft', 'Vandalism'];
+      const vehicles = AUTO_POLICY.vehicles || [{ year: 2022, make: 'Toyota', model: 'Camry' }, { year: 2020, make: 'Honda', model: 'CR-V' }];
+
+      const handleSubmitClaim = () => setClaimSubmitted(true);
+
+      const renderWizard = () => {
+        if (claimSubmitted) {
+          return (
+            <div className="claim-wizard">
+              <div className="policy-card">
+                <div className="policy-body" style={{ textAlign: 'center', padding: '3rem 2rem' }}>
+                  <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>✅</div>
+                  <h3 style={{ fontSize: '1.4rem', marginBottom: '.5rem' }}>Claim Submitted Successfully</h3>
+                  <p style={{ fontSize: '.9rem', color: '#6b7280', marginBottom: '.3rem' }}>
+                    Claim Number: <strong>CLM-{Math.random().toString(36).substring(2, 10).toUpperCase()}</strong>
+                  </p>
+                  <p style={{ fontSize: '.85rem', color: '#6b7280', marginBottom: '1.5rem' }}>A claims adjuster will contact you within 24–48 hours.</p>
+                  <div style={{ display: 'flex', gap: '.6rem', justifyContent: 'center' }}>
+                    <button className="login-btn" style={{ flex: 0, padding: '.7rem 2rem' }} onClick={() => handleNavigate('dashboard')}>Return to Dashboard</button>
+                    <button className="login-btn" style={{ flex: 0, padding: '.7rem 2rem', background: '#fff', color: '#374151', border: '1px solid #d1d5db' }} onClick={() => handleNavigate('auto')}>View Policy</button>
+                  </div>
                 </div>
               </div>
             </div>
+          );
+        }
 
-            <div className="claims-content">
-              <h3>Find out what's covered before you file a claim.</h3>
-              <p className="body-text">
-                Our policies typically cover things like damage to your car from an
-                accident or if you hit another driver and are at fault. If you're not
-                sure about your coverage, you can check your policy.
-              </p>
-              <a href="index.html#auto" className="check-link">Check my policy  ›</a>
+        return (
+          <div className="claim-wizard">
+            {/* Progress */}
+            <div className="claim-progress" style={{ marginBottom: '1.5rem' }}>
+              {['Vehicle', 'Incident', 'Details', 'Review'].map((label, i) => (
+                <div key={i} className={'claim-progress-step' + (i + 1 <= wizardStep ? ' active' : '') + (i + 1 === wizardStep ? ' current' : '')}>
+                  <div className="claim-step-num">{i + 1}</div>
+                  <div className="claim-step-label">{label}</div>
+                </div>
+              ))}
             </div>
 
-            <div className="claims-process">
-              <div className="claims-process-inner">
-                <h3>How the auto claims process works</h3>
-                <p className="process-sub">We'll help you with every step of your claim and provide personalized updates along the way.</p>
-                <div className="process-steps">
-                  <div className="process-step">
-                    <div className="step-num">1</div>
-                    <h5>Report your claim</h5>
-                    <p>Tell us what happened. Get started on secureshield.com or the SecureShield Mobile App.</p>
+            <div className="policy-card">
+              <div className="policy-body">
+                {wizardStep === 1 && (
+                  <div>
+                    <h4 style={{ marginBottom: '1rem' }}>Which vehicle is this claim for?</h4>
+                    <div className="claim-type-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+                      {vehicles.map((v, i) => {
+                        const vLabel = v.year + ' ' + v.make + ' ' + v.model;
+                        return (
+                          <div key={i}
+                            className={'claim-type-option' + (claimData.vehicle === vLabel ? ' selected' : '')}
+                            onClick={() => updateClaim('vehicle', vLabel)}>
+                            <div style={{ fontSize: '1.5rem', marginBottom: '.3rem' }}>🚗</div>
+                            {vLabel}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ marginTop: '1.5rem' }}>
+                      <button className="login-btn" disabled={!claimData.vehicle} onClick={() => setWizardStep(2)}>Continue</button>
+                    </div>
                   </div>
-                  <div className="process-step">
-                    <div className="step-num">2</div>
-                    <h5>Get more details</h5>
-                    <p>We'll review what happened and check what your policy covers. You can also add more details in <a href="#" onClick={e => e.preventDefault()}>My Claims Center</a>.</p>
+                )}
+
+                {wizardStep === 2 && (
+                  <div>
+                    <h4 style={{ marginBottom: '1rem' }}>What type of incident occurred?</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '.4rem' }}>
+                      {incidentTypes.map(type => (
+                        <div key={type}
+                          className={'claim-type-option' + (claimData.incidentType === type ? ' selected' : '')}
+                          style={{ textAlign: 'left', padding: '.7rem 1rem' }}
+                          onClick={() => updateClaim('incidentType', type)}>
+                          {type}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="wizard-footer">
+                      <button className="login-btn" style={{ flex: 1 }} disabled={!claimData.incidentType} onClick={() => setWizardStep(3)}>Continue</button>
+                      <button className="login-btn" style={{ flex: 0, background: '#fff', color: '#374151', border: '1px solid #d1d5db' }} onClick={() => setWizardStep(1)}>Back</button>
+                    </div>
                   </div>
-                  <div className="process-step">
-                    <div className="step-num">3</div>
-                    <h5>Evaluate the claim</h5>
-                    <p>We'll go over the details and figure out what to pay based on your coverage, deductible and who's responsible.</p>
+                )}
+
+                {wizardStep === 3 && (
+                  <div>
+                    <h4 style={{ marginBottom: '1rem' }}>Tell us the details</h4>
+                    <div className="form-group">
+                      <label>Date of Incident</label>
+                      <input type="date" value={claimData.date} onChange={e => updateClaim('date', e.target.value)} />
+                    </div>
+                    <div className="form-group">
+                      <label>Location</label>
+                      <input type="text" value={claimData.location} onChange={e => updateClaim('location', e.target.value)} placeholder="City, State or intersection" />
+                    </div>
+                    <div className="form-group">
+                      <label>Description of what happened</label>
+                      <textarea style={{ width: '100%', padding: '.8rem', border: '1.5px solid #d1d5db', borderRadius: 8, fontFamily: 'inherit', fontSize: '.9rem', minHeight: 100, resize: 'vertical' }}
+                        value={claimData.description}
+                        onChange={e => updateClaim('description', e.target.value)}
+                        placeholder="Describe the incident in detail..." />
+                    </div>
+                    <div className="form-group">
+                      <label style={{ textTransform: 'none', letterSpacing: 0, fontSize: '.85rem', display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={claimData.otherParty} onChange={e => updateClaim('otherParty', e.target.checked)} />
+                        Another vehicle/party was involved
+                      </label>
+                    </div>
+                    <div className="form-group">
+                      <label style={{ textTransform: 'none', letterSpacing: 0, fontSize: '.85rem', display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={claimData.policeReport} onChange={e => updateClaim('policeReport', e.target.checked)} />
+                        A police report was filed
+                      </label>
+                    </div>
+                    <div className="form-group">
+                      <label>Were there any injuries?</label>
+                      <select className="form-select" value={claimData.injuries} onChange={e => updateClaim('injuries', e.target.value)}>
+                        <option value="none">No injuries</option>
+                        <option value="minor">Minor injuries</option>
+                        <option value="major">Serious injuries – medical attention required</option>
+                      </select>
+                    </div>
+                    <div className="wizard-footer">
+                      <button className="login-btn" style={{ flex: 1 }} onClick={() => setWizardStep(4)}>Continue</button>
+                      <button className="login-btn" style={{ flex: 0, background: '#fff', color: '#374151', border: '1px solid #d1d5db' }} onClick={() => setWizardStep(2)}>Back</button>
+                    </div>
                   </div>
-                  <div className="process-step">
-                    <div className="step-num">4</div>
-                    <h5>Settle the claim</h5>
-                    <p>If covered, we'll make a payment to you or a third party.</p>
+                )}
+
+                {wizardStep === 4 && (
+                  <div>
+                    <h4 style={{ marginBottom: '1rem' }}>Review Your Claim</h4>
+                    <div className="info-row"><span className="info-label">Policy</span><span className="info-value">{AUTO_POLICY.policyNumber}</span></div>
+                    <div className="info-row"><span className="info-label">Vehicle</span><span className="info-value">{claimData.vehicle}</span></div>
+                    <div className="info-row"><span className="info-label">Incident Type</span><span className="info-value">{claimData.incidentType}</span></div>
+                    <div className="info-row"><span className="info-label">Date</span><span className="info-value">{claimData.date || 'Not specified'}</span></div>
+                    <div className="info-row"><span className="info-label">Location</span><span className="info-value">{claimData.location || 'Not provided'}</span></div>
+                    <div className="info-row"><span className="info-label">Description</span><span className="info-value">{claimData.description || 'Not provided'}</span></div>
+                    <div className="info-row"><span className="info-label">Other Party</span><span className="info-value">{claimData.otherParty ? 'Yes' : 'No'}</span></div>
+                    <div className="info-row"><span className="info-label">Police Report</span><span className="info-value">{claimData.policeReport ? 'Yes' : 'No'}</span></div>
+                    <div className="info-row"><span className="info-label">Injuries</span><span className="info-value">{claimData.injuries === 'none' ? 'None' : claimData.injuries === 'minor' ? 'Minor' : 'Serious'}</span></div>
+                    <div className="wizard-footer">
+                      <button className="login-btn" style={{ flex: 1 }} onClick={handleSubmitClaim}>Submit Claim</button>
+                      <button className="login-btn" style={{ flex: 0, background: '#fff', color: '#374151', border: '1px solid #d1d5db' }} onClick={() => setWizardStep(3)}>Back</button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
+        );
+      };
+
+      return (
+        <div>
+          <TopNav user={user} currentPage="auto-claims" onNavigate={handleNavigate} onLogout={handleLogout} />
+          {showWizard ? (
+            <div className="claims-page">
+              <div style={{ maxWidth: 960, margin: '0 auto', padding: '1.5rem' }}>
+                <button onClick={() => { setShowWizard(false); setWizardStep(1); setClaimSubmitted(false); }}
+                  style={{ background: 'none', border: 'none', color: '#2a7fff', fontWeight: 600, fontSize: '.85rem', cursor: 'pointer', fontFamily: 'inherit', marginBottom: '.5rem', display: 'flex', alignItems: 'center', gap: '.3rem' }}>
+                  ← Back to Claims
+                </button>
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: '1rem' }}>Report an Auto Claim</h2>
+                {renderWizard()}
+              </div>
+            </div>
+          ) : (
+            <div className="claims-page">
+              <div className="claims-hero">
+                <div className="claims-hero-inner">
+                  <h1>Auto insurance claims</h1>
+                  <p className="hero-sub">We're here to help every step of the way.</p>
+                  <div className="claims-hero-actions">
+                    <a href="#" className="hero-btn primary" onClick={e => { e.preventDefault(); setShowWizard(true); }}>Report an auto claim</a>
+                    <a href="#" className="hero-btn secondary" onClick={e => e.preventDefault()}>Check claim status  ›</a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="claims-content">
+                <h3>Find out what's covered before you file a claim.</h3>
+                <p className="body-text">
+                  Our policies typically cover things like damage to your car from an
+                  accident or if you hit another driver and are at fault. If you're not
+                  sure about your coverage, you can check your policy.
+                </p>
+                <a href="index.html#auto" className="check-link">Check my policy  ›</a>
+              </div>
+
+              <div className="claims-process">
+                <div className="claims-process-inner">
+                  <h3>How the auto claims process works</h3>
+                  <p className="process-sub">We'll help you with every step of your claim and provide personalized updates along the way.</p>
+                  <div className="process-steps">
+                    <div className="process-step">
+                      <div className="step-num">1</div>
+                      <h5>Report your claim</h5>
+                      <p>Tell us what happened. Get started on secureshield.com or the SecureShield Mobile App.</p>
+                    </div>
+                    <div className="process-step">
+                      <div className="step-num">2</div>
+                      <h5>Get more details</h5>
+                      <p>We'll review what happened and check what your policy covers. You can also add more details in <a href="#" onClick={e => e.preventDefault()}>My Claims Center</a>.</p>
+                    </div>
+                    <div className="process-step">
+                      <div className="step-num">3</div>
+                      <h5>Evaluate the claim</h5>
+                      <p>We'll go over the details and figure out what to pay based on your coverage, deductible and who's responsible.</p>
+                    </div>
+                    <div className="process-step">
+                      <div className="step-num">4</div>
+                      <h5>Settle the claim</h5>
+                      <p>If covered, we'll make a payment to you or a third party.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       );
     }

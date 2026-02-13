@@ -1,7 +1,16 @@
 /* AutoInsurancePage Component – Auto insurance policy page with tabs */
-function AutoInsurancePage({ onNavigate }) {
+function AutoInsurancePage({ onNavigate, onPayment, onIdCard }) {
   const [activeTab, setActiveTab] = React.useState('summary');
+  const [editVehicleOpen, setEditVehicleOpen] = React.useState(false);
+  const [editVehicleIndex, setEditVehicleIndex] = React.useState(0);
+  const [nicknameOpen, setNicknameOpen] = React.useState(false);
+  const [policyNickname, setPolicyNickname] = React.useState(null);
   const p = AUTO_POLICY;
+
+  const handleNicknameClose = (name) => {
+    setNicknameOpen(false);
+    if (name) setPolicyNickname(name);
+  };
 
   return (
     <div className="auto-page">
@@ -33,12 +42,12 @@ function AutoInsurancePage({ onNavigate }) {
 
           {/* Action Cards Row */}
           <div className="action-cards-row">
-            <div className="action-card">
+            <div className="action-card" onClick={onIdCard}>
               <div className="card-icon">⬇️</div>
               <div className="card-label">Get Auto ID Cards</div>
               <div className="card-sub">For Registration and Legal Purposes</div>
             </div>
-            <div className="action-card">
+            <div className="action-card" onClick={onIdCard}>
               <div className="card-icon">⬇️</div>
               <div className="card-label">Get Proof of Coverage</div>
               <div className="card-sub">For Lienholder or Leasing Company</div>
@@ -49,7 +58,7 @@ function AutoInsurancePage({ onNavigate }) {
               <div className="premium-note">after discounts &amp; savings</div>
               <div className="disc-label">Discounts &amp; Savings</div>
               <div className="disc-amount">$927.46</div>
-              <button className="pay-btn">View and Pay Bill</button>
+              <button className="pay-btn" onClick={() => onPayment('Auto Insurance (WA)', '$186.40')}>View and Pay Bill</button>
             </div>
           </div>
 
@@ -59,11 +68,11 @@ function AutoInsurancePage({ onNavigate }) {
               <div className="tile-icon">🚗</div>
               <div className="tile-label">Add, Replace or Delete a Vehicle</div>
             </div>
-            <div className="action-tile">
+            <div className="action-tile" onClick={() => setActiveTab('coverage')}>
               <div className="tile-icon">🔄</div>
               <div className="tile-label">View or Update Coverage and Deductibles</div>
             </div>
-            <div className="action-tile">
+            <div className="action-tile" onClick={() => { setEditVehicleIndex(0); setEditVehicleOpen(true); }}>
               <div className="tile-icon">📍</div>
               <div className="tile-label">Change Vehicle Location</div>
             </div>
@@ -71,7 +80,7 @@ function AutoInsurancePage({ onNavigate }) {
               <div className="tile-icon">🛡️</div>
               <div className="tile-label">Save $40.24 on your Auto. Add Life Insurance</div>
             </div>
-            <div className="action-tile">
+            <div className="action-tile" onClick={() => setActiveTab('discounts')}>
               <div className="tile-icon">🐷</div>
               <div className="tile-label">Want a Lower Premium?</div>
             </div>
@@ -80,7 +89,7 @@ function AutoInsurancePage({ onNavigate }) {
           {/* Policy Info Bar */}
           <div className="policy-info-bar">
             <div className="policy-title-group">
-              <h4>Washington Auto Policy <a href="#">» Nickname This Account</a></h4>
+              <h4>{policyNickname || 'Washington Auto Policy'} <a href="#" onClick={e => { e.preventDefault(); setNicknameOpen(true); }}>» Nickname This Account</a></h4>
               <span className="cic">CIC 10944759 7101</span>
             </div>
             <div className="policy-info-meta">
@@ -93,7 +102,7 @@ function AutoInsurancePage({ onNavigate }) {
                 <span className="meta-value">Nov 05, 2025 - May 05, 2026</span>
               </div>
             </div>
-            <a href="#" className="print-link">🖨️ Print | Feb 09, 2026</a>
+            <a href="#" className="print-link" onClick={e => { e.preventDefault(); window.print(); }}>🖨️ Print | Feb 09, 2026</a>
           </div>
 
           {/* Vehicle Rows */}
@@ -115,7 +124,7 @@ function AutoInsurancePage({ onNavigate }) {
                 <div className="vehicle-row-detail">
                   <div className="detail-row">
                     <span className="dlabel">Vehicle Location</span>
-                    <a href="#">» Edit</a>
+                    <a href="#" onClick={e => { e.preventDefault(); setEditVehicleIndex(i); setEditVehicleOpen(true); }}>» Edit</a>
                   </div>
                   <div className="detail-row">
                     <span className="dvalue">21110 4TH AVE W</span>
@@ -127,7 +136,7 @@ function AutoInsurancePage({ onNavigate }) {
                 <div className="vehicle-row-detail">
                   <div className="detail-row">
                     <span className="dlabel">Drivers License Information</span>
-                    <a href="#">» Edit</a>
+                    <a href="#" onClick={e => e.preventDefault()}>» Edit</a>
                   </div>
                   <div className="detail-row">
                     <span className="dvalue">ELIZABETH A MORGAN</span>
@@ -196,10 +205,14 @@ function AutoInsurancePage({ onNavigate }) {
           <div className="auto-promo" style={{ marginTop: '1rem' }}>
             <h4>Want even more savings?</h4>
             <p>Add Life Insurance to save an additional $40.24 on your auto policy. Bundle and save with SecureShield.</p>
-            <a href="#" className="learn-more">Get a Quote</a>
+            <a href="#" className="learn-more" onClick={e => e.preventDefault()}>Get a Quote</a>
           </div>
         </div>
       )}
+
+      {/* Modals */}
+      <EditVehicleModal isOpen={editVehicleOpen} onClose={() => setEditVehicleOpen(false)} vehicleIndex={editVehicleIndex} />
+      <NicknameModal isOpen={nicknameOpen} onClose={handleNicknameClose} />
     </div>
   );
 }

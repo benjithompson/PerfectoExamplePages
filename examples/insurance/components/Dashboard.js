@@ -1,14 +1,14 @@
 /* Dashboard Component – Main dashboard page with banking, insurance, retirement sections */
-function Dashboard({ onNavigate }) {
+function Dashboard({ onNavigate, onPayment, onTransfer, onQuote, onIdCard }) {
   const [claimsOpen, setClaimsOpen] = React.useState(false);
 
   return (
     <div className="dashboard">
       <div className="greeting">Good Afternoon, ELIZABETH</div>
       <div className="greeting-sub">
-        <a href="#">✉️ Inbox</a>
-        <a href="#">📄 Documents</a>
-        <a href="#">✏️ Edit Layout</a>
+        <a href="#" onClick={e => { e.preventDefault(); onNavigate('documents'); }}>✉️ Inbox</a>
+        <a href="#" onClick={e => { e.preventDefault(); onNavigate('documents'); }}>📄 Documents</a>
+        <a href="#" onClick={e => e.preventDefault()}>✏️ Edit Layout</a>
       </div>
 
       <div className="dash-grid">
@@ -28,15 +28,15 @@ function Dashboard({ onNavigate }) {
             <div className="section-header banking">
               <h3>Banking</h3>
               <div className="section-actions">
-                <button><span className="act-icon">↔️</span>Transfer</button>
+                <button onClick={onTransfer}><span className="act-icon">↔️</span>Transfer</button>
                 <button><span className="act-icon">📄</span>Pay bills</button>
-                <button><span className="act-icon">📋</span>Statements</button>
+                <button onClick={() => onNavigate('documents')}><span className="act-icon">📋</span>Statements</button>
                 <button><span className="act-icon">➕</span>Add account</button>
               </div>
             </div>
             <div className="section-body">
               {ACCOUNTS.banking.map((a, i) => (
-                <div className="account-row" key={i}>
+                <div className="account-row" key={i} onClick={() => onNavigate('banking')}>
                   <div>
                     <div className="account-name">{a.name} <span className="account-detail">•{a.mask}</span></div>
                   </div>
@@ -56,9 +56,9 @@ function Dashboard({ onNavigate }) {
               <h3>Insurance</h3>
               <div className="section-actions">
                 <button onClick={() => setClaimsOpen(!claimsOpen)}><span className="act-icon">🏷️</span>Claims</button>
-                <button><span className="act-icon">🪪</span>ID card</button>
-                <button><span className="act-icon">📄</span>Bills</button>
-                <button><span className="act-icon">➕</span>Get quote</button>
+                <button onClick={onIdCard}><span className="act-icon">🪪</span>ID card</button>
+                <button onClick={() => onPayment('Auto Insurance (WA)', '$186.40')}><span className="act-icon">📄</span>Bills</button>
+                <button onClick={onQuote}><span className="act-icon">➕</span>Get quote</button>
               </div>
             </div>
 
@@ -74,7 +74,9 @@ function Dashboard({ onNavigate }) {
                     <a href="auto-claims.html" onClick={() => setClaimsOpen(false)}>
                       File an Auto Claim <span className="arrow">›</span>
                     </a>
-                    <a href="#" onClick={e => e.preventDefault()}>File a Property Claim</a>
+                    <a href="#" onClick={e => { e.preventDefault(); setClaimsOpen(false); onNavigate('property-claim'); }}>
+                      File a Property Claim <span className="arrow">›</span>
+                    </a>
                     <a href="#" onClick={e => e.preventDefault()}>Claims Center <span className="arrow">›</span></a>
                     <a href="#" onClick={e => e.preventDefault()}>Insurance Claims Fraud</a>
                     <a href="#" onClick={e => e.preventDefault()}>Disaster and Recovery Center</a>
@@ -98,7 +100,7 @@ function Dashboard({ onNavigate }) {
               ))}
               <div className="promo-row">
                 <div className="promo-text">SecureShield Life Insurance<small>Give your loved ones a safe place to land with a budget-friendly price.</small></div>
-                <a href="#" className="promo-link">Get started →</a>
+                <a href="#" className="promo-link" onClick={e => { e.preventDefault(); onQuote(); }}>Get started →</a>
               </div>
             </div>
           </div>
@@ -108,7 +110,7 @@ function Dashboard({ onNavigate }) {
             <div className="section-header retirement">
               <h3>Retirement &amp; Investing</h3>
               <div className="section-actions">
-                <button><span className="act-icon">↔️</span>Transfer</button>
+                <button onClick={onTransfer}><span className="act-icon">↔️</span>Transfer</button>
                 <button><span className="act-icon">➕</span>Add account</button>
               </div>
             </div>
@@ -128,7 +130,7 @@ function Dashboard({ onNavigate }) {
           </div>
         </div>
 
-        <Sidebar />
+        <Sidebar onNavigate={onNavigate} />
       </div>
     </div>
   );

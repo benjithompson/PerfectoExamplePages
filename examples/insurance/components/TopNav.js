@@ -1,6 +1,7 @@
 /* TopNav Component – Navigation bar with mega menu */
-function TopNav({ user, currentPage, onNavigate, onLogout }) {
+function TopNav({ user, currentPage, onNavigate, onLogout, onSearch, onChat }) {
   const [megaOpen, setMegaOpen] = React.useState(false);
+  const [profileOpen, setProfileOpen] = React.useState(false);
   const megaRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -17,7 +18,7 @@ function TopNav({ user, currentPage, onNavigate, onLogout }) {
 
   const closeMega = () => setMegaOpen(false);
 
-  const navTo = (page) => { closeMega(); onNavigate(page); };
+  const navTo = (page) => { closeMega(); setProfileOpen(false); onNavigate(page); };
 
   return (
     <nav className="top-nav" style={{ position: 'sticky', top: 0 }}>
@@ -31,16 +32,39 @@ function TopNav({ user, currentPage, onNavigate, onLogout }) {
           <div className="nav-link-wrap">
             <a href="#" className={(currentPage === 'auto' || currentPage === 'home-ins' ? 'active' : '') + (megaOpen ? ' mega-open' : '')} onClick={handleInsuranceClick}>Insurance</a>
           </div>
-          <a href="#" onClick={e => e.preventDefault()}>Banking</a>
-          <a href="#" onClick={e => e.preventDefault()}>Retirement</a>
-          <a href="#" onClick={e => e.preventDefault()}>Investing</a>
-          <a href="#" onClick={e => e.preventDefault()}>Advice</a>
-          <a href="#" onClick={e => e.preventDefault()}>Perks</a>
+          <a href="#" className={currentPage === 'banking' ? 'active' : ''} onClick={e => { e.preventDefault(); navTo('banking'); }}>Banking</a>
+          <a href="#" className={currentPage === 'rewards' ? 'active' : ''} onClick={e => { e.preventDefault(); navTo('rewards'); }}>Rewards</a>
+          <a href="#" className={currentPage === 'perks' ? 'active' : ''} onClick={e => { e.preventDefault(); navTo('perks'); }}>Perks</a>
+          <a href="#" className={currentPage === 'documents' ? 'active' : ''} onClick={e => { e.preventDefault(); navTo('documents'); }}>Documents</a>
         </div>
         <div className="nav-right">
-          <button onClick={e => e.preventDefault()}>🔍 Search</button>
-          <button onClick={e => e.preventDefault()}>💬 Chat</button>
-          <div className="nav-avatar" title={user.fullName}>{user.name.charAt(0)}</div>
+          <button onClick={onSearch}>🔍 Search</button>
+          <button onClick={onChat}>💬 Chat</button>
+          <div className="nav-avatar-wrap">
+            <div className="nav-avatar" title={user.fullName} onClick={() => setProfileOpen(!profileOpen)}>{user.name.charAt(0)}</div>
+            {profileOpen && (
+              <React.Fragment>
+                <div className="claims-overlay" onClick={() => setProfileOpen(false)} />
+                <div className="profile-dropdown">
+                  <div className="profile-dropdown-header">
+                    <div className="nav-avatar" style={{ width: 40, height: 40, fontSize: '.9rem' }}>{user.name.charAt(0)}</div>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '.9rem' }}>{user.fullName}</div>
+                      <div style={{ fontSize: '.75rem', color: '#6b7280' }}>Member ID: {user.memberId}</div>
+                    </div>
+                  </div>
+                  <div className="profile-dropdown-body">
+                    <a href="#" onClick={e => { e.preventDefault(); navTo('profile'); }}>⚙️ Profile &amp; Settings</a>
+                    <a href="#" onClick={e => { e.preventDefault(); navTo('documents'); }}>📄 Documents &amp; Inbox</a>
+                    <a href="#" onClick={e => { e.preventDefault(); navTo('rewards'); }}>🏆 Rewards Center</a>
+                  </div>
+                  <div className="profile-dropdown-footer">
+                    <a href="#" onClick={e => { e.preventDefault(); onLogout(); }}>Log Off</a>
+                  </div>
+                </div>
+              </React.Fragment>
+            )}
+          </div>
           <button onClick={onLogout}>Log Off</button>
         </div>
       </div>
@@ -82,7 +106,11 @@ function TopNav({ user, currentPage, onNavigate, onLogout }) {
               </div>
               <div className="mega-sidebar">
                 {MEGA_MENU.sidebar.map((item, i) => (
-                  <a href="#" key={i} onClick={e => e.preventDefault()}>
+                  <a href="#" key={i} onClick={e => {
+                    e.preventDefault();
+                    if (item.label === 'Claims') navTo('auto-claims');
+                    else if (item.label === 'Auto ID Card') { closeMega(); /* handled by parent */ }
+                  }}>
                     <span className="mega-icon">{item.icon}</span>
                     {item.label}
                   </a>
