@@ -13,9 +13,9 @@ function TransferModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const accounts = [
-    { id: 'checking', label: 'Classic Checking •4219', balance: '$4,287.53' },
-    { id: 'savings', label: 'Savings •7734', balance: '$12,841.09' },
-    { id: 'credit', label: 'Platinum Visa •8683', balance: '$0.00' }
+    { id: 'checking', label: 'Classic Checking •5291', balance: '$5,142.87' },
+    { id: 'savings', label: 'Savings •8347', balance: '$14,396.22' },
+    { id: 'credit', label: 'Platinum Visa •6108', balance: '$0.00' }
   ];
 
   const fromAcc = accounts.find(a => a.id === fromAccount);

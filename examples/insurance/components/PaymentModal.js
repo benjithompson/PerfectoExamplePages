@@ -2,19 +2,19 @@
 function PaymentModal({ isOpen, onClose, policyName, amount }) {
   const [step, setStep] = React.useState('form'); // form | confirm | success
   const [payMethod, setPayMethod] = React.useState('checking');
-  const [payAmount, setPayAmount] = React.useState(amount || '$186.40');
+  const [payAmount, setPayAmount] = React.useState(amount || '$173.60');
   const [payDate, setPayDate] = React.useState('2026-02-15');
 
   React.useEffect(() => {
-    if (isOpen) { setStep('form'); setPayAmount(amount || '$186.40'); }
+    if (isOpen) { setStep('form'); setPayAmount(amount || '$173.60'); }
   }, [isOpen, amount]);
 
   if (!isOpen) return null;
 
   const methods = [
-    { id: 'checking', label: 'USAA Classic Checking •4219', icon: '🏦' },
-    { id: 'savings', label: 'USAA Savings •7734', icon: '💰' },
-    { id: 'credit', label: 'Platinum Visa •8683', icon: '💳' }
+    { id: 'checking', label: 'Classic Checking •5291', icon: '🏦' },
+    { id: 'savings', label: 'Savings •8347', icon: '💰' },
+    { id: 'credit', label: 'Platinum Visa •6108', icon: '💳' }
   ];
 
   const handleConfirm = () => setStep('confirm');

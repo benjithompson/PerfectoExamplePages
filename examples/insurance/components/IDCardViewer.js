@@ -45,7 +45,7 @@ function IDCardViewer({ isOpen, onClose }) {
               <div className="id-card-row">
                 <div className="id-card-field">
                   <span className="id-card-label">Named Insured</span>
-                  <span className="id-card-value">{user.fullName?.toUpperCase() || 'ELIZABETH A. MORGAN'}</span>
+                  <span className="id-card-value">{user.fullName?.toUpperCase() || TEST_USER.fullName.toUpperCase()}</span>
                 </div>
                 <div className="id-card-field">
                   <span className="id-card-label">Policy Number</span>

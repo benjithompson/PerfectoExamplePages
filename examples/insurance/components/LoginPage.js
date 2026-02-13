@@ -39,8 +39,8 @@ function LoginPage({ onLogin }) {
           </form>
           <div className="login-hint">
             <strong>Test Credentials:</strong><br/>
-            Username: <code>elizabeth.morgan</code><br/>
-            Password: <code>Test1234!</code>
+            Username: <code>{TEST_USER.username}</code><br/>
+            Password: <code>{TEST_USER.password}</code>
           </div>
         </div>
       </div>

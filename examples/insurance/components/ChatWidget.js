@@ -1,7 +1,7 @@
 /* ChatWidget Component – Sliding chat panel with FAQ and text input */
 function ChatWidget({ isOpen, onClose }) {
   const [messages, setMessages] = React.useState([
-    { id: 1, from: 'bot', text: 'Hi Elizabeth! 👋 How can I help you today? You can ask a question or choose from the topics below.' }
+    { id: 1, from: 'bot', text: 'Hi ' + TEST_USER.name + '! 👋 How can I help you today? You can ask a question or choose from the topics below.' }
   ]);
   const [input, setInput] = React.useState('');
   const [typing, setTyping] = React.useState(false);

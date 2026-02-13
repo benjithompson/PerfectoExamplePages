@@ -2,11 +2,11 @@
 function ProfileSettings({ onNavigate }) {
   const stored = AuthManager.getUser() || {};
   const [profile, setProfile] = React.useState({
-    fullName: stored.fullName || 'Elizabeth A. Morgan',
-    email: 'elizabeth.morgan@email.com',
-    phone: '(206) 555-0147',
-    address: '21110 4th Ave W, Seattle, WA 98199',
-    memberId: stored.memberId || '2847391056'
+    fullName: stored.fullName || TEST_USER.fullName,
+    email: TEST_USER.email,
+    phone: TEST_USER.phone,
+    address: TEST_USER.address,
+    memberId: stored.memberId || TEST_USER.memberId
   });
   const [editing, setEditing] = React.useState(null); // 'personal' | 'contact' | 'password' | null
   const [notifications, setNotifications] = React.useState({

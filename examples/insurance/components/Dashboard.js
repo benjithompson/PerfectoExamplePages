@@ -4,7 +4,7 @@ function Dashboard({ onNavigate, onPayment, onTransfer, onQuote, onIdCard }) {
 
   return (
     <div className="dashboard">
-      <div className="greeting">Good Afternoon, ELIZABETH</div>
+      <div className="greeting">Good Afternoon, {TEST_USER.name.toUpperCase()}</div>
       <div className="greeting-sub">
         <a href="#" onClick={e => { e.preventDefault(); onNavigate('documents'); }}>✉️ Inbox</a>
         <a href="#" onClick={e => { e.preventDefault(); onNavigate('documents'); }}>📄 Documents</a>

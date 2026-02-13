@@ -1,9 +1,9 @@
 /* EditVehicleModal Component – Edit vehicle location */
 function EditVehicleModal({ isOpen, onClose, vehicleIndex }) {
-  const [address, setAddress] = React.useState('21110 4th Ave W');
-  const [city, setCity] = React.useState('Seattle');
-  const [state, setState] = React.useState('WA');
-  const [zip, setZip] = React.useState('98199');
+  const [address, setAddress] = React.useState('4728 Maple Creek Dr');
+  const [city, setCity] = React.useState('Portland');
+  const [state, setState] = React.useState('OR');
+  const [zip, setZip] = React.useState('97205');
   const [saved, setSaved] = React.useState(false);
 
   React.useEffect(() => {

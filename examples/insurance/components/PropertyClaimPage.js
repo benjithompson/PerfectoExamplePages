@@ -6,7 +6,7 @@ function PropertyClaimPage({ onNavigate }) {
     incidentDate: '',
     description: '',
     damageAreas: [],
-    contactPhone: '(206) 555-0147',
+    contactPhone: TEST_USER.phone,
     hasPhotos: false
   });
   const [submitted, setSubmitted] = React.useState(false);

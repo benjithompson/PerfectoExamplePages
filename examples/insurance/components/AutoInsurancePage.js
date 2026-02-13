@@ -15,7 +15,7 @@ function AutoInsurancePage({ onNavigate, onPayment, onIdCard }) {
   return (
     <div className="auto-page">
       <div className="auto-page-header">
-        <h2>My Auto Insurance Policy (WA)</h2>
+        <h2>My Auto Insurance Policy (OR)</h2>
         <button className="ask-btn">Ask SecureShield</button>
       </div>
 
@@ -30,7 +30,7 @@ function AutoInsurancePage({ onNavigate, onPayment, onIdCard }) {
           {/* Alert */}
           <div className="auto-alert">
             <span className="alert-dot">ℹ️</span>
-            <p>Your auto ID card and Proof of Insurance have been e-mailed, and coverage is effective immediately. Your 2025 TOYOTA 86 will be added as of 12:01 a.m. Standard Time on 11/10/2025. Any premium changes will be reflected in your next billing statement.</p>
+            <p>Your auto ID card and Proof of Insurance have been e-mailed, and coverage is effective immediately. Your 2024 SUBARU CROSSTREK will be added as of 12:01 a.m. Standard Time on 11/10/2025. Any premium changes will be reflected in your next billing statement.</p>
           </div>
 
           {/* Promo */}
@@ -58,7 +58,7 @@ function AutoInsurancePage({ onNavigate, onPayment, onIdCard }) {
               <div className="premium-note">after discounts &amp; savings</div>
               <div className="disc-label">Discounts &amp; Savings</div>
               <div className="disc-amount">$927.46</div>
-              <button className="pay-btn" onClick={() => onPayment('Auto Insurance (WA)', '$186.40')}>View and Pay Bill</button>
+              <button className="pay-btn" onClick={() => onPayment('Auto Insurance (OR)', '$173.60')}>View and Pay Bill</button>
             </div>
           </div>
 
@@ -90,7 +90,7 @@ function AutoInsurancePage({ onNavigate, onPayment, onIdCard }) {
           <div className="policy-info-bar">
             <div className="policy-title-group">
               <h4>{policyNickname || 'Washington Auto Policy'} <a href="#" onClick={e => { e.preventDefault(); setNicknameOpen(true); }}>» Nickname This Account</a></h4>
-              <span className="cic">CIC 10944759 7101</span>
+              <span className="cic">CIC 20738461 5902</span>
             </div>
             <div className="policy-info-meta">
               <div className="meta-item">
@@ -127,10 +127,10 @@ function AutoInsurancePage({ onNavigate, onPayment, onIdCard }) {
                     <a href="#" onClick={e => { e.preventDefault(); setEditVehicleIndex(i); setEditVehicleOpen(true); }}>» Edit</a>
                   </div>
                   <div className="detail-row">
-                    <span className="dvalue">21110 4TH AVE W</span>
+                    <span className="dvalue">4728 MAPLE CREEK DR</span>
                   </div>
                   <div className="detail-row">
-                    <span className="dvalue">SEATTLE, WA 98199</span>
+                    <span className="dvalue">PORTLAND, OR 97205</span>
                   </div>
                 </div>
                 <div className="vehicle-row-detail">
@@ -139,10 +139,10 @@ function AutoInsurancePage({ onNavigate, onPayment, onIdCard }) {
                     <a href="#" onClick={e => e.preventDefault()}>» Edit</a>
                   </div>
                   <div className="detail-row">
-                    <span className="dvalue">ELIZABETH A MORGAN</span>
+                    <span className="dvalue">{TEST_USER.fullName.toUpperCase()}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="dvalue">WA • MORG***E482LN</span>
+                    <span className="dvalue">{TEST_USER.driversLicense}</span>
                   </div>
                 </div>
               </div>

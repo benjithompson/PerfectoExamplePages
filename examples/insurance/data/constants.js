@@ -3,61 +3,65 @@
    ============================================ */
 
 var TEST_USER = {
-  username: 'elizabeth.morgan',
-  password: 'Test1234!',
-  name: 'Elizabeth',
-  fullName: 'Elizabeth A. Morgan',
-  memberId: '2847391056'
+  username: 'sarah.mitchell',
+  password: 'Secure#987',
+  name: 'Sarah',
+  fullName: 'Sarah J. Mitchell',
+  email: 'sarah.mitchell@email.com',
+  phone: '(503) 555-0182',
+  address: '4728 Maple Creek Dr, Portland, OR 97205',
+  memberId: '3916284705',
+  driversLicense: 'OR • MITC***S739RK'
 };
 
 var ACCOUNTS = {
   banking: [
-    { name: 'Platinum Visa', mask: '8683', balance: '$0.00', type: 'credit' },
-    { name: 'USAA Classic Checking', mask: '4219', balance: '$4,287.53', type: 'checking' },
-    { name: 'USAA Savings', mask: '7734', balance: '$12,841.09', type: 'savings' }
+    { name: 'Platinum Visa', mask: '6108', balance: '$0.00', type: 'credit' },
+    { name: 'Classic Checking', mask: '5291', balance: '$5,142.87', type: 'checking' },
+    { name: 'Savings', mask: '8347', balance: '$14,396.22', type: 'savings' }
   ],
   insurance: [
-    { name: 'Auto Insurance (WA)', detail: 'Policy #AUT-8834721', premium: '$186.40/mo' },
-    { name: 'Homeowners', detail: '21110 4TH AVE W', premium: '$142.75/mo' },
-    { name: 'Valuable Personal Property', detail: 'JEWELRY', premium: '$23.50/mo' }
+    { name: 'Auto Insurance (OR)', detail: 'Policy #AUT-6271039', premium: '$173.60/mo' },
+    { name: 'Homeowners', detail: '4728 MAPLE CREEK DR', premium: '$158.25/mo' },
+    { name: 'Valuable Personal Property', detail: 'JEWELRY', premium: '$27.00/mo' }
   ],
   retirement: [
-    { name: 'Your Retirement Savings', balance: '$87,432.18', change: '+$1,247.30', changePercent: '+1.45%' },
-    { name: 'Roth IRA', balance: '$34,219.55', change: '+$412.80', changePercent: '+1.22%' }
+    { name: 'Your Retirement Savings', balance: '$93,817.44', change: '+$1,582.60', changePercent: '+1.71%' },
+    { name: 'Roth IRA', balance: '$41,053.29', change: '+$387.15', changePercent: '+0.95%' }
   ]
 };
 
 var AUTO_POLICY = {
-  policyNumber: 'AUT-8834721',
+  policyNumber: 'AUT-6271039',
   status: 'Active',
   effectiveDate: 'Mar 15, 2025',
   expirationDate: 'Sep 15, 2025',
-  premium: '$186.40',
+  premium: '$173.60',
   frequency: 'Monthly',
   deductible: '$500',
   bodilyInjury: '$100,000 / $300,000',
   propertyDamage: '$100,000',
   uninsuredMotorist: '$100,000 / $300,000',
   vehicles: [
-    { year: '2022', make: 'Toyota', model: 'RAV4 XLE', vin: '2T3W1RFV...8241', premium: '$104.20', icon: '🚙' },
-    { year: '2019', make: 'Honda', model: 'Civic Sport', vin: '19XFC2F5...3847', premium: '$82.20', icon: '🚗' }
+    { year: '2023', make: 'Subaru', model: 'Outback Limited', vin: '4S4BT6LC...5193', premium: '$97.40', icon: '🚙' },
+    { year: '2020', make: 'Mazda', model: 'CX-5 Touring', vin: 'JM3KF4CM...8026', premium: '$76.20', icon: '🚗' }
   ]
 };
 
 var HOME_POLICY = {
-  policyNumber: 'HOM-5529183',
+  policyNumber: 'HOM-3847261',
   status: 'Active',
   effectiveDate: 'Jan 01, 2025',
   expirationDate: 'Jan 01, 2026',
-  premium: '$142.75',
+  premium: '$158.25',
   frequency: 'Monthly',
-  dwelling: '$425,000',
-  personalProperty: '$212,500',
+  dwelling: '$475,000',
+  personalProperty: '$237,500',
   liability: '$300,000',
   deductible: '$1,000',
-  address: '21110 4th Ave W, Seattle, WA 98199',
-  yearBuilt: '2004',
-  sqft: '2,340',
+  address: '4728 Maple Creek Dr, Portland, OR 97205',
+  yearBuilt: '2008',
+  sqft: '2,180',
   roofType: 'Composition Shingle'
 };
 
@@ -73,8 +77,8 @@ var DOCUMENTS = [
 ];
 
 var INBOX_MESSAGES = [
-  { id: 1, from: 'SecureShield Auto', subject: 'Your auto ID card is ready', date: 'Feb 12, 2026', preview: 'Your updated auto insurance ID card for your 2022 Toyota RAV4 is now available for download.', read: false },
-  { id: 2, from: 'SecureShield Billing', subject: 'Payment received – Thank you', date: 'Feb 05, 2026', preview: 'We received your auto insurance premium payment of $186.40. Your next payment is due March 1, 2026.', read: false },
+  { id: 1, from: 'SecureShield Auto', subject: 'Your auto ID card is ready', date: 'Feb 12, 2026', preview: 'Your updated auto insurance ID card for your 2023 Subaru Outback is now available for download.', read: false },
+  { id: 2, from: 'SecureShield Billing', subject: 'Payment received – Thank you', date: 'Feb 05, 2026', preview: 'We received your auto insurance premium payment of $173.60. Your next payment is due March 1, 2026.', read: false },
   { id: 3, from: 'SecureShield Perks', subject: '🎉 New member deals available!', date: 'Feb 03, 2026', preview: 'Check out this month\'s exclusive member discounts on travel, dining, and entertainment.', read: true },
   { id: 4, from: 'SecureShield Home', subject: 'Annual policy review reminder', date: 'Jan 28, 2026', preview: 'It\'s time to review your homeowners policy to ensure your coverage still meets your needs.', read: true },
   { id: 5, from: 'SecureShield Security', subject: 'New device login detected', date: 'Jan 22, 2026', preview: 'A new device was used to sign in to your account. If this was you, no action is needed.', read: true },
@@ -82,16 +86,16 @@ var INBOX_MESSAGES = [
 ];
 
 var TRANSACTIONS = [
-  { id: 1, date: 'Feb 12, 2026', description: 'Whole Foods Market', amount: '-$87.34', category: 'Groceries', account: 'checking' },
-  { id: 2, date: 'Feb 11, 2026', description: 'Shell Gas Station', amount: '-$52.18', category: 'Auto & Gas', account: 'checking' },
-  { id: 3, date: 'Feb 10, 2026', description: 'Direct Deposit – Employer', amount: '+$3,245.00', category: 'Income', account: 'checking' },
-  { id: 4, date: 'Feb 09, 2026', description: 'Netflix Subscription', amount: '-$15.99', category: 'Entertainment', account: 'credit' },
-  { id: 5, date: 'Feb 08, 2026', description: 'Starbucks', amount: '-$6.45', category: 'Dining', account: 'credit' },
-  { id: 6, date: 'Feb 07, 2026', description: 'Amazon.com', amount: '-$124.55', category: 'Shopping', account: 'credit' },
+  { id: 1, date: 'Feb 12, 2026', description: 'New Seasons Market', amount: '-$94.17', category: 'Groceries', account: 'checking' },
+  { id: 2, date: 'Feb 11, 2026', description: 'Chevron Gas Station', amount: '-$48.52', category: 'Auto & Gas', account: 'checking' },
+  { id: 3, date: 'Feb 10, 2026', description: 'Direct Deposit – Employer', amount: '+$3,410.00', category: 'Income', account: 'checking' },
+  { id: 4, date: 'Feb 09, 2026', description: 'Streaming Service', amount: '-$15.99', category: 'Entertainment', account: 'credit' },
+  { id: 5, date: 'Feb 08, 2026', description: 'Coffee Shop', amount: '-$7.20', category: 'Dining', account: 'credit' },
+  { id: 6, date: 'Feb 07, 2026', description: 'Online Retailer', amount: '-$112.38', category: 'Shopping', account: 'credit' },
   { id: 7, date: 'Feb 06, 2026', description: 'Transfer to Savings', amount: '-$500.00', category: 'Transfer', account: 'checking' },
   { id: 8, date: 'Feb 06, 2026', description: 'Transfer from Checking', amount: '+$500.00', category: 'Transfer', account: 'savings' },
-  { id: 9, date: 'Feb 05, 2026', description: 'Auto Insurance Premium', amount: '-$186.40', category: 'Insurance', account: 'checking' },
-  { id: 10, date: 'Feb 04, 2026', description: 'Trader Joe\'s', amount: '-$63.21', category: 'Groceries', account: 'checking' }
+  { id: 9, date: 'Feb 05, 2026', description: 'Auto Insurance Premium', amount: '-$173.60', category: 'Insurance', account: 'checking' },
+  { id: 10, date: 'Feb 04, 2026', description: 'Market of Choice', amount: '-$71.83', category: 'Groceries', account: 'checking' }
 ];
 
 var REWARDS_CATALOG = [
@@ -107,7 +111,7 @@ var REWARDS_ACTIVITY = [
   { date: 'Feb 05, 2026', description: 'On-time payment bonus', points: '+150' },
   { date: 'Jan 15, 2026', description: 'Auto policy renewal', points: '+200' },
   { date: 'Jan 01, 2026', description: 'Monthly membership bonus', points: '+50' },
-  { date: 'Dec 20, 2025', description: 'Referral bonus – John Smith', points: '+500' },
+  { date: 'Dec 20, 2025', description: 'Referral bonus – Friend', points: '+500' },
   { date: 'Dec 15, 2025', description: 'Redeemed: Amazon Gift Card', points: '-500' },
   { date: 'Dec 01, 2025', description: 'Monthly membership bonus', points: '+50' }
 ];
@@ -124,7 +128,7 @@ var PERKS_DEALS = [
 ];
 
 var CHAT_FAQ = [
-  { q: 'How do I file a claim?', a: 'You can file a claim by clicking "Claims" in the Insurance section of your dashboard, or by calling us at 1-800-555-0199. Online claims can be filed 24/7.' },
+  { q: 'How do I file a claim?', a: 'You can file a claim by clicking "Claims" in the Insurance section of your dashboard, or by calling us at 1-800-555-0123. Online claims can be filed 24/7.' },
   { q: 'How do I make a payment?', a: 'Click the "Bills" button on any insurance section, or navigate to the payment page from your policy details. We accept checking accounts, credit cards, and debit cards.' },
   { q: 'How do I get my auto ID card?', a: 'Your digital auto ID card is available on the Auto Insurance page. Click "Get Auto ID Cards" to view and download it. You can also request a physical card to be mailed.' },
   { q: 'How do I update my address?', a: 'You can update your address by going to your Profile settings (click your avatar in the top navigation) or by editing the vehicle location on your Auto Insurance page.' },

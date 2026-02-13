@@ -71,12 +71,12 @@ function GetQuote({ isOpen, onClose }) {
             <div>
               <p style={{ fontSize: '.9rem', color: '#374151', marginBottom: '1rem' }}>Tell us about yourself:</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.8rem' }}>
-                <div className="form-group"><label>First Name</label><input type="text" value={formData.firstName} onChange={e => updateField('firstName', e.target.value)} placeholder="Elizabeth" /></div>
-                <div className="form-group"><label>Last Name</label><input type="text" value={formData.lastName} onChange={e => updateField('lastName', e.target.value)} placeholder="Morgan" /></div>
+                <div className="form-group"><label>First Name</label><input type="text" value={formData.firstName} onChange={e => updateField('firstName', e.target.value)} placeholder="First name" /></div>
+                <div className="form-group"><label>Last Name</label><input type="text" value={formData.lastName} onChange={e => updateField('lastName', e.target.value)} placeholder="Last name" /></div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.8rem' }}>
                 <div className="form-group"><label>Date of Birth</label><input type="date" value={formData.dob} onChange={e => updateField('dob', e.target.value)} /></div>
-                <div className="form-group"><label>ZIP Code</label><input type="text" value={formData.zipCode} onChange={e => updateField('zipCode', e.target.value)} placeholder="98199" maxLength="5" /></div>
+                <div className="form-group"><label>ZIP Code</label><input type="text" value={formData.zipCode} onChange={e => updateField('zipCode', e.target.value)} placeholder="ZIP code" maxLength="5" /></div>
               </div>
               <div style={{ display: 'flex', gap: '.6rem', marginTop: '.5rem' }}>
                 <button className="login-btn" style={{ flex: 1 }} onClick={() => setStep(3)}>Continue</button>
