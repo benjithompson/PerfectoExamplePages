@@ -22,6 +22,16 @@ function App() {
   const initialPage = window.location.hash ? window.location.hash.slice(1) : 'dashboard';
   const [page, setPage] = React.useState(initialPage);
 
+  // Listen for back/forward navigation (mouse buttons, keyboard, etc.)
+  React.useEffect(() => {
+    const onPopState = () => {
+      const hash = window.location.hash.slice(1);
+      setPage(hash || 'dashboard');
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
   // Global modals state
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [chatOpen, setChatOpen] = React.useState(false);
@@ -57,8 +67,12 @@ function App() {
       setQuoteOpen(true);
       return;
     }
+    const newHash = target === 'dashboard' ? '' : target;
+    // Push a new history entry so back/forward buttons work
+    if (window.location.hash.slice(1) !== newHash) {
+      window.history.pushState(null, '', newHash ? '#' + newHash : window.location.pathname);
+    }
     setPage(target);
-    window.location.hash = target === 'dashboard' ? '' : target;
   };
 
   const openPayment = (policyName, amount) => {
