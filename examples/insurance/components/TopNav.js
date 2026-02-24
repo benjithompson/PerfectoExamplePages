@@ -23,7 +23,7 @@ function TopNav({ user, currentPage, onNavigate, onLogout, onSearch, onChat }) {
   return (
     <nav className="top-nav" style={{ position: 'sticky', top: 0 }}>
       <div className="top-nav-inner">
-        <a href="../index.html" className="back-to-index" aria-label="Back to examples index">← Index</a>
+        <a href="../../index.html" className="back-to-index" aria-label="Back to examples index">← Index</a>
         <a href="#" className="nav-logo" onClick={e => { e.preventDefault(); navTo('dashboard'); }}>
           <div className="shield">SS</div>
           <span>SecureShield</span>
