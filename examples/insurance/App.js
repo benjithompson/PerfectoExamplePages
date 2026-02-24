@@ -78,7 +78,7 @@ function App() {
         onSearch={() => setSearchOpen(true)}
         onChat={() => setChatOpen(prev => !prev)}
       />
-      {page === 'dashboard' && <Dashboard onNavigate={handleNavigate} onPayment={openPayment} onTransfer={() => setTransferOpen(true)} onQuote={() => setQuoteOpen(true)} onIdCard={() => setIdCardOpen(true)} />}
+      {page === 'dashboard' && <Dashboard onNavigate={handleNavigate} onPayment={openPayment} onTransfer={() => setTransferOpen(true)} onQuote={() => setQuoteOpen(true)} onIdCard={() => setIdCardOpen(true)} onPayBills={() => setBillsOpen(true)} />}
       {page === 'auto' && <AutoInsurancePage onNavigate={handleNavigate} onPayment={openPayment} onIdCard={() => setIdCardOpen(true)} />}
       {page === 'home-ins' && <HomeInsurancePage onNavigate={handleNavigate} onPayment={openPayment} />}
       {page === 'banking' && <BankingPage onNavigate={handleNavigate} onTransfer={() => setTransferOpen(true)} onPayBills={() => setBillsOpen(true)} />}

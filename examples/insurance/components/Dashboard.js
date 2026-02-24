@@ -1,5 +1,5 @@
 /* Dashboard Component – Main dashboard page with banking, insurance, retirement sections */
-function Dashboard({ onNavigate, onPayment, onTransfer, onQuote, onIdCard }) {
+function Dashboard({ onNavigate, onPayment, onTransfer, onQuote, onIdCard, onPayBills }) {
   const [claimsOpen, setClaimsOpen] = React.useState(false);
 
   return (
@@ -29,7 +29,7 @@ function Dashboard({ onNavigate, onPayment, onTransfer, onQuote, onIdCard }) {
               <h3>Banking</h3>
               <div className="section-actions">
                 <button onClick={onTransfer}><span className="act-icon">↔️</span>Transfer</button>
-                <button><span className="act-icon">📄</span>Pay bills</button>
+                <button onClick={onPayBills}><span className="act-icon">📄</span>Pay bills</button>
                 <button onClick={() => onNavigate('documents')}><span className="act-icon">📋</span>Statements</button>
                 <button><span className="act-icon">➕</span>Add account</button>
               </div>
