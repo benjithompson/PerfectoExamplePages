@@ -221,7 +221,7 @@ Example:
 import { test, expect } from '@playwright/test';
 
 test('my new test', async ({ page }) => {
-  await page.goto('/examples/w2.html');
+  await page.goto('/examples/w2/w2.html');
   // your test code
 });
 ```

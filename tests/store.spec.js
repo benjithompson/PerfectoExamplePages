@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
  * Tests the store showcase page with products, filters, and cart functionality
  */
 
-const STORE_URL = '/examples/store.html';
+const STORE_URL = '/examples/store/store.html';
 
 test.describe('Store Page - Basic Functionality', () => {
   test.beforeEach(async ({ page }) => {

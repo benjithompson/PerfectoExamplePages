@@ -60,7 +60,7 @@ test.describe('W-2 Form Tests', () => {
   
   test.beforeEach(async ({ page }) => {
     // Navigate to the W-2 form page
-    await page.goto('/examples/w2.html');
+    await page.goto('/examples/w2/w2.html');
     
     // Wait for the form to be visible
     await expect(page.locator('#w2Form')).toBeVisible();
@@ -299,7 +299,7 @@ test.describe('W-2 Summary Page Tests', () => {
   
   test.beforeEach(async ({ page, context }) => {
     // First, navigate to form and fill it out
-    await page.goto('/examples/w2.html');
+    await page.goto('/examples/w2/w2.html');
     
     // Fill required fields with test data
     await page.locator('#ein').fill(testData.employer.ein);
@@ -441,7 +441,7 @@ test.describe('W-2 Summary Page Tests', () => {
     await page.evaluate(() => sessionStorage.clear());
     
     // Try to navigate directly to summary
-    await page.goto('/examples/w2summary.html');
+    await page.goto('/examples/w2/w2summary.html');
     
     // Should redirect or show alert and then redirect
     // Wait a moment for redirect
@@ -544,7 +544,7 @@ test.describe('W-2 Complete User Flow', () => {
 
   test('should persist data when going back to edit and resubmitting', async ({ page }) => {
     // Fill and submit form
-    await page.goto('/examples/w2.html');
+    await page.goto('/examples/w2/w2.html');
     
     await page.locator('#ein').fill('11-2233445');
     await page.locator('#employerName').fill('Persist Test Corp');
@@ -574,7 +574,7 @@ test.describe('W-2 Complete User Flow', () => {
 test.describe('Accessibility Tests', () => {
   
   test('W-2 form should have proper ARIA labels and roles', async ({ page }) => {
-    await page.goto('/examples/w2.html');
+    await page.goto('/examples/w2/w2.html');
     
     // Check form has proper structure
     const form = page.locator('#w2Form');
@@ -591,7 +591,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('W-2 summary should have proper heading hierarchy', async ({ page }) => {
-    await page.goto('/examples/w2.html');
+    await page.goto('/examples/w2/w2.html');
     
     // Fill minimal data and submit
     await page.locator('#ein').fill('12-3456789');
@@ -612,7 +612,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('form inputs should be keyboard accessible', async ({ page }) => {
-    await page.goto('/examples/w2.html');
+    await page.goto('/examples/w2/w2.html');
     
     // Press Tab to move focus
     await page.keyboard.press('Tab');
