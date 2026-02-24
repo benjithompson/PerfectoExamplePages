@@ -30,6 +30,7 @@ function App() {
   const [transferOpen, setTransferOpen] = React.useState(false);
   const [quoteOpen, setQuoteOpen] = React.useState(false);
   const [idCardOpen, setIdCardOpen] = React.useState(false);
+  const [billsOpen, setBillsOpen] = React.useState(false);
 
   // Keyboard shortcut for search
   React.useEffect(() => {
@@ -80,7 +81,7 @@ function App() {
       {page === 'dashboard' && <Dashboard onNavigate={handleNavigate} onPayment={openPayment} onTransfer={() => setTransferOpen(true)} onQuote={() => setQuoteOpen(true)} onIdCard={() => setIdCardOpen(true)} />}
       {page === 'auto' && <AutoInsurancePage onNavigate={handleNavigate} onPayment={openPayment} onIdCard={() => setIdCardOpen(true)} />}
       {page === 'home-ins' && <HomeInsurancePage onNavigate={handleNavigate} onPayment={openPayment} />}
-      {page === 'banking' && <BankingPage onNavigate={handleNavigate} onTransfer={() => setTransferOpen(true)} />}
+      {page === 'banking' && <BankingPage onNavigate={handleNavigate} onTransfer={() => setTransferOpen(true)} onPayBills={() => setBillsOpen(true)} />}
       {page === 'documents' && <DocumentsInbox onNavigate={handleNavigate} />}
       {page === 'profile' && <ProfileSettings onNavigate={handleNavigate} />}
       {page === 'rewards' && <RewardsCenter onNavigate={handleNavigate} />}
@@ -92,6 +93,7 @@ function App() {
       <ChatWidget isOpen={chatOpen} onClose={() => setChatOpen(false)} />
       <PaymentModal isOpen={paymentOpen} onClose={() => setPaymentOpen(false)} policyName={paymentContext.policyName} amount={paymentContext.amount} />
       <TransferModal isOpen={transferOpen} onClose={() => setTransferOpen(false)} />
+      <PayBillsModal isOpen={billsOpen} onClose={() => setBillsOpen(false)} />
       <GetQuote isOpen={quoteOpen} onClose={() => setQuoteOpen(false)} />
       <IDCardViewer isOpen={idCardOpen} onClose={() => setIdCardOpen(false)} />
 

@@ -1,5 +1,5 @@
 /* BankingPage Component – Full banking page with transactions and account details */
-function BankingPage({ onNavigate, onTransfer }) {
+function BankingPage({ onNavigate, onTransfer, onPayBills }) {
   const [selectedAccount, setSelectedAccount] = React.useState('all');
   const [sortOrder, setSortOrder] = React.useState('newest');
 
@@ -36,7 +36,7 @@ function BankingPage({ onNavigate, onTransfer }) {
           {/* Quick Actions */}
           <div className="banking-quick-actions">
             <button className="banking-action-btn" onClick={onTransfer}><span>↔️</span> Transfer</button>
-            <button className="banking-action-btn"><span>📄</span> Pay Bills</button>
+            <button className="banking-action-btn" onClick={onPayBills}><span>📄</span> Pay Bills</button>
             <button className="banking-action-btn"><span>📋</span> Statements</button>
             <button className="banking-action-btn"><span>💳</span> Manage Cards</button>
           </div>

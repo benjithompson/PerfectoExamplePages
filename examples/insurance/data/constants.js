@@ -127,6 +127,17 @@ var PERKS_DEALS = [
   { id: 8, name: 'FTD Flowers', discount: '25% Off', description: 'Beautiful bouquets and arrangements at member-exclusive prices.', icon: '💐', category: 'Shopping' }
 ];
 
+var BILLS = [
+  { id: 1, payee: 'Portland General Electric', nickname: 'Electric Bill', category: 'Utilities', icon: '⚡', accountNumber: '•••4821', amount: '$142.37', dueDate: 'Mar 05, 2026', status: 'due', autopay: false },
+  { id: 2, payee: 'NW Natural Gas', nickname: 'Gas Bill', category: 'Utilities', icon: '🔥', accountNumber: '•••7390', amount: '$68.50', dueDate: 'Mar 08, 2026', status: 'due', autopay: true },
+  { id: 3, payee: 'Comcast Xfinity', nickname: 'Internet', category: 'Utilities', icon: '🌐', accountNumber: '•••2156', amount: '$89.99', dueDate: 'Mar 12, 2026', status: 'upcoming', autopay: true },
+  { id: 4, payee: 'City of Portland Water', nickname: 'Water & Sewer', category: 'Utilities', icon: '💧', accountNumber: '•••5538', amount: '$74.20', dueDate: 'Mar 15, 2026', status: 'upcoming', autopay: false },
+  { id: 5, payee: 'Oregon Mortgage Co.', nickname: 'Mortgage', category: 'Housing', icon: '🏠', accountNumber: '•••9012', amount: '$1,847.00', dueDate: 'Mar 01, 2026', status: 'due', autopay: true },
+  { id: 6, payee: 'T-Mobile', nickname: 'Cell Phone', category: 'Utilities', icon: '📱', accountNumber: '•••6284', amount: '$95.00', dueDate: 'Mar 18, 2026', status: 'upcoming', autopay: false },
+  { id: 7, payee: 'SecureShield Auto Insurance', nickname: 'Auto Insurance', category: 'Insurance', icon: '🚗', accountNumber: 'AUT-6271039', amount: '$173.60', dueDate: 'Mar 01, 2026', status: 'paid', autopay: true },
+  { id: 8, payee: 'SecureShield Home Insurance', nickname: 'Home Insurance', category: 'Insurance', icon: '🏡', accountNumber: 'HOM-3847261', amount: '$158.25', dueDate: 'Mar 01, 2026', status: 'paid', autopay: true }
+];
+
 var CHAT_FAQ = [
   { q: 'How do I file a claim?', a: 'You can file a claim by clicking "Claims" in the Insurance section of your dashboard, or by calling us at 1-800-555-0123. Online claims can be filed 24/7.' },
   { q: 'How do I make a payment?', a: 'Click the "Bills" button on any insurance section, or navigate to the payment page from your policy details. We accept checking accounts, credit cards, and debit cards.' },
