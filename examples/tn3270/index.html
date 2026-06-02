@@ -205,6 +205,15 @@
     <span style="font-size:11px;color:#444;padding:0 4px;">Session: BANKPROD</span>
   </div>
 
+  <!-- Keyboard proxy: always-focused input for automation compatibility.
+       Automation tools (Perfecto, Selenium, etc.) type into this element;
+       keydown/input events are forwarded to the terminal logic. -->
+  <input id="keyProxy"
+         aria-label="Terminal keyboard input"
+         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+         style="position:absolute;opacity:0;width:1px;height:1px;top:0;left:0;border:none;outline:none;padding:0;margin:0;"
+         tabindex="0" />
+
   <!-- Screen Area -->
   <div id="screenArea">
     <div id="screen"></div>
@@ -807,27 +816,68 @@
   window.term = term;
 
   /* ── Keyboard capture ── */
-  document.addEventListener('keydown', e => {
-    // Allow default for non-character keys where needed
-    const tag = document.activeElement.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
+  // Central key dispatcher — called from both the proxy input and document.
+  function dispatchKey(e) {
     switch (e.key) {
-      case 'Enter':   e.preventDefault(); handleEnter(); break;
-      case 'Tab':     e.preventDefault(); term.pressKey(e.shiftKey ? 'backtab' : 'tab'); break;
+      case 'Enter':     e.preventDefault(); handleEnter(); break;
+      case 'Tab':       e.preventDefault(); term.pressKey(e.shiftKey ? 'backtab' : 'tab'); break;
       case 'Backspace': e.preventDefault(); backspace(); break;
-      case 'F1':      e.preventDefault(); term.pressKey('pf1'); break;
-      case 'F3':      e.preventDefault(); term.pressKey('pf3'); break;
-      case 'F5':      e.preventDefault(); term.pressKey('pf5'); break;
-      case 'F6':      e.preventDefault(); term.pressKey('pf6'); break;
-      case 'F12':     e.preventDefault(); term.pressKey('pf12'); break;
+      case 'Delete':    e.preventDefault(); backspace(); break;
+      case 'F1':        e.preventDefault(); term.pressKey('pf1'); break;
+      case 'F3':        e.preventDefault(); term.pressKey('pf3'); break;
+      case 'F5':        e.preventDefault(); term.pressKey('pf5'); break;
+      case 'F6':        e.preventDefault(); term.pressKey('pf6'); break;
+      case 'F12':       e.preventDefault(); term.pressKey('pf12'); break;
       default:
         if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
           e.preventDefault();
           typeChar(e.key.toUpperCase());
         }
     }
+  }
+
+  const proxyInput = document.getElementById('keyProxy');
+
+  // Keep proxy input focused whenever the window has focus.
+  // Re-focus after any click on the app window (but not on toolbar buttons).
+  document.getElementById('appWindow').addEventListener('click', e => {
+    if (e.target.closest('button, .win-btn, .menu-item')) return;
+    proxyInput.focus();
   });
+  document.addEventListener('focusin', e => {
+    if (e.target !== proxyInput && !e.target.closest('button, .win-btn, .menu-item')) {
+      proxyInput.focus();
+    }
+  });
+
+  // Keydown on the proxy input (automation sends keys here).
+  proxyInput.addEventListener('keydown', e => {
+    dispatchKey(e);
+  });
+
+  // Input event: handles automation that sets .value directly (sendKeys/type).
+  // Drain the accumulated characters one by one, then clear.
+  proxyInput.addEventListener('input', () => {
+    const val = proxyInput.value;
+    proxyInput.value = '';
+    for (const ch of val) {
+      if (ch === '\n' || ch === '\r') { handleEnter(); }
+      else { typeChar(ch.toUpperCase()); }
+    }
+  });
+
+  // Also listen on document for manual keyboard use (physical keyboard, non-proxy).
+  document.addEventListener('keydown', e => {
+    if (e.target === proxyInput) return; // already handled above
+    const tag = e.target.tagName;
+    if (tag === 'BUTTON') return; // toolbar buttons handle their own clicks
+    dispatchKey(e);
+  });
+
+  // Focus the proxy on load.
+  window.addEventListener('load', () => proxyInput.focus());
+  proxyInput.focus();
 
   /* ── Clock ── */
   function updateClock() {
