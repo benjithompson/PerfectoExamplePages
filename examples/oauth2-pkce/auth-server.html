@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Acme Auth — Authorization Server</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../themes/default.css">
+  <script>
+    (function(){
+      const t = localStorage.getItem('site-theme');
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    :root {
+      --color-accent: #7c3aed;
+      --color-accent-hover: #6d28d9;
+      --color-accent-subtle: #f5f3ff;
+    }
+    [data-theme="dark"] {
+      --color-accent: #a78bfa;
+      --color-accent-hover: #7c3aed;
+      --color-accent-subtle: #2e1065;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; font-family: var(--font-sans); background: var(--color-bg); color: var(--color-text); line-height: 1.4; min-height: 100vh; display: flex; flex-direction: column; }
+
+    header.site-header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(145deg, var(--color-bg-alt), var(--color-surface) 60%);
+      border-bottom: 1px solid var(--color-border);
+      display: flex; align-items: center; gap: 1rem;
+      padding: .85rem clamp(1rem,3vw,2rem);
+      box-shadow: var(--shadow-xs);
+    }
+    .brand { font-weight: 600; letter-spacing: .5px; font-size: 1rem; display: flex; align-items: center; gap: .55rem; }
+    .brand-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: 14px;
+      background: var(--color-accent); color: #fff;
+      font-weight: 700; font-size: .85rem;
+      box-shadow: 0 0 0 4px rgba(124,58,237,.25);
+    }
+    .brand-badge { background: var(--color-accent); color: #fff; font-size: .6rem; padding: .35rem .55rem; border-radius: var(--radius-sm); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+    .sim-notice { margin-left: auto; font-size: .7rem; color: var(--color-text-dim); background: var(--color-surface-alt); border: 1px solid var(--color-border); padding: .3rem .65rem; border-radius: var(--radius-pill); }
+
+    .step-tracker { background: var(--color-surface); border-bottom: 1px solid var(--color-border); padding: .75rem clamp(1rem,3vw,2rem); overflow-x: auto; }
+    .steps { display: flex; align-items: center; min-width: 500px; max-width: 900px; margin: 0 auto; }
+    .step { display: flex; align-items: center; flex: 1; }
+    .step-pill { display: inline-flex; align-items: center; gap: .35rem; font-size: .7rem; font-weight: 600; letter-spacing: .5px; padding: .35rem .7rem; border-radius: var(--radius-pill); border: 1.5px solid var(--color-border); color: var(--color-text-dim); background: var(--color-surface-alt); white-space: nowrap; }
+    .step-pill.active { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+    .step-pill.done { background: #dcfce7; border-color: #16a34a; color: #15803d; }
+    [data-theme="dark"] .step-pill.done { background: #14532d; border-color: #16a34a; color: #4ade80; }
+    .step-connector { flex: 1; height: 1.5px; background: var(--color-border); min-width: 10px; margin: 0 4px; }
+    .step-connector.done { background: #16a34a; }
+
+    main { flex: 1; width: 100%; max-width: 540px; margin: 0 auto; padding: 2rem clamp(1rem,3vw,2rem) 4rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; box-shadow: var(--shadow-md); }
+    .card-title { font-size: 1.25rem; font-weight: 700; margin: 0 0 .25rem; }
+    .card-sub { font-size: .85rem; color: var(--color-text-dim); margin: 0 0 1.4rem; }
+
+    .creds-hint { background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius); padding: .85rem 1rem; margin-bottom: 1.25rem; font-size: .83rem; color: #92400e; }
+    [data-theme="dark"] .creds-hint { background: #292001; border-color: #854d0e; color: #fde68a; }
+    .creds-hint strong { display: block; margin-bottom: .35rem; font-size: .72rem; text-transform: uppercase; letter-spacing: .6px; }
+    .creds-hint code { font-family: monospace; background: rgba(0,0,0,.08); padding: .1rem .35rem; border-radius: 4px; font-size: .88em; }
+    [data-theme="dark"] .creds-hint code { background: rgba(255,255,255,.1); }
+
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: .75rem; font-weight: 600; margin-bottom: .4rem; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: .5px; }
+    input[type="text"], input[type="password"] {
+      width: 100%; padding: .65rem .85rem;
+      border: 1.5px solid var(--color-border);
+      background: var(--color-bg-alt); color: var(--color-text);
+      border-radius: var(--radius-sm); font: inherit; font-size: .9rem;
+      transition: var(--transition);
+    }
+    input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(124,58,237,.2); }
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 2.5rem; }
+    .pw-toggle { position: absolute; right: .65rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--color-text-dim); font-size: .85rem; padding: .2rem; line-height: 1; }
+    .pw-toggle:hover { color: var(--color-text); }
+
+    .btn-primary { width: 100%; padding: .75rem; background: var(--color-accent); color: #fff; border: none; border-radius: var(--radius-sm); font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; transition: var(--transition); margin-top: .25rem; }
+    .btn-primary:hover { background: var(--color-accent-hover); }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+    .form-error { color: var(--color-danger); font-size: .82rem; margin-top: .5rem; min-height: 1.2em; }
+    .cancel-link { display: block; text-align: center; margin-top: 1rem; font-size: .82rem; color: var(--color-text-dim); text-decoration: none; }
+    .cancel-link:hover { color: var(--color-text); text-decoration: underline; }
+
+    details.auth-details { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden; }
+    details.auth-details summary {
+      padding: .85rem 1rem; font-size: .75rem; font-weight: 600; letter-spacing: .6px;
+      text-transform: uppercase; cursor: pointer; background: var(--color-surface-alt);
+      color: var(--color-text-dim); list-style: none; user-select: none;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    details.auth-details summary::-webkit-details-marker { display: none; }
+    details.auth-details summary::before { content: "▶"; font-size: .6rem; transition: transform .2s; }
+    details[open].auth-details summary::before { transform: rotate(90deg); }
+    .details-body { padding: 1rem; }
+    .param-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    .param-table tr:not(:last-child) td { border-bottom: 1px solid var(--color-border); }
+    .param-table td { padding: .5rem .3rem; vertical-align: top; }
+    .param-table td:first-child { color: var(--color-text-dim); font-weight: 600; white-space: nowrap; padding-right: 1rem; width: 38%; font-family: monospace; font-size: .75rem; }
+    .param-table code { font-family: monospace; font-size: .75rem; word-break: break-all; background: var(--color-surface-alt); padding: .15rem .35rem; border-radius: 3px; }
+    .details-caption { font-size: .72rem; color: var(--color-text-dim); margin: .75rem 0 0; line-height: 1.5; }
+    .details-caption code { font-family: monospace; font-size: .88em; background: var(--color-surface-alt); padding: .1rem .3rem; border-radius: 3px; }
+
+    .error-panel { background: var(--color-danger-bg); border: 1.5px solid var(--color-danger); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; }
+    .error-panel h2 { color: var(--color-danger); margin: 0 0 .5rem; font-size: 1.1rem; }
+    .error-panel p { margin: 0; font-size: .88rem; color: var(--color-text-dim); line-height: 1.6; }
+
+    .hidden { display: none !important; }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fade .3s ease; }
+
+    footer.site-footer { padding: 1rem clamp(1rem,3vw,2rem); font-size: .7rem; color: var(--color-text-dim); border-top: 1px solid var(--color-border); text-align: center; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-icon">AA</span>
+      <div style="display:flex;flex-direction:column;line-height:1.05;gap:2px;">
+        <strong style="font-size:.95rem;">Acme Auth</strong>
+        <span class="brand-badge">Authorization Server</span>
+      </div>
+    </div>
+    <span class="sim-notice">⚠ Simulated — No real auth occurs</span>
+  </header>
+
+  <div class="step-tracker">
+    <div class="steps">
+      <div class="step"><span class="step-pill done">✓ ① Generate PKCE</span></div>
+      <div class="step-connector done"></div>
+      <div class="step"><span class="step-pill done">✓ ② Redirect</span></div>
+      <div class="step-connector done"></div>
+      <div class="step"><span class="step-pill active">③ User Login</span></div>
+      <div class="step-connector"></div>
+      <div class="step"><span class="step-pill">④ Token Exchange</span></div>
+      <div class="step-connector"></div>
+      <div class="step"><span class="step-pill">⑤ Protected</span></div>
+    </div>
+  </div>
+
+  <main>
+    <div id="errorPanel" class="error-panel fade-in hidden">
+      <h2>Bad Request</h2>
+      <p id="errorMsg">Missing required OAuth parameters. Please initiate the flow from the client application.</p>
+    </div>
+
+    <div id="loginCard" class="card fade-in hidden">
+      <h1 class="card-title">Sign in to Acme Auth</h1>
+      <p class="card-sub">An application is requesting access to your account.</p>
+
+      <div class="creds-hint">
+        <strong>Demo Credentials</strong>
+        Username: <code>demo</code> &nbsp;&nbsp;/&nbsp;&nbsp; Password: <code>Password1</code>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" autocomplete="username" placeholder="demo" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" />
+            <button type="button" class="pw-toggle" id="pwToggle" aria-label="Toggle password visibility">👁</button>
+          </div>
+        </div>
+        <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
+        <button type="submit" class="btn-primary" id="submitBtn">Authorize Access</button>
+      </form>
+
+      <a href="#" class="cancel-link" id="cancelLink">Cancel — return to application</a>
+    </div>
+
+    <details class="auth-details fade-in" id="authDetails" open>
+      <summary>Authorization Request Details</summary>
+      <div class="details-body">
+        <table class="param-table" id="paramTable"></table>
+        <p class="details-caption">
+          These parameters were sent by the client application when starting the OAuth flow.
+          The <code>code_challenge</code> is <code>BASE64URL(SHA-256(code_verifier))</code> — the client
+          holds the secret <code>code_verifier</code> and sends only its hash here, preventing interception attacks.
+        </p>
+      </div>
+    </details>
+  </main>
+
+  <footer class="site-footer">Acme Auth &mdash; Simulated OAuth 2.0 Authorization Server &copy; <span id="year"></span></footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const params = new URLSearchParams(location.search);
+    const REQUIRED = ['response_type', 'client_id', 'redirect_uri', 'code_challenge', 'code_challenge_method', 'state'];
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function base64urlEncode(buf) {
+      const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+      let str = '';
+      bytes.forEach(b => str += String.fromCharCode(b));
+      return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    }
+
+    function appendFlowLog(entry) {
+      const log = JSON.parse(sessionStorage.getItem('pkce_flow_log') || '[]');
+      log.push({ ts: Date.now(), ...entry });
+      sessionStorage.setItem('pkce_flow_log', JSON.stringify(log));
+    }
+
+    // Populate param table (always shown)
+    const table = document.getElementById('paramTable');
+    ['response_type', 'client_id', 'redirect_uri', 'scope', 'state', 'code_challenge', 'code_challenge_method'].forEach(key => {
+      const val = params.get(key);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${key}</td><td><code>${val ? escapeHtml(val) : '<em style="color:var(--color-danger)">missing</em>'}</code></td>`;
+      table.appendChild(tr);
+    });
+
+    // Validate
+    const missing = REQUIRED.filter(k => !params.get(k));
+    const wrongType = params.get('response_type') && params.get('response_type') !== 'code';
+
+    if (missing.length || wrongType) {
+      document.getElementById('errorPanel').classList.remove('hidden');
+      if (wrongType) {
+        document.getElementById('errorMsg').textContent = 'Invalid response_type "' + params.get('response_type') + '". Only "code" is supported.';
+      } else {
+        document.getElementById('errorMsg').textContent = 'Missing required parameters: ' + missing.join(', ') + '. Please initiate the flow from the client application.';
+      }
+    } else {
+      document.getElementById('loginCard').classList.remove('hidden');
+
+      document.getElementById('cancelLink').addEventListener('click', e => {
+        e.preventDefault();
+        const url = new URL(params.get('redirect_uri'));
+        url.searchParams.set('error', 'access_denied');
+        url.searchParams.set('error_description', 'The user denied access');
+        url.searchParams.set('state', params.get('state'));
+        window.location.href = url.toString();
+      });
+
+      document.getElementById('pwToggle').addEventListener('click', () => {
+        const pw = document.getElementById('password');
+        pw.type = pw.type === 'password' ? 'text' : 'password';
+      });
+
+      document.getElementById('loginForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const errEl = document.getElementById('formError');
+        const btn = document.getElementById('submitBtn');
+
+        errEl.textContent = '';
+
+        if (username !== 'demo' || password !== 'Password1') {
+          errEl.textContent = 'Invalid credentials. Use demo / Password1.';
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Authorizing…';
+
+        const codeBytes = new Uint8Array(16);
+        crypto.getRandomValues(codeBytes);
+        const code = base64urlEncode(codeBytes);
+
+        localStorage.setItem('pkce_auth_code_store', JSON.stringify({
+          code,
+          codeChallenge: params.get('code_challenge'),
+          codeChallengeMethod: params.get('code_challenge_method'),
+          clientId: params.get('client_id'),
+          redirectUri: params.get('redirect_uri'),
+          expiresAt: Date.now() + 60000
+        }));
+
+        appendFlowLog({
+          step: 3,
+          label: 'User Login & Code Issued',
+          origin: 'auth-server',
+          detail: {
+            user: username,
+            code_preview: code.slice(0, 8) + '…',
+            code_expires_in: '60s',
+            client_id: params.get('client_id')
+          }
+        });
+
+        const redirectUrl = new URL(params.get('redirect_uri'));
+        redirectUrl.searchParams.set('code', code);
+        redirectUrl.searchParams.set('state', params.get('state'));
+        window.location.href = redirectUrl.toString();
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - link "← Index" [ref=e3] [cursor=pointer]:
+      - /url: ../../index.html
+    - generic [ref=e4]:
+      - generic [ref=e5]: 🔐
+      - generic [ref=e6]:
+        - strong [ref=e7]: OAuth 2.0 PKCE Demo
+        - generic [ref=e8]: Perfecto
+  - generic [ref=e10]:
+    - generic [ref=e12]: ① Generate PKCE
+    - generic [ref=e15]: ② Redirect to Auth
+    - generic [ref=e18]: ③ User Login
+    - generic [ref=e21]: ④ Token Exchange
+    - generic [ref=e24]: ⑤ Protected
+  - main [ref=e25]:
+    - generic [ref=e27]:
+      - heading "OAuth 2.0 PKCE Flow" [level=1] [ref=e28]
+      - paragraph [ref=e29]:
+        - text: This demo walks through the complete
+        - strong [ref=e30]: Proof Key for Code Exchange
+        - text: authorization flow using real browser cryptography (
+        - code [ref=e31]: SubtleCrypto
+        - text: ) — no backend required. The "authorization server" is a second page on the same origin that simulates issuing an authorization code after login.
+      - generic [ref=e32]:
+        - paragraph [ref=e33]: What will happen
+        - generic [ref=e34]:
+          - generic [ref=e35]: ①
+          - text: Generate a random
+          - code [ref=e36]: code_verifier
+          - text: and compute
+          - code [ref=e37]: code_challenge = BASE64URL(SHA-256(verifier))
+        - generic [ref=e38]:
+          - generic [ref=e39]: ②
+          - text: Redirect to the simulated Acme Auth server with the challenge (never the verifier)
+        - generic [ref=e40]:
+          - generic [ref=e41]: ③
+          - text: Log in with
+          - code [ref=e42]: demo
+          - text: /
+          - code [ref=e43]: Password1
+          - text: — auth server issues an authorization code
+        - generic [ref=e44]:
+          - generic [ref=e45]: ④
+          - text: "Back here: exchange the code + verifier for a token (PKCE verified with real SHA-256)"
+        - generic [ref=e46]:
+          - generic [ref=e47]: ⑤
+          - text: View the decoded access token and the complete flow audit log
+      - button "🔑 Sign In with Acme Auth" [ref=e48] [cursor=pointer]
+    - text: ▶
+  - contentinfo [ref=e49]: © 2026 OAuth 2.0 PKCE Demo • Perfecto Example Pages
