@@ -95,6 +95,21 @@
     .cancel-link { display: block; text-align: center; margin-top: 1rem; font-size: .82rem; color: var(--color-text-dim); text-decoration: none; }
     .cancel-link:hover { color: var(--color-text); text-decoration: underline; }
 
+    /* OTP digit boxes */
+    .otp-wrap { display: flex; gap: .55rem; justify-content: center; margin: 1.25rem 0; }
+    .otp-digit {
+      width: 48px; height: 56px; text-align: center; font-size: 1.4rem; font-weight: 700;
+      font-family: monospace; border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm); background: var(--color-bg-alt); color: var(--color-text);
+      caret-color: var(--color-accent); transition: var(--transition);
+    }
+    .otp-digit:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(124,58,237,.2); }
+    .otp-digit.filled { border-color: var(--color-accent); }
+    .otp-digit.error { border-color: var(--color-danger); animation: shake .35s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-4px)} 40%,80%{transform:translateX(4px)} }
+    .tfa-back { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem; color: var(--color-text-dim); text-decoration: none; margin-top: .25rem; }
+    .tfa-back:hover { color: var(--color-text); }
+
     details.auth-details { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden; }
     details.auth-details summary {
       padding: .85rem 1rem; font-size: .75rem; font-weight: 600; letter-spacing: .6px;
@@ -185,6 +200,34 @@
       <a href="#" class="cancel-link" id="cancelLink">Cancel — return to application</a>
     </div>
 
+    <div id="tfaCard" class="card fade-in hidden">
+      <h1 class="card-title">Two-Factor Authentication</h1>
+      <p class="card-sub">Enter the 6-digit code from your authenticator app.</p>
+
+      <div class="creds-hint">
+        <strong>Demo 2FA Code</strong>
+        Code: <code>123456</code>
+      </div>
+
+      <form id="tfaForm" novalidate>
+        <label style="display:block;text-align:center;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--color-text-dim);margin-bottom:.25rem;">Authentication Code</label>
+        <div class="otp-wrap" id="otpWrap">
+          <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1" />
+          <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+          <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+          <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+          <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+          <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+        </div>
+        <p class="form-error" id="tfaError" role="alert" aria-live="polite"></p>
+        <button type="submit" class="btn-primary" id="tfaSubmitBtn">Verify Code</button>
+      </form>
+
+      <div style="text-align:center;margin-top:1rem;">
+        <a href="#" class="tfa-back" id="tfaBackLink">← Back to login</a>
+      </div>
+    </div>
+
     <details class="auth-details fade-in" id="authDetails" open>
       <summary>Authorization Request Details</summary>
       <div class="details-body">
@@ -260,12 +303,11 @@
         pw.type = pw.type === 'password' ? 'text' : 'password';
       });
 
-      document.getElementById('loginForm').addEventListener('submit', async e => {
+      document.getElementById('loginForm').addEventListener('submit', e => {
         e.preventDefault();
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
         const errEl = document.getElementById('formError');
-        const btn = document.getElementById('submitBtn');
 
         errEl.textContent = '';
 
@@ -274,8 +316,72 @@
           return;
         }
 
-        btn.disabled = true;
-        btn.textContent = 'Authorizing…';
+        // Credentials valid — advance to 2FA step
+        document.getElementById('loginCard').classList.add('hidden');
+        document.getElementById('tfaCard').classList.remove('hidden');
+        document.querySelectorAll('.otp-digit')[0].focus();
+      });
+
+      // ── OTP digit box behaviour ──────────────────────────────────────────
+      const digits = Array.from(document.querySelectorAll('.otp-digit'));
+
+      digits.forEach((input, i) => {
+        input.addEventListener('input', e => {
+          const val = e.target.value.replace(/\D/g, '');
+          e.target.value = val.slice(-1);
+          e.target.classList.toggle('filled', val.length > 0);
+          if (val && i < digits.length - 1) digits[i + 1].focus();
+        });
+
+        input.addEventListener('keydown', e => {
+          if (e.key === 'Backspace' && !e.target.value && i > 0) {
+            digits[i - 1].value = '';
+            digits[i - 1].classList.remove('filled');
+            digits[i - 1].focus();
+          }
+        });
+
+        input.addEventListener('paste', e => {
+          e.preventDefault();
+          const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+          pasted.split('').forEach((ch, j) => {
+            if (digits[i + j]) {
+              digits[i + j].value = ch;
+              digits[i + j].classList.add('filled');
+            }
+          });
+          const nextEmpty = digits.findIndex((d, j) => j >= i && !d.value);
+          (nextEmpty >= 0 ? digits[nextEmpty] : digits[digits.length - 1]).focus();
+        });
+      });
+
+      // ── 2FA form submission ──────────────────────────────────────────────
+      document.getElementById('tfaBackLink').addEventListener('click', e => {
+        e.preventDefault();
+        document.getElementById('tfaCard').classList.add('hidden');
+        document.getElementById('tfaError').textContent = '';
+        digits.forEach(d => { d.value = ''; d.classList.remove('filled', 'error'); });
+        document.getElementById('loginCard').classList.remove('hidden');
+      });
+
+      document.getElementById('tfaForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const entered = digits.map(d => d.value).join('');
+        const tfaErr = document.getElementById('tfaError');
+        const tfaBtn = document.getElementById('tfaSubmitBtn');
+
+        tfaErr.textContent = '';
+
+        if (entered !== '123456') {
+          tfaErr.textContent = 'Invalid code. Use 123456.';
+          digits.forEach(d => d.classList.add('error'));
+          setTimeout(() => digits.forEach(d => d.classList.remove('error')), 400);
+          digits[0].focus();
+          return;
+        }
+
+        tfaBtn.disabled = true;
+        tfaBtn.textContent = 'Verifying…';
 
         const codeBytes = new Uint8Array(16);
         crypto.getRandomValues(codeBytes);
@@ -292,10 +398,11 @@
 
         appendFlowLog({
           step: 3,
-          label: 'User Login & Code Issued',
+          label: 'User Login & 2FA Verified, Code Issued',
           origin: 'auth-server',
           detail: {
-            user: username,
+            user: 'demo',
+            mfa_method: 'TOTP',
             code_preview: code.slice(0, 8) + '…',
             code_expires_in: '60s',
             client_id: params.get('client_id')
