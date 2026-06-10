@@ -79,3 +79,4 @@ playwright/.cache/
 
 # Temporary test/debug files
 verify-*.js
+.DS_Store
