@@ -78,6 +78,18 @@ tests/playwright-report/
 playwright/.cache/
 
 # ------------------------------
+# JMeter / Taurus Run Artifacts
+# ------------------------------
+*.jtl
+results/
+jmeter/report/
+bzt-artifacts/
+
+# Per-example test bundle output (examples/*/tests/)
+test-results/
+playwright-report/
+
+# ------------------------------
 # Browser Automation / Agent Tool Output
 # ------------------------------
 # Playwright MCP writes page snapshots (.yml), console logs and traces here.

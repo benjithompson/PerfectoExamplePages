@@ -1,0 +1,23 @@
+# Taurus config for the BlazeMeter Tech College "Apply Now" Playwright test.
+# Upload this folder (spec + package.json + playwright.config.js + this file)
+# to BlazeMeter, or run locally with: bzt blazemeter.yml
+
+execution:
+- executor: playwright
+  concurrency: 1
+  iterations: 1
+  scenario: apply-now-flow
+
+scenarios:
+  apply-now-flow:
+    script: college-apply.spec.js
+    browser: chromium
+
+settings:
+  env:
+    # Target site. Override per environment; playwright.config.js reads this.
+    BASE_URL: https://benjithompson.github.io/PerfectoExamplePages/examples/college/
+
+reporting:
+- module: console
+- module: final-stats

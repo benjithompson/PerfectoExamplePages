@@ -76,7 +76,14 @@ Use a server rather than `file://` — relative theme paths and fetches depend o
 
 ## Tests
 
-Playwright specs in `tests/` (`npm test`, `npm run test:headed`, `npm run report`). `playwright.config.js` auto-starts the Python server on port 8000; `baseURL` is `http://localhost:8000`, so specs use `page.goto('/examples/w2/w2.html')`. Only `w2` and `store` have specs; adding one for a new example is optional.
+Playwright specs in `tests/` (`npm test`, `npm run test:headed`, `npm run report`). `playwright.config.js` auto-starts the Python server on port 8000; `baseURL` is `http://localhost:8000`, so specs use `page.goto('/examples/w2/w2.html')`. Set `PORT=8010` if something else already owns 8000 — `reuseExistingServer` would otherwise run the suite against whatever is listening. Only `w2` and `store` have specs here; adding one for a new example is optional.
+
+An example may instead ship a **self-contained test bundle** in `examples/<name>/tests/` — see `examples/college/tests/`:
+
+- `college-apply.spec.js`, `playwright.config.js`, `package.json`, `blazemeter.yml` — a standalone Playwright project (own deps, own config) that can be zipped and uploaded to BlazeMeter. `playwright.config.js` reads `BASE_URL` (defaults to the deployed Pages URL); Taurus passes it via `settings.env.BASE_URL`. Spec paths are relative (`apply.html`), so `BASE_URL` must end in a slash. Taurus's `playwright` executor maps `browser:` → `--project=` and `concurrency`/`iterations` → `--workers`/`--repeat-each`.
+- `college-flows.jmx` — JMeter plan; defaults to the deployed site at 1 VU. Override with `-Jprotocol= -Jhost= -Jport= -Jbase= -Jusers=`.
+
+Keep run output (`test-results/`, `results/`, `*.jtl`, `node_modules/`) out of git — already covered by `.gitignore`.
 
 ## Related docs
 

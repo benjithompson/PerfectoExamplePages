@@ -3,6 +3,13 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * Playwright configuration for testing example pages
  */
+
+/* Port for the local static server. Override with PORT=8010 npm test when
+ * something else already owns 8000 — reuseExistingServer would otherwise
+ * silently run the suite against whatever is listening there. */
+const PORT = process.env.PORT || 8000;
+const BASE_URL = `http://localhost:${PORT}`;
+
 export default defineConfig({
   testDir: './tests',
   
@@ -30,7 +37,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:8000',
+    baseURL: BASE_URL,
     
     /* Collect trace when retrying the failed test. */
     trace: 'on-first-retry',
@@ -72,8 +79,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'python3 -m http.server 8000',
-    url: 'http://localhost:8000',
+    command: `python3 -m http.server ${PORT}`,
+    url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },
