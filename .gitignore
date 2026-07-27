@@ -77,6 +77,26 @@ tests/test-results/
 tests/playwright-report/
 playwright/.cache/
 
+# ------------------------------
+# Browser Automation / Agent Tool Output
+# ------------------------------
+# Playwright MCP writes page snapshots (.yml), console logs and traces here.
+.playwright-mcp/
+*.har
+trace.zip
+
+# Screenshots dropped in the repo root by browser tooling.
+# Only root-level — images inside examples/ are page assets and stay tracked.
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
+
+# Local editor/agent state
+.claude/settings.local.json
+
+# ------------------------------
 # Temporary test/debug files
+# ------------------------------
 verify-*.js
 .DS_Store
