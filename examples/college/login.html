@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MyBlazeMeter Sign In - BlazeMeter Tech (Demo)</title>
+  <meta name="description" content="Mock student portal sign-in page with published demo credentials. Not a real login." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main id="main-content" class="page">
+    <div class="container" style="max-width:520px;">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a> / MyBlazeMeter Sign In
+      </nav>
+
+      <div class="card">
+        <div class="card-header">MyBlazeMeter &middot; Student Information System</div>
+        <div class="card-body">
+          <div class="alert alert-warn">
+            <strong>Demo credentials.</strong> This is a fictional sign-in page for testing practice &mdash; no real
+            account is involved and nothing is transmitted anywhere.<br>
+            Username <code id="demo-username">jdoe</code> &nbsp;&middot;&nbsp; Password <code id="demo-password">Test1234!</code>
+          </div>
+
+          <form id="login-form" novalidate>
+            <div class="field">
+              <label for="username">Username <span class="req">*</span></label>
+              <input type="text" id="username" name="username" autocomplete="username" required />
+              <span class="error-text" id="username-error" hidden></span>
+            </div>
+            <div class="field">
+              <label for="password">Password <span class="req">*</span></label>
+              <input type="password" id="password" name="password" autocomplete="current-password" required />
+              <span class="error-text" id="password-error" hidden></span>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="remember" name="remember" />
+              <label for="remember">Keep me signed in on this device</label>
+            </div>
+            <div class="alert alert-danger" id="login-error" role="alert" hidden></div>
+            <button class="btn btn-green btn-lg btn-block" type="submit" id="sign-in">Sign In</button>
+          </form>
+
+          <p style="margin-top:1rem;font-size:.9rem;">
+            <a href="login.html">Forgot your password?</a> &nbsp;&middot;&nbsp;
+            <a href="apply.html">Apply for admission</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header green">Need Help?</div>
+        <div class="card-body" style="font-size:.92rem;">
+          <p>New students receive MyBlazeMeter credentials by email 2&ndash;3 business days after the application is submitted.</p>
+          <p>For sign-in assistance, contact the IT Service Desk at (555) 010-1000.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="site.js"></script>
+  <script>
+    COLLEGE.renderHeader();
+    COLLEGE.renderFooter();
+
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const next = params.get('next') || 'portal.html';
+      const errorBox = document.getElementById('login-error');
+
+      function fieldError(id, message) {
+        const input = document.getElementById(id);
+        const err = document.getElementById(id + '-error');
+        if (message) {
+          input.setAttribute('aria-invalid', 'true');
+          err.textContent = message;
+          err.hidden = false;
+        } else {
+          input.removeAttribute('aria-invalid');
+          err.hidden = true;
+        }
+      }
+
+      document.getElementById('login-form').addEventListener('submit', e => {
+        e.preventDefault();
+        errorBox.hidden = true;
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        fieldError('username', username.trim() ? '' : 'Username is required.');
+        fieldError('password', password ? '' : 'Password is required.');
+        if (!username.trim() || !password) return;
+
+        if (COLLEGE.login(username, password)) {
+          window.location.href = ['portal.html', 'register.html'].includes(next) ? next : 'portal.html';
+        } else {
+          errorBox.textContent = 'The username or password you entered is incorrect. Please try again.';
+          errorBox.hidden = false;
+          document.getElementById('password').value = '';
+          document.getElementById('password').focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

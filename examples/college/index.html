@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Home - BlazeMeter Tech (Demo)</title>
+  <meta name="description" content="Mock college homepage used for automated-testing practice. BlazeMeter Technical Community College is a fictional institution." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main id="main-content" class="page">
+    <div class="container">
+
+      <!-- ---------------- HERO CAROUSEL ---------------- -->
+      <h1 class="visually-hidden">BlazeMeter Tech Demo Home</h1>
+      <section class="hero" id="hero" aria-roledescription="carousel" aria-label="Featured announcements">
+        <div class="slide active" data-slide="0" role="group" aria-label="Slide 1 of 3">
+          <p class="slide-eyebrow">July &ndash; December 2026</p>
+          <h2>Quality Instruction.<br>Endless Possibilities.</h2>
+          <p>Tuition-free training through the BlazeMeter Promise Scholarship. Workforce development and community education.</p>
+          <a class="btn btn-navy" href="registration-info.html" id="hero-view-courses">View Courses</a>
+        </div>
+        <div class="slide" data-slide="1" role="group" aria-label="Slide 2 of 3">
+          <p class="slide-eyebrow">60th Anniversary</p>
+          <h2>Six Decades of<br>Student Success</h2>
+          <p>Read the latest issue of the BlazeMeter Tech magazine.</p>
+          <a class="btn btn-navy" href="index.html">Read the Latest Issue</a>
+        </div>
+        <div class="slide" data-slide="2" role="group" aria-label="Slide 3 of 3">
+          <p class="slide-eyebrow">Fall 2026 Registration</p>
+          <h2>Register Now for<br>Fall Classes</h2>
+          <p>Returning students can register completely online through MyBlazeMeter.</p>
+          <a class="btn btn-navy" href="login.html" id="hero-register">Register for Classes</a>
+        </div>
+        <button class="hero-control prev" type="button" id="hero-prev" aria-label="Previous slide">&#10094;</button>
+        <button class="hero-control next" type="button" id="hero-next" aria-label="Next slide">&#10095;</button>
+        <div class="hero-dots" role="tablist" aria-label="Choose slide">
+          <button type="button" data-dot="0" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-dot="1" aria-current="false" aria-label="Slide 2"></button>
+          <button type="button" data-dot="2" aria-current="false" aria-label="Slide 3"></button>
+        </div>
+      </section>
+
+      <!-- ---------------- FEATURE CARDS ---------------- -->
+      <section class="grid-3" style="margin-top:1.4rem;" aria-label="Highlights">
+        <div class="card">
+          <div class="tile-img" aria-hidden="true">&#9993;</div>
+          <div class="card-body">
+            <h3>Virtual Information Sessions</h3>
+            <p>Get answers to your questions about how to get started, programs of study, financial aid, and how to enroll.</p>
+            <ul>
+              <li>July 29 @ 6 p.m.</li>
+              <li>Sept. 1 @ 3 p.m.</li>
+            </ul>
+            <a class="btn btn-green btn-block" href="admissions.html">Virtual Information Sessions &rarr;</a>
+          </div>
+        </div>
+        <div class="card">
+          <div class="tile-img green" aria-hidden="true">&#9998;</div>
+          <div class="card-body">
+            <h3>Student Support</h3>
+            <p>Academic support and student resources are available to help with your academic success. Applicants and enrolled students can access staff, information, resources, and more.</p>
+            <a class="btn btn-green btn-block" href="registration-info.html">Student Support &rarr;</a>
+          </div>
+        </div>
+        <div class="card">
+          <div class="tile-img" aria-hidden="true">&#127891;</div>
+          <div class="card-body">
+            <h3>100+ Programs of Study</h3>
+            <p>We offer a wide variety of credit programs &mdash; including bachelor&rsquo;s degrees, associate degrees, certificates and diplomas &mdash; designed to prepare you for success or to transfer credits to a four-year university.</p>
+            <a class="btn btn-green btn-block" href="registration-info.html">Programs of Study &rarr;</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------- EVENTS + CTA ---------------- -->
+      <section class="grid-2" style="margin-top:1.4rem;align-items:start;">
+        <div class="card">
+          <div class="card-header">Upcoming Events</div>
+          <div class="card-body">
+            <p><strong>Student Government Association: Fall Kickoff</strong><br><span style="font-size:.88rem;">Tue, Jul 28, 12 p.m. &middot; Ashford</span></p>
+            <p><strong>Last day to withdraw from a course for &ldquo;W&rdquo; grade instead of &ldquo;F&rdquo; grade (7-Week Session)</strong><br><span style="font-size:.88rem;">Thu, Jul 30</span></p>
+            <p><strong>Engineering Technology Club: Meeting</strong><br><span style="font-size:.88rem;">Wed, Aug 5, 12:30 p.m. &middot; Brookdale</span></p>
+            <p><a href="index.html">View all Events &rarr;</a></p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header green">Take the Next Step</div>
+          <div class="card-body">
+            <a class="btn btn-green btn-lg btn-block" style="margin-bottom:.7rem;" href="admissions.html" id="cta-inquire">&#10067; Inquire</a>
+            <a class="btn btn-green btn-lg btn-block" style="margin-bottom:.7rem;" href="admissions.html" id="cta-visit">&#127963; Visit</a>
+            <a class="btn btn-green btn-lg btn-block" href="apply.html" id="cta-apply">&#128221; Apply</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------- NEWS ---------------- -->
+      <section class="card" style="margin-top:1.4rem;">
+        <div class="card-header">What&rsquo;s Happening</div>
+        <div class="card-body grid-3">
+          <div>
+            <div class="tile-img" aria-hidden="true">&#127942;</div>
+            <p style="font-size:.82rem;margin:.5rem 0 .2rem;">JULY 16, 2026</p>
+            <a href="index.html">Nursing Program Earns Statewide Accreditation Renewal</a>
+          </div>
+          <div>
+            <div class="tile-img green" aria-hidden="true">&#127912;</div>
+            <p style="font-size:.82rem;margin:.5rem 0 .2rem;">JULY 14, 2026</p>
+            <a href="index.html">Culinary Arts Students Win Regional Competition</a>
+          </div>
+          <div>
+            <div class="tile-img" aria-hidden="true">&#127939;</div>
+            <p style="font-size:.82rem;margin:.5rem 0 .2rem;">JUNE 26, 2026</p>
+            <a href="index.html">Northgate Campus 5k Raises Funds for Student Emergency Aid</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------- FIND IT ---------------- -->
+      <section class="card" style="margin-top:1.4rem;max-width:320px;">
+        <div class="card-header">Find It</div>
+        <div class="card-body">
+          <ul style="margin:0;padding-left:1.1rem;">
+            <li><a href="apply.html">Apply Now</a></li>
+            <li><a href="registration-info.html">Academic Calendar</a></li>
+            <li><a href="registration-info.html">Programs of Study</a></li>
+            <li><a href="admissions.html">Tuition &amp; Fees</a></li>
+            <li><a href="register.html">Search for Courses</a></li>
+            <li><a href="login.html">MyBlazeMeter Sign In</a></li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="site.js"></script>
+  <script>
+    COLLEGE.renderHeader('about');
+    COLLEGE.renderFooter();
+
+    /* ---------------- Hero carousel ---------------- */
+    (function () {
+      const slides = [...document.querySelectorAll('#hero .slide')];
+      const dots = [...document.querySelectorAll('.hero-dots button')];
+      let current = 0;
+
+      function show(i) {
+        current = (i + slides.length) % slides.length;
+        slides.forEach((s, n) => s.classList.toggle('active', n === current));
+        dots.forEach((d, n) => d.setAttribute('aria-current', String(n === current)));
+      }
+
+      document.getElementById('hero-next').addEventListener('click', () => show(current + 1));
+      document.getElementById('hero-prev').addEventListener('click', () => show(current - 1));
+      dots.forEach(d => d.addEventListener('click', () => show(Number(d.dataset.dot))));
+      setInterval(() => show(current + 1), 7000);
+    })();
+  </script>
+</body>
+</html>

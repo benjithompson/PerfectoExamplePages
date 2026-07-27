@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MyBlazeMeter Dashboard - BlazeMeter Tech (Demo)</title>
+  <meta name="description" content="Mock student information system dashboard with holds, balances, plan and registration entry point." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+  <div id="portal-chrome"></div>
+
+  <main id="main-content" class="page">
+    <div class="container">
+      <h1 id="welcome-heading">Dashboard</h1>
+
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">Student ID</div><div class="stat-value" id="stat-id">&mdash;</div></div>
+        <div class="stat"><div class="stat-label">Credits Earned</div><div class="stat-value" id="stat-credits">&mdash;</div></div>
+        <div class="stat"><div class="stat-label">Cumulative GPA</div><div class="stat-value" id="stat-gpa">&mdash;</div></div>
+        <div class="stat"><div class="stat-label">Account Balance</div><div class="stat-value" id="stat-balance">&mdash;</div></div>
+      </div>
+
+      <div class="alert alert-success" id="holds-alert" role="status">
+        You have no registration holds. Registration for <strong>Fall 2026</strong> is open through September 8, 2026.
+      </div>
+
+      <div class="grid-2" style="align-items:start;">
+        <div class="card">
+          <div class="card-header">Registration</div>
+          <div class="card-body">
+            <p>The College&rsquo;s student records system allows returning students to register completely online.</p>
+            <a class="btn btn-green btn-lg btn-block" href="register.html" id="register-or-drop">Register or Drop Classes</a>
+            <p style="margin-top:1rem;font-size:.9rem;">Your advisor: <strong id="advisor-name">&mdash;</strong></p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">My Program</div>
+          <div class="card-body">
+            <p><strong id="program-name">&mdash;</strong><br><span id="program-campus">&mdash;</span> Campus</p>
+            <p style="font-size:.9rem;">Degree audit shows <strong>34 of 60</strong> credits complete.</p>
+            <a class="btn btn-outline" href="portal.html">View Degree Audit</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">My Plan &mdash; Fall 2026</div>
+        <div class="card-body">
+          <p>These courses were placed on your plan during advisement. You can add their sections directly from the
+            <a href="register.html">Plans tab</a> when registering.</p>
+          <table class="table" id="plan-table">
+            <caption class="visually-hidden">Planned courses for Fall 2026</caption>
+            <thead><tr><th>Course</th><th>Title</th><th>Credits</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Academic History</div>
+        <div class="card-body">
+          <table class="table" id="history-table">
+            <caption class="visually-hidden">Completed courses</caption>
+            <thead><tr><th>Course</th><th>Title</th><th>Credits</th><th>Grade</th><th>Term</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="site.js"></script>
+  <script src="data/courses.js"></script>
+  <script>
+    COLLEGE.renderHeader();
+    COLLEGE.renderFooter();
+
+    (function () {
+      const s = COLLEGE.requireSession();
+      if (!s) return;
+      const u = s.user;
+
+      COLLEGE.renderPortalChrome('portal.html');
+      document.getElementById('welcome-heading').textContent = 'Welcome back, ' + u.firstName + '!';
+      document.getElementById('stat-id').textContent = u.studentId;
+      document.getElementById('stat-credits').textContent = u.creditsEarned;
+      document.getElementById('stat-gpa').textContent = u.gpa;
+      document.getElementById('stat-balance').textContent = u.balance;
+      document.getElementById('advisor-name').textContent = u.advisor;
+      document.getElementById('program-name').textContent = u.program;
+      document.getElementById('program-campus').textContent = u.campus;
+
+      document.querySelector('#plan-table tbody').innerHTML = window.COLLEGE_STUDENT_PLAN.map(c =>
+        '<tr><td>' + c.subject + ' ' + c.number + '</td><td>' + c.title + '</td><td>' + c.credits +
+        '</td><td><span class="badge badge-pending">' + c.status + '</span></td></tr>'
+      ).join('');
+
+      document.querySelector('#history-table tbody').innerHTML = window.COLLEGE_COMPLETED.map(c =>
+        '<tr><td>' + c.course + '</td><td>' + c.title + '</td><td>' + c.credits + '</td><td>' + c.grade +
+        '</td><td>' + c.term + '</td></tr>'
+      ).join('');
+    })();
+  </script>
+</body>
+</html>

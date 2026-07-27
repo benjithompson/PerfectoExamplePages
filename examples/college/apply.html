@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Apply Online - BlazeMeter Tech (Demo)</title>
+  <meta name="description" content="Mock multi-step college application: contact form, personal information, program selection, education history, review and submit." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main id="main-content" class="page">
+    <div class="container" style="max-width:900px;">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a> / <a href="admissions.html">Admissions</a> / Apply Online
+      </nav>
+
+      <h1>Apply Online</h1>
+
+      <ol class="stepper" id="stepper">
+        <li data-step="contact" aria-current="step">1. Contact Form</li>
+        <li data-step="personal">2. Personal Info</li>
+        <li data-step="program">3. Program &amp; Term</li>
+        <li data-step="education">4. Education History</li>
+        <li data-step="review">5. Review &amp; Submit</li>
+      </ol>
+
+      <!-- ============ STEP 1: CONTACT FORM ============ -->
+      <section class="card" id="step-contact" data-step-panel="contact">
+        <div class="card-header">BlazeMeter Tech Application Contact Form</div>
+        <div class="card-body">
+          <p>Thank you for your interest in applying to BlazeMeter Tech. To get started, please complete and submit the contact form below. After you submit the form, a unique link will be sent to the email address you provided to begin your online application.</p>
+          <p>If you have already started an application, <a href="apply.html">click here</a> to retrieve your application.</p>
+          <div class="alert alert-info">
+            By providing your information, you consent to receive communications from the College.
+          </div>
+
+          <form id="contact-form" novalidate>
+            <div class="grid-2">
+              <div class="field">
+                <label for="firstName">Legal First Name <span class="req">*</span></label>
+                <input type="text" id="firstName" name="firstName" autocomplete="given-name" required />
+                <span class="error-text" id="firstName-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="lastName">Legal Last Name <span class="req">*</span></label>
+                <input type="text" id="lastName" name="lastName" autocomplete="family-name" required />
+                <span class="error-text" id="lastName-error" hidden></span>
+              </div>
+            </div>
+
+            <p><em>The personal email address is required to access your application. Please check spelling for accuracy.</em></p>
+            <div class="grid-2">
+              <div class="field">
+                <label for="email">Personal Email Address <span class="req">*</span></label>
+                <input type="email" id="email" name="email" autocomplete="email" required />
+                <span class="hint">Please do not use a high school or college issued email address.</span>
+                <span class="error-text" id="email-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="phone">Cell Phone Number <span class="req">*</span></label>
+                <input type="tel" id="phone" name="phone" placeholder="(555) 010-0134" autocomplete="tel" required />
+                <span class="error-text" id="phone-error" hidden></span>
+              </div>
+            </div>
+
+            <h3>Campus and Application Type</h3>
+            <p><strong>Step 1: Identify the campus.</strong> BlazeMeter Tech has four campuses: Brookdale, Ashford, Clearview, and Northgate.</p>
+            <p><strong>Step 2: Identify the application option.</strong></p>
+            <ul>
+              <li><strong>Degree Seeking</strong> &ndash; associate, diploma, or certificate program (required for Promise Scholarship eligibility).</li>
+              <li><strong>Only Courses</strong> &ndash; select courses only; not eligible for financial aid.</li>
+            </ul>
+
+            <div class="field">
+              <label for="campusType">Select your Campus and Student Type <span class="req">*</span></label>
+              <select id="campusType" name="campusType" required>
+                <option value="">-- Select --</option>
+                <option>Degree Seeking-Brookdale</option>
+                <option>Degree Seeking-Ashford</option>
+                <option>Degree Seeking-Northgate</option>
+                <option>Degree Seeking-Clearview</option>
+                <option>Only Courses-Brookdale</option>
+                <option>Only Courses-Ashford</option>
+                <option>Only Courses-Northgate</option>
+                <option>Only Courses-Clearview</option>
+              </select>
+              <span class="error-text" id="campusType-error" hidden></span>
+            </div>
+
+            <h3>Acknowledgement of Programs</h3>
+            <p>Please note this is not an application for admission. Upon your acknowledgement below and submission of this form, you will receive a unique link to the email address provided to begin your online application.</p>
+            <div class="check">
+              <input type="checkbox" id="acknowledge" name="acknowledge" />
+              <label for="acknowledge">I acknowledge that I have read the information above. <span class="req">*</span></label>
+            </div>
+            <span class="error-text" id="acknowledge-error" hidden></span>
+
+            <button class="btn btn-green btn-lg" type="submit" id="contact-submit">Submit</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ EMAIL LINK INTERSTITIAL ============ -->
+      <section class="card" id="step-emailed" data-step-panel="emailed" hidden>
+        <div class="card-header green">Check Your Email</div>
+        <div class="card-body">
+          <div class="alert alert-success" id="emailed-message" role="status"></div>
+          <p>In the live system the unique application link arrives by email. For this demo, continue directly to the application.</p>
+          <button class="btn btn-green btn-lg" type="button" id="continue-to-application">Continue to My Application</button>
+        </div>
+      </section>
+
+      <!-- ============ STEP 2: PERSONAL INFO ============ -->
+      <section class="card" id="step-personal" data-step-panel="personal" hidden>
+        <div class="card-header">Personal Information</div>
+        <div class="card-body">
+          <form id="personal-form" novalidate>
+            <div class="grid-2">
+              <div class="field">
+                <label for="p-firstName">Legal First Name <span class="req">*</span></label>
+                <input type="text" id="p-firstName" name="p-firstName" required />
+                <span class="error-text" id="p-firstName-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="p-lastName">Legal Last Name <span class="req">*</span></label>
+                <input type="text" id="p-lastName" name="p-lastName" required />
+                <span class="error-text" id="p-lastName-error" hidden></span>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="dob">Date of Birth <span class="req">*</span></label>
+                <input type="date" id="dob" name="dob" required />
+                <span class="error-text" id="dob-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="ssn">Social Security Number (optional)</label>
+                <input type="text" id="ssn" name="ssn" placeholder="XXX-XX-XXXX" inputmode="numeric" />
+                <span class="hint">Required only if you plan to apply for financial aid. Demo page &ndash; do not enter a real SSN.</span>
+                <span class="error-text" id="ssn-error" hidden></span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="address">Street Address <span class="req">*</span></label>
+              <input type="text" id="address" name="address" autocomplete="street-address" required />
+              <span class="error-text" id="address-error" hidden></span>
+            </div>
+            <div class="grid-3" style="gap:1rem;">
+              <div class="field">
+                <label for="city">City <span class="req">*</span></label>
+                <input type="text" id="city" name="city" required />
+                <span class="error-text" id="city-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="state">State <span class="req">*</span></label>
+                <select id="state" name="state" required>
+                  <option value="">-- Select --</option>
+                  <option>Lakeland</option><option>Eastport</option><option>Northvale</option>
+                  <option>Westbrook</option><option>Other</option>
+                </select>
+                <span class="error-text" id="state-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="zip">ZIP Code <span class="req">*</span></label>
+                <input type="text" id="zip" name="zip" inputmode="numeric" maxlength="10" required />
+                <span class="error-text" id="zip-error" hidden></span>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="residency">Lakeland Resident? <span class="req">*</span></label>
+                <select id="residency" name="residency" required>
+                  <option value="">-- Select --</option>
+                  <option>Yes &ndash; in-state tuition</option>
+                  <option>No &ndash; out-of-state tuition</option>
+                </select>
+                <span class="error-text" id="residency-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="citizenship">Citizenship Status <span class="req">*</span></label>
+                <select id="citizenship" name="citizenship" required>
+                  <option value="">-- Select --</option>
+                  <option>U.S. Citizen</option>
+                  <option>Permanent Resident</option>
+                  <option>International Student (F-1)</option>
+                  <option>Other</option>
+                </select>
+                <span class="error-text" id="citizenship-error" hidden></span>
+              </div>
+            </div>
+            <div style="display:flex;gap:.7rem;">
+              <button class="btn btn-outline" type="button" data-back="contact">Back</button>
+              <button class="btn btn-green" type="submit">Continue</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ STEP 3: PROGRAM & TERM ============ -->
+      <section class="card" id="step-program" data-step-panel="program" hidden>
+        <div class="card-header">Program and Entry Term</div>
+        <div class="card-body">
+          <form id="program-form" novalidate>
+            <div class="grid-2">
+              <div class="field">
+                <label for="campus">Campus <span class="req">*</span></label>
+                <select id="campus" name="campus" required>
+                  <option value="">-- Select --</option>
+                  <option>Ashford</option><option>Brookdale</option>
+                  <option>Clearview</option><option>Northgate</option>
+                </select>
+                <span class="error-text" id="campus-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="entryTerm">Entry Term <span class="req">*</span></label>
+                <select id="entryTerm" name="entryTerm" required>
+                  <option value="">-- Select --</option>
+                  <option>Fall 2026</option><option>Spring 2027</option><option>Summer 2027</option>
+                </select>
+                <span class="error-text" id="entryTerm-error" hidden></span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="program">Program of Study <span class="req">*</span></label>
+              <select id="program" name="program" required>
+                <option value="">-- Select --</option>
+                <option>A.A.S. Computer Information Systems</option>
+                <option>A.A.S. Nursing</option>
+                <option>A.A.S. Business Administration</option>
+                <option>A.A.S. Criminal Justice</option>
+                <option>A.A.S. Electrical Engineering Technology</option>
+                <option>A.S. Education</option>
+                <option>B.A.S. Cybersecurity</option>
+                <option>Certificate &ndash; Medical Assisting</option>
+                <option>Undecided</option>
+              </select>
+              <span class="error-text" id="program-error" hidden></span>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="enrollmentStatus">Enrollment Status <span class="req">*</span></label>
+                <select id="enrollmentStatus" name="enrollmentStatus" required>
+                  <option value="">-- Select --</option>
+                  <option>Full-time (12+ credits)</option>
+                  <option>Part-time (fewer than 12 credits)</option>
+                </select>
+                <span class="error-text" id="enrollmentStatus-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="studentType">Student Type <span class="req">*</span></label>
+                <select id="studentType" name="studentType" required>
+                  <option value="">-- Select --</option>
+                  <option>New Student</option>
+                  <option>Transfer Student</option>
+                  <option>Returning Student</option>
+                  <option>High School Student (dual enrollment)</option>
+                  <option>Veteran / Service Member</option>
+                </select>
+                <span class="error-text" id="studentType-error" hidden></span>
+              </div>
+            </div>
+            <div class="check">
+              <input type="checkbox" id="promise" name="promise" />
+              <label for="promise">I want to be considered for the BlazeMeter Promise Scholarship.</label>
+            </div>
+            <div style="display:flex;gap:.7rem;">
+              <button class="btn btn-outline" type="button" data-back="personal">Back</button>
+              <button class="btn btn-green" type="submit">Continue</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ STEP 4: EDUCATION HISTORY ============ -->
+      <section class="card" id="step-education" data-step-panel="education" hidden>
+        <div class="card-header">Education History</div>
+        <div class="card-body">
+          <form id="education-form" novalidate>
+            <div class="grid-2">
+              <div class="field">
+                <label for="highSchool">High School Name <span class="req">*</span></label>
+                <input type="text" id="highSchool" name="highSchool" required />
+                <span class="error-text" id="highSchool-error" hidden></span>
+              </div>
+              <div class="field">
+                <label for="gradYear">Graduation Year (or GED year) <span class="req">*</span></label>
+                <input type="number" id="gradYear" name="gradYear" min="1950" max="2035" required />
+                <span class="error-text" id="gradYear-error" hidden></span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="priorCollege">Have you attended another college? <span class="req">*</span></label>
+              <select id="priorCollege" name="priorCollege" required>
+                <option value="">-- Select --</option>
+                <option>No</option>
+                <option>Yes</option>
+              </select>
+              <span class="error-text" id="priorCollege-error" hidden></span>
+            </div>
+            <div class="field" id="priorCollegeNameField" hidden>
+              <label for="priorCollegeName">Previous College Name <span class="req">*</span></label>
+              <input type="text" id="priorCollegeName" name="priorCollegeName" />
+              <span class="hint">Official transcripts must be sent to the Admissions Office.</span>
+              <span class="error-text" id="priorCollegeName-error" hidden></span>
+            </div>
+            <div style="display:flex;gap:.7rem;">
+              <button class="btn btn-outline" type="button" data-back="program">Back</button>
+              <button class="btn btn-green" type="submit">Continue</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ STEP 5: REVIEW ============ -->
+      <section class="card" id="step-review" data-step-panel="review" hidden>
+        <div class="card-header">Review and Submit</div>
+        <div class="card-body">
+          <p>Please review your responses. Use <strong>Back</strong> to make corrections.</p>
+          <table class="table" id="review-table">
+            <caption class="visually-hidden">Application summary</caption>
+            <tbody></tbody>
+          </table>
+          <form id="review-form" novalidate>
+            <div class="check">
+              <input type="checkbox" id="certify" name="certify" />
+              <label for="certify">I certify that the information provided is complete and accurate to the best of my knowledge. <span class="req">*</span></label>
+            </div>
+            <span class="error-text" id="certify-error" hidden></span>
+            <div class="field" style="max-width:360px;">
+              <label for="signature">Electronic Signature (type your full name) <span class="req">*</span></label>
+              <input type="text" id="signature" name="signature" required />
+              <span class="error-text" id="signature-error" hidden></span>
+            </div>
+            <div style="display:flex;gap:.7rem;">
+              <button class="btn btn-outline" type="button" data-back="education">Back</button>
+              <button class="btn btn-green btn-lg" type="submit" id="submit-application">Submit Application</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ CONFIRMATION ============ -->
+      <section class="card" id="step-confirmation" data-step-panel="confirmation" hidden>
+        <div class="card-header green">Application Submitted</div>
+        <div class="card-body">
+          <div class="alert alert-success" role="status" id="confirmation-message"></div>
+          <table class="table" id="confirmation-table">
+            <caption class="visually-hidden">Submitted application details</caption>
+            <tbody></tbody>
+          </table>
+          <h3>What happens next</h3>
+          <ol>
+            <li>Watch your email for your MyBlazeMeter account credentials (2&ndash;3 business days).</li>
+            <li>Submit your proof of Lakeland residency before you register for classes.</li>
+            <li>Complete the FAFSA if you plan to apply for financial aid.</li>
+            <li>Meet with an academic counselor for required initial advisement.</li>
+            <li>Register for classes in <a href="login.html">MyBlazeMeter</a>.</li>
+          </ol>
+          <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
+            <a class="btn btn-green" href="login.html" id="go-to-portal">Go to MyBlazeMeter</a>
+            <a class="btn btn-outline" href="index.html">Return to Home</a>
+            <button class="btn btn-outline" type="button" id="start-over">Start a New Application</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="site.js"></script>
+  <script>
+    COLLEGE.renderHeader('admissions');
+    COLLEGE.renderFooter();
+
+    (function () {
+      'use strict';
+
+      const STEPS = ['contact', 'personal', 'program', 'education', 'review'];
+      const data = {};
+
+      /* ---------------- step navigation ---------------- */
+      function goTo(step) {
+        document.querySelectorAll('[data-step-panel]').forEach(p => {
+          p.hidden = p.dataset.stepPanel !== step;
+        });
+        document.querySelectorAll('#stepper li').forEach(li => {
+          const idx = STEPS.indexOf(li.dataset.step);
+          const cur = STEPS.indexOf(step);
+          li.removeAttribute('aria-current');
+          li.classList.toggle('done', cur > idx || cur === -1);
+          if (idx === cur) li.setAttribute('aria-current', 'step');
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      document.querySelectorAll('[data-back]').forEach(btn => {
+        btn.addEventListener('click', () => goTo(btn.dataset.back));
+      });
+
+      /* ---------------- validation helpers ---------------- */
+      function setError(id, message) {
+        const input = document.getElementById(id);
+        const err = document.getElementById(id + '-error');
+        if (message) {
+          input.setAttribute('aria-invalid', 'true');
+          err.textContent = message;
+          err.hidden = false;
+        } else {
+          input.removeAttribute('aria-invalid');
+          err.textContent = '';
+          err.hidden = true;
+        }
+      }
+
+      function validate(rules) {
+        let firstBad = null;
+        rules.forEach(([id, message, test]) => {
+          const el = document.getElementById(id);
+          const value = el.type === 'checkbox' ? el.checked : el.value.trim();
+          const ok = test ? test(value) : (el.type === 'checkbox' ? value === true : value !== '');
+          setError(id, ok ? '' : message);
+          if (!ok && !firstBad) firstBad = el;
+        });
+        if (firstBad) firstBad.focus();
+        return !firstBad;
+      }
+
+      const isEmail = v => /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v);
+      const isPhone = v => (v.replace(/\D/g, '').length === 10);
+
+      function collect(form) {
+        [...form.elements].forEach(el => {
+          if (!el.name) return;
+          data[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+        });
+        COLLEGE.store.set(COLLEGE.APP_KEY, data);
+      }
+
+      /* ---------------- step 1: contact form ---------------- */
+      document.getElementById('contact-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const ok = validate([
+          ['firstName', 'Legal first name is required.'],
+          ['lastName', 'Legal last name is required.'],
+          ['email', 'Enter a valid personal email address.', isEmail],
+          ['phone', 'Enter a 10-digit cell phone number.', isPhone],
+          ['campusType', 'Select your campus and student type.'],
+          ['acknowledge', 'You must acknowledge before submitting.']
+        ]);
+        if (!ok) return;
+        collect(e.target);
+        document.getElementById('emailed-message').textContent =
+          'Thank you, ' + data.firstName + '. A unique application link has been sent to ' + data.email + '.';
+        document.querySelectorAll('[data-step-panel]').forEach(p => { p.hidden = true; });
+        document.getElementById('step-emailed').hidden = false;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      document.getElementById('continue-to-application').addEventListener('click', () => {
+        document.getElementById('p-firstName').value = data.firstName || '';
+        document.getElementById('p-lastName').value = data.lastName || '';
+        const type = data.campusType || '';
+        const campusFromContact = type.split('-')[1];
+        if (campusFromContact) document.getElementById('campus').value = campusFromContact.trim();
+        if (type.startsWith('Only Courses')) document.getElementById('program').value = 'Undecided';
+        goTo('personal');
+      });
+
+      /* ---------------- step 2: personal ---------------- */
+      document.getElementById('personal-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const ok = validate([
+          ['p-firstName', 'Legal first name is required.'],
+          ['p-lastName', 'Legal last name is required.'],
+          ['dob', 'Date of birth is required.'],
+          ['ssn', 'Use the format XXX-XX-XXXX.', v => v === '' || /^\d{3}-\d{2}-\d{4}$/.test(v)],
+          ['address', 'Street address is required.'],
+          ['city', 'City is required.'],
+          ['state', 'Select a state.'],
+          ['zip', 'Enter a 5-digit ZIP code.', v => /^\d{5}(-\d{4})?$/.test(v)],
+          ['residency', 'Select your residency status.'],
+          ['citizenship', 'Select your citizenship status.']
+        ]);
+        if (!ok) return;
+        collect(e.target);
+        goTo('program');
+      });
+
+      document.getElementById('ssn').addEventListener('input', e => {
+        const digits = e.target.value.replace(/\D/g, '').slice(0, 9);
+        e.target.value = digits.length > 5 ? digits.replace(/(\d{3})(\d{2})(\d+)/, '$1-$2-$3')
+          : digits.length > 3 ? digits.replace(/(\d{3})(\d+)/, '$1-$2') : digits;
+      });
+
+      /* ---------------- step 3: program ---------------- */
+      document.getElementById('program-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const ok = validate([
+          ['campus', 'Select a campus.'],
+          ['entryTerm', 'Select an entry term.'],
+          ['program', 'Select a program of study.'],
+          ['enrollmentStatus', 'Select an enrollment status.'],
+          ['studentType', 'Select a student type.']
+        ]);
+        if (!ok) return;
+        collect(e.target);
+        goTo('education');
+      });
+
+      /* ---------------- step 4: education ---------------- */
+      const priorCollege = document.getElementById('priorCollege');
+      priorCollege.addEventListener('change', () => {
+        document.getElementById('priorCollegeNameField').hidden = priorCollege.value !== 'Yes';
+      });
+
+      document.getElementById('education-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const rules = [
+          ['highSchool', 'High school name is required.'],
+          ['gradYear', 'Enter a graduation year between 1950 and 2035.', v => /^\d{4}$/.test(v) && +v >= 1950 && +v <= 2035],
+          ['priorCollege', 'Select an option.']
+        ];
+        if (priorCollege.value === 'Yes') rules.push(['priorCollegeName', 'Previous college name is required.']);
+        if (!validate(rules)) return;
+        collect(e.target);
+        buildReview();
+        goTo('review');
+      });
+
+      /* ---------------- step 5: review ---------------- */
+      const REVIEW_ROWS = [
+        ['Name', d => (d['p-firstName'] || d.firstName) + ' ' + (d['p-lastName'] || d.lastName)],
+        ['Email', d => d.email],
+        ['Cell Phone', d => d.phone],
+        ['Date of Birth', d => d.dob],
+        ['Address', d => d.address + ', ' + d.city + ', ' + d.state + ' ' + d.zip],
+        ['Lakeland Resident', d => d.residency],
+        ['Citizenship', d => d.citizenship],
+        ['Campus', d => d.campus],
+        ['Entry Term', d => d.entryTerm],
+        ['Program of Study', d => d.program],
+        ['Enrollment Status', d => d.enrollmentStatus],
+        ['Student Type', d => d.studentType],
+        ['Promise Scholarship', d => d.promise ? 'Yes' : 'No'],
+        ['High School', d => d.highSchool + ' (' + d.gradYear + ')'],
+        ['Previous College', d => d.priorCollege === 'Yes' ? d.priorCollegeName : 'None']
+      ];
+
+      function buildReview() {
+        const tbody = document.querySelector('#review-table tbody');
+        tbody.innerHTML = REVIEW_ROWS.map(([label, fn]) =>
+          '<tr><th scope="row" style="width:38%;">' + label + '</th><td>' + (fn(data) || '&mdash;') + '</td></tr>'
+        ).join('');
+      }
+
+      document.getElementById('review-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const fullName = ((data['p-firstName'] || '') + ' ' + (data['p-lastName'] || '')).trim().toLowerCase();
+        const ok = validate([
+          ['certify', 'You must certify before submitting.'],
+          ['signature', 'Type your full name exactly as entered above (' + fullName + ').',
+            v => v.trim().toLowerCase() === fullName]
+        ]);
+        if (!ok) return;
+        collect(e.target);
+
+        const appId = 'APP-2026-' + String(Math.floor(100000 + Math.random() * 899999));
+        data.applicationId = appId;
+        data.submittedAt = new Date().toLocaleString();
+        COLLEGE.store.set(COLLEGE.APP_KEY, data);
+
+        document.getElementById('confirmation-message').textContent =
+          'Your application has been received. Your application number is ' + appId + '.';
+        document.querySelector('#confirmation-table tbody').innerHTML =
+          '<tr><th scope="row" style="width:38%;">Application Number</th><td id="application-id">' + appId + '</td></tr>' +
+          '<tr><th scope="row">Submitted</th><td>' + data.submittedAt + '</td></tr>' +
+          '<tr><th scope="row">Applicant</th><td>' + data['p-firstName'] + ' ' + data['p-lastName'] + '</td></tr>' +
+          '<tr><th scope="row">Program</th><td>' + data.program + '</td></tr>' +
+          '<tr><th scope="row">Campus / Term</th><td>' + data.campus + ' &middot; ' + data.entryTerm + '</td></tr>' +
+          '<tr><th scope="row">Status</th><td><span class="badge badge-registered">Submitted</span></td></tr>';
+
+        document.querySelectorAll('[data-step-panel]').forEach(p => { p.hidden = true; });
+        document.getElementById('stepper').querySelectorAll('li').forEach(li => {
+          li.classList.add('done');
+          li.removeAttribute('aria-current');
+        });
+        document.getElementById('step-confirmation').hidden = false;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      document.getElementById('start-over').addEventListener('click', () => {
+        COLLEGE.store.clear(COLLEGE.APP_KEY);
+        window.location.reload();
+      });
+    })();
+  </script>
+</body>
+</html>

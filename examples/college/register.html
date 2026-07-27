@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Register or Drop Classes - BlazeMeter Tech (Demo)</title>
+  <meta name="description" content="Mock course registration: select a term, search sections, add to cart, submit to register." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* minmax(0,1fr) keeps the wide results table from pushing the summary pane out of the container. */
+    .reg-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 1.2rem; align-items: start; }
+    .summary-pane { position: sticky; top: 1rem; }
+    .tabs { display: flex; gap: .3rem; border-bottom: 2px solid var(--brand-border); margin-bottom: 1rem; }
+    .tabs button {
+      font: inherit; background: none; border: 0; cursor: pointer; padding: .6rem 1.1rem;
+      color: var(--brand-navy); border-bottom: 3px solid transparent; margin-bottom: -2px;
+    }
+    .tabs button[aria-selected="true"] { border-bottom-color: var(--brand-green); font-weight: 700; }
+    .cart-item { border-bottom: 1px solid var(--brand-border); padding: .6rem 0; font-size: .88rem; }
+    .cart-item:last-child { border-bottom: 0; }
+    .cart-item .cart-title { font-weight: 500; color: var(--brand-navy); }
+    .cart-actions { display: flex; gap: .4rem; margin-top: .35rem; }
+    @media (max-width: 900px) { .reg-layout { grid-template-columns: 1fr; } .summary-pane { position: static; } }
+  </style>
+</head>
+<body>
+  <header id="site-header"></header>
+  <div id="portal-chrome"></div>
+
+  <main id="main-content" class="page">
+    <div class="container">
+      <h1>Register or Drop Classes</h1>
+
+      <!-- ============ TERM SELECTION ============ -->
+      <section class="card" id="term-panel">
+        <div class="card-header">Select a Term</div>
+        <div class="card-body">
+          <form id="term-form" novalidate>
+            <div class="field" style="max-width:420px;">
+              <label for="term">Term <span class="req">*</span></label>
+              <select id="term" name="term" required>
+                <option value="">-- Select a term --</option>
+              </select>
+              <span class="hint" id="term-window"></span>
+              <span class="error-text" id="term-error" hidden></span>
+            </div>
+            <button class="btn btn-green btn-lg" type="submit" id="term-continue">Continue</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ REGISTRATION WORKSPACE ============ -->
+      <div id="workspace" hidden>
+        <div class="alert alert-info" id="term-banner" role="status"></div>
+
+        <div class="reg-layout">
+          <div>
+            <div class="tabs" role="tablist" aria-label="Registration views">
+              <button type="button" role="tab" id="tab-search" aria-selected="true" aria-controls="panel-search">Search for Courses</button>
+              <button type="button" role="tab" id="tab-plans" aria-selected="false" aria-controls="panel-plans">Plans</button>
+              <button type="button" role="tab" id="tab-schedule" aria-selected="false" aria-controls="panel-schedule">My Schedule</button>
+            </div>
+
+            <!-- ---------- SEARCH TAB ---------- -->
+            <section id="panel-search" role="tabpanel" aria-labelledby="tab-search">
+              <div class="card">
+                <div class="card-header">Course Search</div>
+                <div class="card-body">
+                  <form id="search-form" novalidate>
+                    <div class="grid-3" style="gap:1rem;">
+                      <div class="field">
+                        <label for="subject">Subject <span class="req">*</span></label>
+                        <select id="subject" name="subject" required>
+                          <option value="">-- Select --</option>
+                        </select>
+                        <span class="error-text" id="subject-error" hidden></span>
+                      </div>
+                      <div class="field">
+                        <label for="courseNumber">Course Number</label>
+                        <input type="text" id="courseNumber" name="courseNumber" placeholder="e.g. 106" />
+                        <span class="hint">Leave blank for all courses in the subject.</span>
+                      </div>
+                      <div class="field">
+                        <label for="searchCampus">Campus</label>
+                        <select id="searchCampus" name="searchCampus">
+                          <option value="">All Campuses</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div style="display:flex;gap:.7rem;">
+                      <button class="btn btn-green" type="submit" id="search-button">Search</button>
+                      <button class="btn btn-outline" type="reset" id="search-reset">Clear</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div class="card" id="results-card" hidden>
+                <div class="card-header" id="results-header">Search Results</div>
+                <div class="card-body">
+                  <div class="alert alert-warn" id="no-results" role="status" hidden>
+                    No sections match your search. Try a different subject, course number, or campus.
+                  </div>
+                  <div style="overflow-x:auto;">
+                    <table class="table" id="results-table">
+                      <caption class="visually-hidden">Available course sections</caption>
+                      <thead>
+                        <tr>
+                          <th>CRN</th><th>Course</th><th>Title</th><th>Credits</th>
+                          <th>Days / Time</th><th>Campus</th><th>Instructor</th><th>Seats</th><th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ---------- PLANS TAB ---------- -->
+            <section id="panel-plans" role="tabpanel" aria-labelledby="tab-plans" hidden>
+              <div class="card">
+                <div class="card-header">My Plan</div>
+                <div class="card-body">
+                  <p>Courses placed on your plan during advisement. Choose <strong>View Sections</strong> to see all
+                    available sections, or <strong>Add All</strong> to add the first open section of every planned course.</p>
+                  <button class="btn btn-green" type="button" id="add-all-plan">Add All Planned Courses</button>
+                  <table class="table" id="plan-table" style="margin-top:1rem;">
+                    <caption class="visually-hidden">Planned courses</caption>
+                    <thead><tr><th>Course</th><th>Title</th><th>Credits</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <!-- ---------- SCHEDULE TAB ---------- -->
+            <section id="panel-schedule" role="tabpanel" aria-labelledby="tab-schedule" hidden>
+              <div class="card">
+                <div class="card-header">My Schedule</div>
+                <div class="card-body">
+                  <div class="alert alert-info" id="schedule-empty" role="status">
+                    You are not registered for any classes in this term yet.
+                  </div>
+                  <div style="overflow-x:auto;">
+                    <table class="table" id="schedule-table" hidden>
+                      <caption class="visually-hidden">Registered sections</caption>
+                      <thead>
+                        <tr><th>CRN</th><th>Course</th><th>Title</th><th>Credits</th><th>Days / Time</th><th>Campus</th><th>Status</th><th>Action</th></tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- ---------- SUMMARY / CART ---------- -->
+          <aside class="summary-pane" aria-label="Registration summary">
+            <div class="card">
+              <div class="card-header green">Summary</div>
+              <div class="card-body">
+                <p style="font-size:.88rem;margin-top:0;">
+                  Registered credits: <strong id="registered-credits">0</strong> &middot;
+                  Pending credits: <strong id="pending-credits">0</strong>
+                </p>
+                <div class="alert alert-danger" id="conflict-alert" role="alert" hidden></div>
+                <div id="cart-list">
+                  <p style="font-size:.88rem;color:var(--brand-text-dim);" id="cart-empty">
+                    Your cart is empty. Search for a course and choose <strong>Add</strong>.
+                  </p>
+                </div>
+                <button class="btn btn-green btn-block btn-lg" type="button" id="submit-registration" style="margin-top:.8rem;" disabled>
+                  Submit
+                </button>
+                <p class="hint" style="margin-top:.5rem;">
+                  Sections stay in <em>Pending</em> status until you choose Submit.
+                </p>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">Estimated Charges</div>
+              <div class="card-body" style="font-size:.9rem;">
+                <p style="margin:0;">In-state tuition &amp; fees<br>
+                  <strong id="estimated-cost">$0.00</strong> <span style="color:var(--brand-text-dim);">($183.00 per credit)</span></p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="site.js"></script>
+  <script src="data/courses.js"></script>
+  <script>
+    COLLEGE.renderHeader();
+    COLLEGE.renderFooter();
+
+    (function () {
+      'use strict';
+
+      const s = COLLEGE.requireSession();
+      if (!s) return;
+      COLLEGE.renderPortalChrome('register.html');
+
+      const PER_CREDIT = 183;
+      const DAY_ORDER = ['M', 'T', 'W', 'R', 'F'];
+      let term = null;
+      let cart = COLLEGE.store.get(COLLEGE.CART_KEY, []);   // [{crn, status:'pending'|'registered'}]
+
+      /* ---------------- term selection ---------------- */
+      const termSelect = document.getElementById('term');
+      window.COLLEGE_TERMS.forEach(t => termSelect.add(new Option(t.name, t.code)));
+
+      termSelect.addEventListener('change', () => {
+        const t = window.COLLEGE_TERMS.find(x => x.code === termSelect.value);
+        document.getElementById('term-window').textContent = t ? t.window : '';
+      });
+
+      document.getElementById('term-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const err = document.getElementById('term-error');
+        if (!termSelect.value) {
+          termSelect.setAttribute('aria-invalid', 'true');
+          err.textContent = 'Select a term to continue.';
+          err.hidden = false;
+          termSelect.focus();
+          return;
+        }
+        termSelect.removeAttribute('aria-invalid');
+        err.hidden = true;
+        term = window.COLLEGE_TERMS.find(t => t.code === termSelect.value);
+        document.getElementById('term-banner').innerHTML =
+          'Registering for <strong>' + term.name + '</strong>. ' + term.window + '.';
+        document.getElementById('term-panel').hidden = true;
+        document.getElementById('workspace').hidden = false;
+        renderPlan();
+        renderCart();
+        document.getElementById('subject').focus();
+      });
+
+      /* ---------------- populate search selects ---------------- */
+      const subjectSelect = document.getElementById('subject');
+      window.COLLEGE_SUBJECTS.forEach(sub => subjectSelect.add(new Option(sub.code + ' - ' + sub.name, sub.code)));
+      const campusSelect = document.getElementById('searchCampus');
+      window.COLLEGE_CAMPUSES.forEach(c => campusSelect.add(new Option(c, c)));
+
+      /* ---------------- tabs ---------------- */
+      const TABS = [['tab-search', 'panel-search'], ['tab-plans', 'panel-plans'], ['tab-schedule', 'panel-schedule']];
+      TABS.forEach(([tabId, panelId]) => {
+        document.getElementById(tabId).addEventListener('click', () => {
+          TABS.forEach(([t, p]) => {
+            const selected = t === tabId;
+            document.getElementById(t).setAttribute('aria-selected', String(selected));
+            document.getElementById(p).hidden = !selected;
+          });
+          if (panelId === 'panel-schedule') renderSchedule();
+        });
+      });
+
+      /* ---------------- helpers ---------------- */
+      const sectionByCrn = crn => window.COLLEGE_SECTIONS.find(x => x.crn === crn);
+      const meeting = sec => sec.days === 'ONLINE' ? 'Online' : sec.days + ' ' + fmt(sec.start) + '-' + fmt(sec.end);
+
+      function fmt(hhmm) {
+        if (!hhmm) return '';
+        const [h, m] = hhmm.split(':').map(Number);
+        const suffix = h >= 12 ? 'p.m.' : 'a.m.';
+        const hour = h % 12 === 0 ? 12 : h % 12;
+        return hour + ':' + String(m).padStart(2, '0') + ' ' + suffix;
+      }
+
+      const toMinutes = hhmm => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
+
+      function conflicts(a, b) {
+        if (a.days === 'ONLINE' || b.days === 'ONLINE') return false;
+        const shared = [...a.days].some(d => DAY_ORDER.includes(d) && b.days.includes(d));
+        if (!shared) return false;
+        return toMinutes(a.start) < toMinutes(b.end) && toMinutes(b.start) < toMinutes(a.end);
+      }
+
+      function inCart(crn) { return cart.some(c => c.crn === crn); }
+      function cartSections() { return cart.map(c => ({ entry: c, sec: sectionByCrn(c.crn) })); }
+      function save() { COLLEGE.store.set(COLLEGE.CART_KEY, cart); }
+
+      /* ---------------- search ---------------- */
+      document.getElementById('search-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const subject = subjectSelect.value;
+        const err = document.getElementById('subject-error');
+        if (!subject) {
+          subjectSelect.setAttribute('aria-invalid', 'true');
+          err.textContent = 'Select a subject to search.';
+          err.hidden = false;
+          subjectSelect.focus();
+          return;
+        }
+        subjectSelect.removeAttribute('aria-invalid');
+        err.hidden = true;
+
+        const number = document.getElementById('courseNumber').value.trim();
+        const campus = campusSelect.value;
+        const matches = window.COLLEGE_SECTIONS.filter(sec =>
+          sec.term === term.code &&
+          sec.subject === subject &&
+          (!number || sec.number === number) &&
+          (!campus || sec.campus === campus)
+        );
+        renderResults(matches);
+      });
+
+      document.getElementById('search-reset').addEventListener('click', () => {
+        document.getElementById('results-card').hidden = true;
+      });
+
+      function renderResults(list) {
+        const card = document.getElementById('results-card');
+        const tbody = document.querySelector('#results-table tbody');
+        card.hidden = false;
+        document.getElementById('results-header').textContent = 'Search Results (' + list.length + ')';
+        document.getElementById('no-results').hidden = list.length > 0;
+        document.getElementById('results-table').hidden = list.length === 0;
+
+        tbody.innerHTML = list.map(sec => {
+          const added = inCart(sec.crn);
+          const seatBadge = sec.status === 'waitlist'
+            ? '<span class="badge badge-waitlist">Waitlist</span>'
+            : '<span class="badge badge-open">' + sec.seats + ' open</span>';
+          const action = added
+            ? '<button class="btn btn-sm btn-outline" type="button" disabled>Added</button>'
+            : '<button class="btn btn-sm btn-green" type="button" data-add="' + sec.crn + '">Add</button>';
+          return '<tr data-crn="' + sec.crn + '">' +
+            '<td>' + sec.crn + '</td>' +
+            '<td>' + sec.subject + ' ' + sec.number + '-' + sec.section + '</td>' +
+            '<td>' + sec.title + '<br><span style="font-size:.8rem;color:var(--brand-text-dim);">' + sec.mode + '</span></td>' +
+            '<td>' + sec.credits + '</td>' +
+            '<td>' + meeting(sec) + '</td>' +
+            '<td>' + sec.campus + '</td>' +
+            '<td>' + sec.instructor + '</td>' +
+            '<td>' + seatBadge + '</td>' +
+            '<td>' + action + '</td>' +
+            '</tr>';
+        }).join('');
+
+        tbody.querySelectorAll('[data-add]').forEach(btn => {
+          btn.addEventListener('click', () => addToCart(btn.dataset.add));
+        });
+      }
+
+      /* ---------------- cart ---------------- */
+      /* Returns null on success, or a message explaining why the section was rejected. */
+      function tryAdd(crn) {
+        if (inCart(crn)) return null;
+        const sec = sectionByCrn(crn);
+
+        const dupe = cartSections().find(({ sec: other }) =>
+          other.subject === sec.subject && other.number === sec.number);
+        if (dupe) {
+          return 'Duplicate course: ' + sec.subject + ' ' + sec.number + '-' + sec.section +
+            ' was not added because ' + dupe.sec.subject + ' ' + dupe.sec.number + '-' + dupe.sec.section +
+            ' is already in your cart. Only one section per course may be registered.';
+        }
+
+        const clash = cartSections().find(({ sec: other }) => conflicts(sec, other));
+        if (clash) {
+          return 'Time conflict: ' + sec.subject + ' ' + sec.number + '-' + sec.section +
+            ' (' + meeting(sec) + ') overlaps ' + clash.sec.subject + ' ' + clash.sec.number + '-' +
+            clash.sec.section + ' (' + meeting(clash.sec) + '). This section was not added.';
+        }
+
+        cart.push({ crn: crn, status: sec.status === 'waitlist' ? 'waitlisted' : 'pending' });
+        save();
+        return null;
+      }
+
+      function showAlert(messages) {
+        const alertBox = document.getElementById('conflict-alert');
+        if (!messages.length) { alertBox.hidden = true; return; }
+        alertBox.innerHTML = messages.map(m => '<div>' + m + '</div>').join('');
+        alertBox.hidden = false;
+      }
+
+      function addToCart(crn) {
+        if (inCart(crn)) return;
+        const problem = tryAdd(crn);
+        if (problem) { showAlert([problem]); return; }
+        showAlert([]);
+        renderCart();
+        // Refresh the visible results so the Add button flips to "Added".
+        const row = document.querySelector('#results-table tbody tr[data-crn="' + crn + '"] [data-add]');
+        if (row) {
+          row.outerHTML = '<button class="btn btn-sm btn-outline" type="button" disabled>Added</button>';
+        }
+      }
+
+      function removeFromCart(crn) {
+        cart = cart.filter(c => c.crn !== crn);
+        save();
+        renderCart();
+        renderSchedule();
+        document.querySelectorAll('#results-table tbody tr[data-crn="' + crn + '"] td:last-child').forEach(td => {
+          td.innerHTML = '<button class="btn btn-sm btn-green" type="button" data-add="' + crn + '">Add</button>';
+          td.querySelector('[data-add]').addEventListener('click', () => addToCart(crn));
+        });
+      }
+
+      function renderCart() {
+        const list = document.getElementById('cart-list');
+        const submitBtn = document.getElementById('submit-registration');
+
+        if (!cart.length) {
+          list.innerHTML = '<p style="font-size:.88rem;color:var(--brand-text-dim);" id="cart-empty">' +
+            'Your cart is empty. Search for a course and choose <strong>Add</strong>.</p>';
+          submitBtn.disabled = true;
+        } else {
+          list.innerHTML = cart.map(entry => {
+            const sec = sectionByCrn(entry.crn);
+            const badge = entry.status === 'registered' ? '<span class="badge badge-registered">Registered</span>'
+              : entry.status === 'waitlisted' ? '<span class="badge badge-waitlist">Waitlisted</span>'
+              : '<span class="badge badge-pending">Pending</span>';
+            const removeLabel = entry.status === 'registered' ? 'Drop' : 'Remove';
+            return '<div class="cart-item" data-cart-crn="' + sec.crn + '">' +
+              '<div class="cart-title">' + sec.subject + ' ' + sec.number + '-' + sec.section + '</div>' +
+              '<div>' + sec.title + '</div>' +
+              '<div style="color:var(--brand-text-dim);">' + meeting(sec) + ' &middot; ' + sec.campus + ' &middot; ' + sec.credits + ' cr</div>' +
+              '<div class="cart-actions">' + badge +
+                '<button class="btn btn-sm btn-outline" type="button" data-remove="' + sec.crn + '">' + removeLabel + '</button>' +
+              '</div></div>';
+          }).join('');
+          list.querySelectorAll('[data-remove]').forEach(btn => {
+            btn.addEventListener('click', () => removeFromCart(btn.dataset.remove));
+          });
+          submitBtn.disabled = !cart.some(c => c.status === 'pending' || c.status === 'waitlisted');
+        }
+
+        const registered = cartSections().filter(({ entry }) => entry.status === 'registered');
+        const pending = cartSections().filter(({ entry }) => entry.status !== 'registered');
+        const sum = arr => arr.reduce((n, { sec }) => n + sec.credits, 0);
+        document.getElementById('registered-credits').textContent = sum(registered);
+        document.getElementById('pending-credits').textContent = sum(pending);
+        document.getElementById('estimated-cost').textContent =
+          '$' + (sum(registered) * PER_CREDIT).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      /* ---------------- submit ---------------- */
+      document.getElementById('submit-registration').addEventListener('click', () => {
+        cart = cart.map(c => c.status === 'pending' ? { crn: c.crn, status: 'registered' } : c);
+        save();
+        renderCart();
+        renderSchedule();
+
+        const banner = document.getElementById('term-banner');
+        const count = cart.filter(c => c.status === 'registered').length;
+        const waits = cart.filter(c => c.status === 'waitlisted').length;
+        banner.className = 'alert alert-success';
+        banner.innerHTML = '<strong>Registration submitted.</strong> You are registered for ' + count +
+          ' section' + (count === 1 ? '' : 's') + ' in ' + term.name +
+          (waits ? ' and waitlisted for ' + waits + '.' : '.') +
+          ' View them on the <strong>My Schedule</strong> tab.';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      /* ---------------- schedule tab ---------------- */
+      function renderSchedule() {
+        const registered = cartSections().filter(({ entry }) => entry.status !== 'pending');
+        const table = document.getElementById('schedule-table');
+        const empty = document.getElementById('schedule-empty');
+        empty.hidden = registered.length > 0;
+        table.hidden = registered.length === 0;
+        table.querySelector('tbody').innerHTML = registered.map(({ entry, sec }) =>
+          '<tr><td>' + sec.crn + '</td><td>' + sec.subject + ' ' + sec.number + '-' + sec.section + '</td>' +
+          '<td>' + sec.title + '</td><td>' + sec.credits + '</td><td>' + meeting(sec) + '</td>' +
+          '<td>' + sec.campus + '</td>' +
+          '<td>' + (entry.status === 'registered'
+            ? '<span class="badge badge-registered">Registered</span>'
+            : '<span class="badge badge-waitlist">Waitlisted</span>') + '</td>' +
+          '<td><button class="btn btn-sm btn-outline" type="button" data-drop="' + sec.crn + '">Drop</button></td></tr>'
+        ).join('');
+        table.querySelectorAll('[data-drop]').forEach(btn => {
+          btn.addEventListener('click', () => removeFromCart(btn.dataset.drop));
+        });
+      }
+
+      /* ---------------- plans tab ---------------- */
+      function planSections(course) {
+        return window.COLLEGE_SECTIONS.filter(sec =>
+          sec.term === term.code && sec.subject === course.subject && sec.number === course.number);
+      }
+
+      function renderPlan() {
+        const rows = window.COLLEGE_STUDENT_PLAN.map(course => {
+          const available = planSections(course).length;
+          return '<tr><td>' + course.subject + ' ' + course.number + '</td><td>' + course.title + '</td>' +
+            '<td>' + course.credits + '</td>' +
+            '<td><button class="btn btn-sm btn-outline" type="button" data-view="' + course.subject + '|' + course.number + '">' +
+            'View Sections (' + available + ')</button></td></tr>';
+        }).join('');
+        document.querySelector('#plan-table tbody').innerHTML = rows;
+        document.querySelectorAll('[data-view]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const [subject, number] = btn.dataset.view.split('|');
+            document.getElementById('tab-search').click();
+            subjectSelect.value = subject;
+            document.getElementById('courseNumber').value = number;
+            campusSelect.value = '';
+            document.getElementById('search-button').click();
+          });
+        });
+      }
+
+      document.getElementById('add-all-plan').addEventListener('click', () => {
+        const problems = [];
+        window.COLLEGE_STUDENT_PLAN.forEach(course => {
+          const label = course.subject + ' ' + course.number;
+          const already = cartSections().some(({ sec }) =>
+            sec.subject === course.subject && sec.number === course.number);
+          if (already) return;
+
+          // Walk the open sections until one fits the schedule already in the cart.
+          const open = planSections(course).filter(sec => sec.status === 'open');
+          let added = false;
+          let lastProblem = null;
+          for (const sec of open) {
+            const problem = tryAdd(sec.crn);
+            if (!problem) { added = true; break; }
+            lastProblem = problem;
+          }
+          if (!added) {
+            problems.push(open.length
+              ? label + ' could not be added. ' + lastProblem
+              : label + ' has no open sections in this term.');
+          }
+        });
+        renderCart();
+        showAlert(problems);
+        document.getElementById('tab-search').click();
+      });
+    })();
+  </script>
+</body>
+</html>

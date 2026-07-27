@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registration - BlazeMeter Tech (Demo)</title>
+  <meta name="description" content="Mock registration information page describing the steps to register online." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main id="main-content" class="page">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a> / <a href="registration-info.html">Academics</a> / Registration
+      </nav>
+
+      <div class="layout">
+        <aside class="sidebar" aria-label="Academics section menu">
+          <div class="sidebar-title">Academics</div>
+          <ul>
+            <li><a href="registration-info.html">Programs of Study</a></li>
+            <li><a href="registration-info.html" aria-current="page">Registration</a></li>
+            <li><a class="sub" href="register.html">Register for Courses</a></li>
+            <li><a href="registration-info.html">Academic Calendar</a></li>
+            <li><a href="registration-info.html">Transfer Options</a></li>
+            <li><a href="registration-info.html">Catalog/Student Handbook</a></li>
+          </ul>
+        </aside>
+
+        <div>
+          <h1>Registration</h1>
+          <p>The College&rsquo;s student records system allows returning students the convenience of registering completely online.</p>
+
+          <h2>New students</h2>
+          <p>New students must complete the <a href="apply.html">application process</a> and initial advisement before registering. Apply early for the best selection of classes.</p>
+
+          <h2>Returning students (within four terms)</h2>
+          <p>Make an appointment with your program advisor to schedule your classes. Remember to register early for the best selection of courses.</p>
+
+          <h2>Students who have not attended for more than four consecutive terms</h2>
+          <p>Complete a readmission form and return it to the Admissions Office. Meet with an academic counselor to access your Student Information System, verify program requirements, arrange a schedule and register.</p>
+
+          <div class="card">
+            <div class="card-header">Follow These Easy Steps to Register Online</div>
+            <div class="card-body">
+              <a class="btn btn-green btn-lg btn-block" href="login.html" id="register-sis" style="margin-bottom:1rem;">
+                Register &ndash; MyBlazeMeter Student Information System
+              </a>
+              <ol>
+                <li>Click the button above to go to the MyBlazeMeter Student Information System.</li>
+                <li>Click on <strong>Register or Drop Classes</strong>.</li>
+                <li>Select a term and click <strong>Continue</strong>.</li>
+                <li>Enter the Subject, Course Number, and Campus, then click <strong>Search</strong>.</li>
+                <li>Review your search results and click <strong>Add</strong> on the right to add the course to your cart (to add another course, click Search again).</li>
+                <li>Make sure to click <strong>Submit</strong> in the summary pane to move the class from Pending status to Registered status.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">Follow These Easy Steps to Register Online from a Plan</div>
+            <div class="card-body">
+              <ol>
+                <li>Go to the MyBlazeMeter Student Information System and click <strong>Register or Drop Classes</strong>.</li>
+                <li>Select a term and click <strong>Continue</strong>.</li>
+                <li>Go to the <strong>Plans</strong> tab.</li>
+                <li>Click <strong>Add</strong> to add sections individually, or <strong>Add All</strong> to add every planned course section to your cart.</li>
+                <li>Click <strong>Submit</strong> in the summary pane to move the classes from Pending to Registered status.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">Important Dates</div>
+            <div class="card-body">
+              <table class="table">
+                <caption class="visually-hidden">Registration dates</caption>
+                <thead><tr><th>Date</th><th>Event</th></tr></thead>
+                <tbody>
+                  <tr><td>Mon, Aug 17, 2026</td><td>Registration for senior citizens for fall semester begins at 8:30 a.m.</td></tr>
+                  <tr><td>Sun, Oct 4, 2026</td><td>Last day to apply for semester</td></tr>
+                  <tr><td>Mon, Oct 26, 2026</td><td>Priority of service registration for spring semester: Veterans 8:30 a.m.; Student-Athletes 4:00 p.m.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="site.js"></script>
+  <script>
+    COLLEGE.renderHeader('academics');
+    COLLEGE.renderFooter();
+  </script>
+</body>
+</html>

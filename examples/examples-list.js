@@ -15,7 +15,8 @@ window.EXAMPLE_GROUPS = [
       { file: 'restaurant/restaurant.html', name: 'Restaurant Ordering (Xenial POC)' },
       { file: 'insurance/login.html', name: 'Insurance Portal (React)' },
       { file: 'tn3270/index.html', name: 'TN3270 Host Emulator (Bank)' },
-      { file: 'oauth2-pkce/index.html', name: 'OAuth 2.0 PKCE Flow' }
+      { file: 'oauth2-pkce/index.html', name: 'OAuth 2.0 PKCE Flow' },
+      { file: 'college/index.html', name: 'BlazeMeter Tech College (Apply & Register)' }
     ]
   },
   {
