@@ -456,7 +456,7 @@ log.info(&quot;Flow A application completed: ${vars.get(&apos;application_id&apo
               <stringProp name="filename"></stringProp>
             </JSR223Sampler>
             <hashTree>
-              <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Form Fill Time" enabled="true">
+              <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Form Fill Time">
                 <stringProp name="ConstantTimer.delay">${FORM_THINK_MS}</stringProp>
                 <stringProp name="RandomTimer.range">${FORM_THINK_RANGE_MS}</stringProp>
               </UniformRandomTimer>
@@ -502,7 +502,7 @@ log.info(&quot;Flow A application completed: ${vars.get(&apos;application_id&apo
               <stringProp name="HTTP2Sampler.h2cCacheTtlMs">300000</stringProp>
             </com.blazemeter.jmeter.http2.sampler.HTTP2Sampler>
             <hashTree>
-              <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA: Page &lt; ${SLA_PAGE_MS}ms" enabled="true">
+              <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA: Page &lt; ${SLA_PAGE_MS}ms">
                 <stringProp name="DurationAssertion.duration">${SLA_PAGE_MS}</stringProp>
               </DurationAssertion>
               <hashTree/>
